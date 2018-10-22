@@ -1,0 +1,1072 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"><meta name="google-site-verification" content="cCHsgG9ktuCTgWgYfqCJql8AeR4gAne4DTZqztPoirE"><meta name="apple-itunes-app" content="app-id=987739104"><meta name="baidu-site-verification" content="qiK2a1kcFc"><meta name="360-site-verification" content="4c3c7d57d59f0e1a308462fbc7fd7e51"><meta name="sogou_site_verification" content="c49WUDZczQ"><meta data-vue-meta="true" data-vmid="keywords" name="keywords" content="Android,架构,Glide,Picasso"><meta data-vue-meta="true" data-vmid="description" name="description" content="一、前言 图片加载的轮子有很多了，Universal-Image-Loader, Picasso, Glide, Fresco等。 网上各种分析和对比文章很多，我们这里就不多作介绍了。 古人云：“纸上得来终觉浅，绝知此事要躬行”。 只看分析，不动手实践，终究印"><title data-vue-meta="true">如何实现一个图片加载框架 - 掘金</title><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/js/manifest.20254fa563d3539b68bf.js" as="script"><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/js/vendor.e6fd81aa1499049a5bee.js" as="script"><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/js/app.a99a1e8180beec940a3f.js" as="script"><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/css/app.37151bbb8a40894c7953daf9b02b2ff7.css" as="style"><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/js/1.705b4e2ab600a85b4a54.js" as="script"><link rel="apple-touch-icon" sizes="180x180" href="https://b-gold-cdn.xitu.io/favicons/v2/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://b-gold-cdn.xitu.io/favicons/v2/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://b-gold-cdn.xitu.io/favicons/v2/favicon-16x16.png"><link rel="manifest" href="https://b-gold-cdn.xitu.io/favicons/v2/manifest.json"><link rel="mask-icon" href="https://b-gold-cdn.xitu.io/favicons/v2/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="https://b-gold-cdn.xitu.io/favicons/v2/favicon.ico"><meta name="msapplication-config" content="https://b-gold-cdn.xitu.io/favicons/v2/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="search" title="掘金" href="https://b-gold-cdn.xitu.io/conf/search.xml" type="application/opensearchdescription+xml"><link rel="stylesheet" href="https://b-gold-cdn.xitu.io/ionicons/2.0.1/css/ionicons.min.css"><link rel="stylesheet" href="https://b-gold-cdn.xitu.io/asset/fw-icon/1.0.9/iconfont.css"><link href="https://b-gold-cdn.xitu.io/v3/static/css/app.37151bbb8a40894c7953daf9b02b2ff7.css" rel="stylesheet"><script async="" src="https://hm.baidu.com/hm.js?93bbd335a208870aa1f296bcd6842e5e"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://assets.growingio.com/vds.js"></script><script type="text/javascript" charset="utf-8" async="" src="https://b-gold-cdn.xitu.io/v3/static/js/1.705b4e2ab600a85b4a54.js"></script></head><body><div id="juejin" data-v-6ede48a3=""><div class="global-component-box" data-v-6ede48a3=""><!----><div data-v-2840e9c3="" data-v-6ede48a3="" class="alert-list alert-list"></div><div data-v-6ddb54c6="" data-v-6ede48a3="" class="suspension-panel suspension-panel"><button data-v-6ddb54c6="" title="回到顶部" class="btn to-top-btn" style="display: none;"><i data-v-6ddb54c6="" class="ion-android-arrow-dropup"></i></button><button data-v-6ddb54c6="" title="建议反馈" class="btn meiqia-btn" style=""><i data-v-6ddb54c6="" class="ion-chatbubble-working"></i></button></div><!----><!----><div class="emoji-barrage" data-v-475389e2="" data-v-6ede48a3=""><!----></div><div class="book-new-user-award-popup" style="display: none;" data-v-7c95f01f="" data-v-6ede48a3=""><div class="content-box" style="display:;" data-v-7c95f01f=""><div class="close ion-close-round" data-v-7c95f01f=""></div><div class="header" data-v-7c95f01f=""><div class="icon" data-v-7c95f01f=""><img src="https://b-gold-cdn.xitu.io/v3/static/img/icon.a87e5ae.svg" data-v-7c95f01f=""></div><div class="txt" data-v-7c95f01f="">新人专享好礼</div></div><div class="desc" data-v-7c95f01f="">凡未购买过小册的用户，均可领取三张 5 折新人专享券，购买小册时自动使用专享券，最高可节省 45 元。</div><div class="tickets" data-v-7c95f01f=""><div class="ticket" data-v-7c95f01f=""><div class="ticket__inner" data-v-7c95f01f=""><div class="enjoy" data-v-7c95f01f=""><span class="new-title" data-v-7c95f01f="">小册新人 5 折券</span></div><div class="sale" data-v-7c95f01f="">最高可省 15 元</div></div></div><div class="ticket" data-v-7c95f01f=""><div class="ticket__inner" data-v-7c95f01f=""><div class="enjoy" data-v-7c95f01f=""><span class="new-title" data-v-7c95f01f="">小册新人 5 折券</span></div><div class="sale" data-v-7c95f01f="">最高可省 15 元</div></div></div><div class="ticket" data-v-7c95f01f=""><div class="ticket__inner" data-v-7c95f01f=""><div class="enjoy" data-v-7c95f01f=""><span class="new-title" data-v-7c95f01f="">小册新人 5 折券</span></div><div class="sale" data-v-7c95f01f="">最高可省 15 元</div></div></div></div><div class="remark" data-v-7c95f01f="">注：专享券的使用期限在领券的七天内。</div><div class="submit-btn" data-v-7c95f01f="">一键领取</div></div><div class="model success" style="display: none;" data-v-7c95f01f=""><div class="heading" data-v-7c95f01f="">领取成功</div><div class="content-text" data-v-7c95f01f="">购买小册时自动使用专享券</div><div class="btn-success-footer" data-v-7c95f01f=""><div class="btn-ok" data-v-7c95f01f="">知道了</div><div class="btn-ok btn-link" data-v-7c95f01f="">前往小册首页</div></div></div><div class="model fail" style="display: none;" data-v-7c95f01f=""><div class="heading" data-v-7c95f01f="">领取失败</div><div class="content-text" data-v-7c95f01f="">本活动仅适用于小册新用户</div><div class="btn-ok" data-v-7c95f01f="">知道了</div></div></div><!----></div><!----><div data-v-3f216172="" data-v-13f76525="" data-v-6ede48a3="" class="view-container"><div data-v-3f216172="" class="main-header-box"><header data-v-5ce25e66="" data-v-3f216172="" class="main-header main-header unauthorized visible"><div data-v-5ce25e66="" class="container"><a data-v-5ce25e66="" href="/" class="logo"><img data-v-5ce25e66="" src="https://b-gold-cdn.xitu.io/v3/static/img/logo.a7995ad.svg" alt="掘金" class="logo-img"></a><nav data-v-5ce25e66="" role="navigation" class="main-nav"><ul data-v-5ce25e66="" class="nav-list"><li data-v-5ce25e66="" class="main-nav-list"><div data-v-5ce25e66="" class="phone-show-menu"><span data-v-5ce25e66="">首页</span><div data-v-5ce25e66="" class="icon ion-arrow-down-b"></div></div><ul data-v-5ce25e66="" class="phone-hide"><li data-v-5ce25e66="" class="nav-item link-item route-active"><a data-v-5ce25e66="" href="/">首页</a></li><li data-v-5ce25e66="" class="nav-item link-item pin"><a data-v-5ce25e66="" href="/pins">沸点</a><!----></li><li data-v-5ce25e66="" class="nav-item link-item book"><a data-v-5ce25e66="" href="/books">小册</a></li><li data-v-5ce25e66="" class="nav-item link-item"><a data-v-5ce25e66="" href="/repos">开源库</a></li><li data-v-5ce25e66="" class="nav-item link-item"><a data-v-5ce25e66="" href="/events/all">活动</a></li><li data-v-5ce25e66="" class="nav-item link-item conf"><a data-v-5ce25e66="" st:name="confGif" title="掘金开发者大会 · 微信小程序专场" target="_blank" href="https://conf.juejin.im/2018/mini-programs"><img data-v-5ce25e66="" src="https://b-gold-cdn.xitu.io/v3/static/img/conf.78960f5.gif" alt="掘金开发者大会 · 微信小程序专场" class="conf-icon"></a></li></ul></li><li data-v-5ce25e66="" class="nav-item search"><form data-v-5ce25e66="" role="search" class="search-form"><input data-v-5ce25e66="" maxlength="32" placeholder="搜索掘金" class="search-input"><img data-v-5ce25e66="" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjJweCIgaGVpZ2h0PSIyMnB4IiB2aWV3Qm94PSIwIDAgMjIgMjIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogc2tldGNodG9vbCA0MS4yICgzNTM5NykgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+CiAgICA8dGl0bGU+Qjk3RUIxMEEtOEYzNC00QUI1LUFCQUYtNDFEOTMzNzQxRUQwPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBza2V0Y2h0b29sLjwvZGVzYz4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSLpppbpobUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSLlr7zoiKrmoI/mkJzntKLmoYYiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC05OTAuMDAwMDAwLCAtMTkuMDAwMDAwKSIgZmlsbD0iI0MzQ0NENSI+CiAgICAgICAgICAgIDxnIGlkPSJHcm91cCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOTkwLjAwMDAwMCwgMTkuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTIuOTg2MTI2LDE0LjQwMDMzOTUgTDE2LjI5Mjg5MzIsMTcuNzA3MTA2OCBDMTYuNjgzNDE3NSwxOC4wOTc2MzExIDE3LjMxNjU4MjUsMTguMDk3NjMxMSAxNy43MDcxMDY4LDE3LjcwNzEwNjggQzE4LjA5NzYzMTEsMTcuMzE2NTgyNSAxOC4wOTc2MzExLDE2LjY4MzQxNzUgMTcuNzA3MTA2OCwxNi4yOTI4OTMyIEwxNC40MDAzMzk1LDEyLjk4NjEyNiBDMTUuOTYwMzg4MSwxMC43NTczMjk4IDE1Ljc0NTI0MDIsNy42NjQwMTk4MyAxMy43NTQ4OTU5LDUuNjczNjc1NTQgQzExLjUyMzMyODUsMy40NDIxMDgxNSA3LjkwNTI0MjkyLDMuNDQyMTA4MTUgNS42NzM2NzU1NCw1LjY3MzY3NTU0IEMzLjQ0MjEwODE1LDcuOTA1MjQyOTIgMy40NDIxMDgxNSwxMS41MjMzMjg1IDUuNjczNjc1NTQsMTMuNzU0ODk1OSBDNy42NjQwMTk4MywxNS43NDUyNDAyIDEwLjc1NzMyOTgsMTUuOTYwMzg4MSAxMi45ODYxMjYsMTQuNDAwMzM5NSBaIE03LjA4Nzg4OTEsMTIuMzQwNjgyMyBDNS42MzczNzAzLDEwLjg5MDE2MzUgNS42MzczNzAzLDguNTM4NDA3OSA3LjA4Nzg4OTEsNy4wODc4ODkxIEM4LjUzODQwNzksNS42MzczNzAzIDEwLjg5MDE2MzUsNS42MzczNzAzIDEyLjM0MDY4MjMsNy4wODc4ODkxIEMxMy43OTEyMDExLDguNTM4NDA3OSAxMy43OTEyMDExLDEwLjg5MDE2MzUgMTIuMzQwNjgyMywxMi4zNDA2ODIzIEMxMC44OTAxNjM1LDEzLjc5MTIwMTEgOC41Mzg0MDc5LDEzLjc5MTIwMTEgNy4wODc4ODkxLDEyLjM0MDY4MjMgWiIgaWQ9IkNvbWJpbmVkLVNoYXBlIj48L3BhdGg+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" alt="搜索" class="search-icon"></form></li><!----><!----><!----><li data-v-5ce25e66="" class="nav-item submit"><img data-v-5ce25e66="" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjJweCIgaGVpZ2h0PSIyMnB4IiB2aWV3Qm94PSIwIDAgMjIgMjIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogc2tldGNodG9vbCA0MiAoMzY3ODEpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPjA1Q0I0NzU5LUIyRkQtNDcxOC04RTBDLTg0OEVCNzQ2RDAyMzwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggc2tldGNodG9vbC48L2Rlc2M+CiAgICA8ZGVmcz4KICAgICAgICA8cmVjdCBpZD0icGF0aC0xIiB4PSIyMzgiIHk9IjEyOCIgd2lkdGg9IjcwMCIgaGVpZ2h0PSI1MCIgcng9IjIiPjwvcmVjdD4KICAgICAgICA8ZmlsdGVyIHg9Ii01MCUiIHk9Ii01MCUiIHdpZHRoPSIyMDAlIiBoZWlnaHQ9IjIwMCUiIGZpbHRlclVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgaWQ9ImZpbHRlci0yIj4KICAgICAgICAgICAgPGZlT2Zmc2V0IGR4PSIwIiBkeT0iMSIgaW49IlNvdXJjZUFscGhhIiByZXN1bHQ9InNoYWRvd09mZnNldE91dGVyMSI+PC9mZU9mZnNldD4KICAgICAgICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMSIgaW49InNoYWRvd09mZnNldE91dGVyMSIgcmVzdWx0PSJzaGFkb3dCbHVyT3V0ZXIxIj48L2ZlR2F1c3NpYW5CbHVyPgogICAgICAgICAgICA8ZmVDb2xvck1hdHJpeCB2YWx1ZXM9IjAgMCAwIDAgMCAgIDAgMCAwIDAgMCAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNTAyNzE3MzkxIDAiIHR5cGU9Im1hdHJpeCIgaW49InNoYWRvd0JsdXJPdXRlcjEiPjwvZmVDb2xvck1hdHJpeD4KICAgICAgICA8L2ZpbHRlcj4KICAgICAgICA8cmVjdCBpZD0icGF0aC0zIiB4PSI0IiB5PSI0IiB3aWR0aD0iMTMiIGhlaWdodD0iMTQiIHJ4PSIyIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stNCIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxNCIgZmlsbD0id2hpdGUiPgogICAgICAgICAgICA8dXNlIHhsaW5rOmhyZWY9IiNwYXRoLTMiPjwvdXNlPgogICAgICAgIDwvbWFzaz4KICAgIDwvZGVmcz4KICAgIDxnIGlkPSLpppbpobUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSLpppbpobUyX0NvX+aZrumAmueUqOaItyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTMwNS4wMDAwMDAsIC0xNDIuMDAwMDAwKSI+CiAgICAgICAgICAgIDxnIGlkPSJDb21iaW5lZC1TaGFwZSI+CiAgICAgICAgICAgICAgICA8dXNlIGZpbGw9ImJsYWNrIiBmaWxsLW9wYWNpdHk9IjEiIGZpbHRlcj0idXJsKCNmaWx0ZXItMikiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPHVzZSBmaWxsPSIjRkZGRkZGIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxnIGlkPSJHcm91cC0zMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzA1LjAwMDAwMCwgMTQyLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS0zIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjIiIGhlaWdodD0iMjIiPjwvcmVjdD4KICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik05Ljg5NTY2MjY1LDkuMzQ2Mjc4MzIgTDYuNjY3NTA3MzEsOS4zNDYyNzgzMiBDNi4zNzA1MDcxNyw5LjM0NjI3ODMyIDYuMTI5NDQ5ODQsOS4xMDI3MDQ4MiA2LjEyOTQ0OTg0LDguODAyNTc4MzYgQzYuMTI5NDQ5ODQsOC41MDI0NzMxNyA2LjM3MDUwNzE3LDguMjU4ODk5NjggNi42Njc1MDczMSw4LjI1ODg5OTY4IEw5Ljg5NTY4MzcxLDguMjU4ODk5NjggQzEwLjE5MjYyMDcsOC4yNTg4OTk2OCAxMC40MzM2NTcsOC41MDI0NzMxNyAxMC40MzM2NTcsOC44MDI1NzgzNiBDMTAuNDMzNjM1OSw5LjEwMjcwNDgyIDEwLjE5MjU5OTYsOS4zNDYyNzgzMiA5Ljg5NTY2MjY1LDkuMzQ2Mjc4MzIgTTEzLjExMzIzNzEsMTIuNjA4NDE0MiBMNi42NjY2OTgyLDEyLjYwODQxNDIgQzYuMzcwMTQ0NjcsMTIuNjA4NDE0MiA2LjEyOTQ0OTg0LDEyLjM2NTQwNTcgNi4xMjk0NDk4NCwxMi4wNjQ3NTY4IEM2LjEyOTQ0OTg0LDExLjc2NDAyMjkgNi4zNzAxNDQ2NywxMS41MjEwMzU2IDYuNjY2Njk4MiwxMS41MjEwMzU2IEwxMy4xMTMyMzcxLDExLjUyMTAzNTYgQzEzLjQxMDI3NDEsMTEuNTIxMDM1NiAxMy42NTA0ODU0LDExLjc2NDAyMjkgMTMuNjUwNDg1NCwxMi4wNjQ3NTY4IEMxMy42NTA0ODU0LDEyLjM2NTM4NDQgMTMuNDEwMjc0MSwxMi42MDg0MTQyIDEzLjExMzIzNzEsMTIuNjA4NDE0MiIgaWQ9Imljb25mb250LWJpYW5qaSIgZmlsbD0iIzAwN0ZGRiI+PC9wYXRoPgogICAgICAgICAgICAgICAgPHVzZSBpZD0iUmVjdGFuZ2xlIiBzdHJva2U9IiMwMDdGRkYiIG1hc2s9InVybCgjbWFzay00KSIgc3Ryb2tlLXdpZHRoPSIyIiB4bGluazpocmVmPSIjcGF0aC0zIj48L3VzZT4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" class="icon"><span data-v-5ce25e66="">写文章</span><!----></li><li data-v-5ce25e66="" class="nav-item auth"><span data-v-5ce25e66="" class="login">登录</span><span data-v-5ce25e66="" class="register">注册</span></li></ul></nav></div></header></div><main data-v-3f216172="" class="container main-container"><div data-v-13f76525="" data-v-3f216172="" class="view column-view"><div data-v-13f76525="" data-v-3f216172="" class="main-area article-area shadow"><article data-v-13f76525="" itemscope="itemscope" itemtype="http://schema.org/Article" class="article" data-v-3f216172=""><meta itemprop="url" content="https://juejin.im/post/5bca698751882576676f606a"><meta itemprop="headline" content="如何实现一个图片加载框架"><meta itemprop="keywords" content="Android,架构,Glide,Picasso"><meta itemprop="datePublished" content="2018-10-19T23:41:51.451Z"><meta itemprop="image" content="https://b-gold-cdn.xitu.io/icon/icon-128.png"><div itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person"><meta itemprop="name" content="Horizon757"><meta itemprop="url" content="https://juejin.im/user/59abef0af265da246c4a3de1"></div><div itemprop="publisher" itemscope="itemscope" itemtype="http://schema.org/Organization"><meta itemprop="name" content="掘金"><div itemprop="logo" itemscope="itemscope" itemtype="https://schema.org/ImageObject"><meta itemprop="url" content="https://b-gold-cdn.xitu.io/icon/icon-white-180.png"><meta itemprop="width" content="180"><meta itemprop="height" content="180"></div></div><div data-v-13f76525="" class="author-info-block"><a data-v-13f76525="" href="/user/59abef0af265da246c4a3de1" target="_blank" rel="" class="avatar-link"><div data-v-b2db8566="" data-v-1b9df826="" data-v-13f76525="" data-src="https://user-gold-cdn.xitu.io/2017/9/4/99570a2ee1b1cf607608ecb6c8b7c76d?imageView2/1/w/100/h/100/q/85/interlace/1" class="lazy avatar avatar loaded" title="" style="background-image: url(https://user-gold-cdn.xitu.io/2017/9/4/99570a2ee1b1cf607608ecb6c8b7c76d?imageView2/1/w/100/h/100/q/85/interlace/1);"></div></a><div data-v-13f76525="" class="author-info-box"><a data-v-13f76525="" href="/user/59abef0af265da246c4a3de1" target="_blank" rel="" class="username ellipsis">Horizon757</a><div data-v-13f76525="" class="meta-box"><time data-v-13f76525="" datetime="2018-10-19T23:41:51.451Z" title="Sat Oct 20 2018 07:41:51 GMT+0800 (CST)" class="time">2018年10月20日</time><span data-v-13f76525="" class="views-count">阅读 64</span><!----></div></div></div><!----><h1 data-v-13f76525="" class="article-title">如何实现一个图片加载框架</h1><div data-v-13f76525="" data-id="5bca6bbff265da0aeb713a85" itemprop="articleBody" class="article-content"><h1 class="heading" data-id="heading-0">一、前言</h1>
+<p>图片加载的轮子有很多了，Universal-Image-Loader, Picasso, Glide, Fresco等。<br>
+网上各种分析和对比文章很多，我们这里就不多作介绍了。</p>
+<p>古人云：“纸上得来终觉浅，绝知此事要躬行”。<br>
+只看分析，不动手实践，终究印象不深。<br>
+用当下流行的“神经网络”来说，就是要通过“输出”，形成“反馈”，才能更有效地“训练”。</p>
+<p>当然，大千世界，包罗万象，我们不可能任何事情都去经历。<br>
+能挑自己感兴趣的方面探究一番，已经幸事。</p>
+<p>图片加载是笔者比较感兴趣的，其中有不少知识和技巧值得研究探讨。</p>
+<h1 class="heading" data-id="heading-1">二、 框架命名</h1>
+<p>命名是比较令人头疼的一件事。<br>
+在反复翻了单词表之后，决定用<strong>Doodle</strong>作为框架的名称。</p>
+<p>Picasso是画家毕加索的名字，Fresco翻译过来是“壁画”，比ImageLoader之类的要更有格调;<br>
+本来想起Van、Vince之类的，但想想还是不要冒犯这些巨擘了。</p>
+<p>Doodle为涂鸦之意，除了单词本身内涵之外，外在也很有趣，很像一个单词：Google。<br>
+这样的兼具有趣灵魂和好看皮囊的词，真的不多了。</p>
+<h1 class="heading" data-id="heading-2">三、流程&amp;架构</h1>
+<h2 class="heading" data-id="heading-3">3.1 加载流程</h2>
+<p>概括来说，图片加载包含封装，解析，下载，解码，变换，缓存，显示等操作。
+流程图如下：
+</p><figure><img class="lazyload inited loaded" data-src="https://user-gold-cdn.xitu.io/2018/10/20/1668eab2192e67cf?imageView2/0/w/1280/h/960/ignore-error/1" data-width="551" data-height="910" src="https://user-gold-cdn.xitu.io/2018/10/20/1668eab2192e67cf?imageView2/0/w/1280/h/960/ignore-error/1"><figcaption></figcaption></figure><p></p>
+<ul>
+<li><strong>封装参数</strong>：从指定来源，到输出结果，中间可能经历很多流程，所以第一件事就是封装参数，这些参数会贯穿整个过程；</li>
+<li><strong>解析路径</strong>：图片的来源有多种，格式也不尽相同，需要规范化；</li>
+<li><strong>读取缓存</strong>：为了减少计算，通常都会做缓存；同样的请求，从缓存中取图片（Bitmap）即可；</li>
+<li><strong>查找文件/下载文件</strong>：如果是本地的文件，直接解码即可；如果是网络图片，需要先下载；</li>
+<li><strong>解码</strong>：这一步是整个过程中最复杂的步骤之一，有不少细节；</li>
+<li><strong>变换</strong>：解码出Bitmap之后，可能还需要做一些变换处理（圆角，滤镜等）；</li>
+<li><strong>缓存</strong>：得到最终bitmap之后，可以缓存起来，一边下次请求时直接取结果；</li>
+<li><strong>显示</strong>：显示结果，可能需要做些动画（淡入动画，crossFade等）。</li>
+</ul>
+<p>以上简化版的流程（只是众多路径中的一个分支），后面我们将会看到，完善各种细节之后，会比这复杂很多。<br>
+但万事皆由简入繁，先简单梳理，后续再慢慢填充，犹如绘画，先绘轮廓，再描细节。</p>
+<h2 class="heading" data-id="heading-4">3.2 基本架构</h2>
+<p>解决复杂问题，思路都是相似的：分而治之。<br>
+参考MVC的思路，我们将框架划分三层：</p>
+<ul>
+<li><strong>Interface</strong>: 框架入口和外部接口</li>
+<li><strong>Processor</strong>: 逻辑处理层</li>
+<li><strong>Storage</strong>：存储层，负责各种缓存。</li>
+</ul>
+<p>具体划分如下：
+</p><figure><img class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/20/1668eab2190aa906?imageView2/0/w/1280/h/960/ignore-error/1" data-width="817" data-height="770" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;817&quot; height=&quot;770&quot;&gt;&lt;/svg&gt;"><figcaption></figcaption></figure><p></p>
+<ul>
+<li>
+<p>外部接口<br>
+<strong>Doodle</strong>: 提供全局参数配置，图片加载入口，以及内存缓存接口。<br>
+<strong>Config</strong>: 全局参数配置。包括缓存路径，缓存大小，图片编码等参数。<br>
+<strong>Request</strong>:  封装请求参数。包括数据源，剪裁参数，行为参数，以及目标。</p>
+</li>
+<li>
+<p>执行单元<br>
+<strong>Dispatcher</strong> : 负责请求调度, 以及结果显示。<br>
+<strong>Worker</strong>: 工作线程，异步执行加载，解码，转换，存储等。<br>
+<strong>Downloader</strong>: 负责文件下载。<br>
+<strong>Source</strong>:  解析数据源，提供统一的解码接口。<br>
+<strong>Decoder</strong>: 负责具体的解码工作。</p>
+</li>
+<li>
+<p>存储组件 <br>
+<strong>MemoryCache</strong>: 管理Bitmap缓存。<br>
+<strong>DiskCache</strong>: 图片“结果”的磁盘缓存；原图由OkHttp缓存。</p>
+</li>
+</ul>
+<h1 class="heading" data-id="heading-5">四、功能实现</h1>
+<p>上一节分析了流程和架构，接下来就是在理解流程，了解架构的前提下，<br>
+分别实现关键功能，然后串联起来，先实现基本的图片加载功能，然后再不断地添加功能和完善细节。</p>
+<h2 class="heading" data-id="heading-6">4.1 API设计</h2>
+<p>众多图片加载框架中，Picasso和Glide的API是比较友好的。</p>
+<pre><code class="hljs java copyable" lang="java">Picasso.with(context)
+		.load(url)
+		.placeholder(R.drawable.loading)
+		.into(imageView);
+<span class="copy-code-btn">复制代码</span></code></pre><p>Glide的API和Picasso类似。</p>
+<p>当参数较多时，构造者模式就可以搬上用场了，其链式API能使参数指定更加清晰，而且更加灵活（随意组合参数）。<br>
+Doodle也用类似的API，而且为了方便理解，有些方法命名也参照Picasso和 Glide。</p>
+<h3 class="heading" data-id="heading-7">4.1.1 全局参数</h3>
+<ul>
+<li>Config</li>
+</ul>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">object</span> Config  {
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> userAgent: String = <span class="hljs-string">""</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> diskCachePath: String = <span class="hljs-string">""</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> diskCacheCapacity: <span class="hljs-built_in">Long</span> = <span class="hljs-number">128</span>L shl <span class="hljs-number">20</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> diskCacheMaxAge: <span class="hljs-built_in">Long</span> = <span class="hljs-number">30</span> * <span class="hljs-number">24</span> * <span class="hljs-number">3600</span> * <span class="hljs-number">1000</span>L
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> bitmapConfig: Bitmap.Config = Bitmap.Config.ARGB_8888
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">setUserAgent</span><span class="hljs-params">(userAgent: <span class="hljs-type">String</span>)</span></span>: Config {
+        <span class="hljs-keyword">this</span>.userAgent = userAgent
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">setDiskCachePath</span><span class="hljs-params">(path: <span class="hljs-type">String</span>)</span></span>: Config {
+        <span class="hljs-keyword">this</span>.diskCachePath = path
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>
+    }
+    <span class="hljs-comment">// ....</span>
+}
+<span class="copy-code-btn">复制代码</span></code></pre><ul>
+<li>Doodle</li>
+</ul>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">object</span> Doodle {
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">lateinit</span> <span class="hljs-keyword">var</span> appContext: Context
+
+    <span class="hljs-meta">@JvmStatic</span>
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">init</span><span class="hljs-params">(context: <span class="hljs-type">Context</span>)</span></span> : Config {
+        appContext = context <span class="hljs-keyword">as</span>? Application ?: context.applicationContext
+        registerActivityLifeCycle(appContext)
+        <span class="hljs-keyword">return</span> Config
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><ul>
+<li>框架初始化</li>
+</ul>
+<pre><code class="hljs kotlin copyable" lang="kotlin">Doodle.init(context)
+      .setDiskCacheCapacity(<span class="hljs-number">256</span>L shl <span class="hljs-number">20</span>)
+      .setMemoryCacheCapacity(<span class="hljs-number">128</span>L shl <span class="hljs-number">20</span>)
+      .setDefaultBitmapConfig(Bitmap.Config.ARGB_8888)
+<span class="copy-code-btn">复制代码</span></code></pre><p>虽然也是链式API，但是没有参照Picasso那样的构造者模式的用法（读写分离），因为那种写法有点麻烦，而且不直观。<br>
+Doodle在初始化的时候传入context（最好传入Application）, 这样后面请求单个图片时，就不用像Picasso和Glide那样用with传context了。</p>
+<h3 class="heading" data-id="heading-8">4.1.2 图片请求</h3>
+<p>加载图片：</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin">Doodle.load(url)
+		.placeholder(R.drawable.loading)
+		.into(topIv)
+<span class="copy-code-btn">复制代码</span></code></pre><p>实现方式和Config是类似的：</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">object</span> Doodle {
+    <span class="hljs-comment">// ....</span>
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">load</span><span class="hljs-params">(path: <span class="hljs-type">String</span>)</span></span>: Request {
+        <span class="hljs-keyword">return</span> Request(path)
+    }
+	
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">load</span><span class="hljs-params">(resID: <span class="hljs-type">Int</span>)</span></span>: Request {
+        <span class="hljs-keyword">return</span> Request(resID)
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">load</span><span class="hljs-params">(uri: <span class="hljs-type">Uri</span>)</span></span>: Request {
+        <span class="hljs-keyword">return</span> Request(uri)
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><ul>
+<li>Request</li>
+</ul>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Request</span> </span>{
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">val</span> key: <span class="hljs-built_in">Long</span> <span class="hljs-keyword">by</span> lazy { MHash.hash64(toString()) }
+
+    <span class="hljs-comment">// 图片源</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> uri: Uri? = <span class="hljs-literal">null</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> path: String
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> sourceKey: String? = <span class="hljs-literal">null</span>
+
+    <span class="hljs-comment">// 图片参数</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> viewWidth: <span class="hljs-built_in">Int</span> = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> viewHeight: <span class="hljs-built_in">Int</span> = <span class="hljs-number">0</span>
+    <span class="hljs-comment">// ....</span>
+
+    <span class="hljs-comment">// 加载行为</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> priority = Priority.NORMAL
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> memoryCacheStrategy= MemoryCacheStrategy.LRU
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> diskCacheStrategy = DiskCacheStrategy.ALL
+    <span class="hljs-comment">// ....</span>
+   
+    <span class="hljs-comment">// target</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> simpleTarget: SimpleTarget? = <span class="hljs-literal">null</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> targetReference: WeakReference&lt;ImageView&gt;? = <span class="hljs-literal">null</span>
+	
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">constructor</span>(path: String) {
+        <span class="hljs-keyword">if</span> (TextUtils.isEmpty(path)) {
+            <span class="hljs-keyword">this</span>.path = <span class="hljs-string">""</span>
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">this</span>.path = <span class="hljs-keyword">if</span> (path.startsWith(<span class="hljs-string">"http"</span>) || path.contains(<span class="hljs-string">"://"</span>)) path <span class="hljs-keyword">else</span> <span class="hljs-string">"file://<span class="hljs-subst">$path</span>"</span>
+        }
+    }
+	
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">sourceKey</span><span class="hljs-params">(sourceKey: <span class="hljs-type">String</span>)</span></span>: Request {
+        <span class="hljs-keyword">this</span>.sourceKey = sourceKey
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">into</span><span class="hljs-params">(target: <span class="hljs-type">ImageView</span>?)</span></span> {
+		<span class="hljs-keyword">if</span> (target == <span class="hljs-literal">null</span>) {
+			<span class="hljs-keyword">return</span>
+		}
+		targetReference = WeakReference(target)
+
+		<span class="hljs-keyword">if</span> (noClip) {
+			fillSizeAndLoad(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+		} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (viewWidth &gt; <span class="hljs-number">0</span> &amp;&amp; viewHeight &gt; <span class="hljs-number">0</span>) {
+			fillSizeAndLoad(viewWidth, viewHeight)
+		} 
+		<span class="hljs-comment">// ...</span>
+   }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">fillSizeAndLoad</span><span class="hljs-params">(targetWidth: <span class="hljs-type">Int</span>, targetHeight: <span class="hljs-type">Int</span>)</span></span> {
+        viewWidth = targetWidth
+        viewHeight = targetHeight
+        <span class="hljs-comment">// ...</span>
+        Dispatcher.start(<span class="hljs-keyword">this</span>)
+    }
+	
+    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">toString</span><span class="hljs-params">()</span></span>: String {
+        <span class="hljs-keyword">val</span> builder = StringBuilder()
+        <span class="hljs-keyword">if</span> (!TextUtils.isEmpty(sourceKey)) {
+            builder.append(<span class="hljs-string">"source:"</span>).append(sourceKey)
+        } <span class="hljs-keyword">else</span> {
+            builder.append(<span class="hljs-string">"path:"</span>).append(path)
+        }
+        <span class="hljs-comment">// ....</span>
+        <span class="hljs-keyword">return</span> builder.toString()
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>Request主要职能是封装请求参数，参数可以大约划分为4类：</p>
+<ul>
+<li>1、图片源；</li>
+<li>2、图片参数：宽高，scaleType，图片配置（ARGB_8888, RGB_565）等；</li>
+<li>3、加载行为：加载优先级，缓存策略，占位图，动画等；</li>
+<li>4、目标，ImageView或者回调等。</li>
+</ul>
+<p>其中，图片源和图片参数决定了最终的bitmap,  所以，我们拼接这些参数作为请求的key，这个key会用于缓存的定位和任务的去重。<br>
+拼接参数后字符串很长，所以需要压缩成摘要，由于终端上的图片数量不会太多，64bit的摘要即可（原理参考《<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fwww.jianshu.com%2Fp%2Fad9756fe21c8" rel="nofollow noopener noreferrer">漫谈散列函数</a>》）。</p>
+<p>如果说图片源是input的话，目标便是output。</p>
+<p>图片文件的来源，通常有 网络图片，drawable/raw资源， assets文件，本地文件等。<br>
+当然，严格来说，除了网络图片之外，其他都是本地文件，只是有各种形式而已。<br>
+Doodle支持三种参数， id(Int), path(String), 和Uri（常见于调用相机或者相册时）。</p>
+<p>对于有的图片源，路径可能会变化，比如url, 里面可能有一些动态的参数：</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">val</span> url = <span class="hljs-string">"http://www.xxx.com/a.jpg?t=1521551707"</span>
+<span class="copy-code-btn">复制代码</span></code></pre><p>请求服务端的时候，其实返回的是同一张图片。<br>
+但是如果用整个url作为请求的key的一部分，因为动态参数的原因，每次请求key都不一样，会导致缓存失效。<br>
+为此，可以将url不变的部分作为制定为图片源的key:</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin">    <span class="hljs-keyword">val</span> url = <span class="hljs-string">"http://www.xxx.com/a.jpg"</span>
+    Skate.load(url + <span class="hljs-string">"?t="</span> + System.currentTimeMillis())
+            .sourceKey(url)
+            .into(testIv);
+<span class="copy-code-btn">复制代码</span></code></pre><p>有点类似Glide的StringSignature。</p>
+<p>请求的target最常见的应该是ImageView, <br>
+此外，有时候需要单纯获取Bitmap, <br>
+或者同时获取Bitmap和ImageView,<br>
+抑或是在当前线程获取Bitmap ……<br>
+总之，有各种获取结果的需求，这些都是设计API时需要考虑的。</p>
+<h2 class="heading" data-id="heading-9">4.2 缓存设计</h2>
+<p>几大图片加载框架都实现了缓存，各种文章中，有说二级缓存，有说三级缓存。<br>
+其实从存储来说，可简单地分为内存缓存和磁盘缓存；<br>
+只是同样是内存/磁盘缓存，也有多种形式，例如Glide的“磁盘缓存”就分为“原图缓存”和“结果缓存”。</p>
+<h3 class="heading" data-id="heading-10">4.2.1 内存缓存</h3>
+<p>为了复用计算结果，提高用户用户体验，通常会做bitmap的缓存；<br>
+由于要限制缓存的大小，需要淘汰机制（通常是LRU策略）。<br>
+Android SDK提供了LruCache类，查看源码，其核心是LinkedHashMap。<br>
+为了更好地定制，这里我们不用SDK提供的LruCache，直接用LinkedHashMap，封装自己的<strong>LruCache</strong>。</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">internal</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BitmapWrapper</span></span>(<span class="hljs-keyword">var</span> bitmap: Bitmap) {
+    <span class="hljs-keyword">var</span> bytesCount: <span class="hljs-built_in">Int</span> = <span class="hljs-number">0</span>
+    init {
+        <span class="hljs-keyword">this</span>.bytesCount = Utils.getBytesCount(bitmap)
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">internal</span> <span class="hljs-keyword">object</span> LruCache {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> cache = LinkedHashMap&lt;<span class="hljs-built_in">Long</span>, BitmapWrapper&gt;(<span class="hljs-number">16</span>, <span class="hljs-number">0.75</span>f, <span class="hljs-literal">true</span>)
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> sum: <span class="hljs-built_in">Long</span> = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> minSize: <span class="hljs-built_in">Long</span> = Runtime.getRuntime().maxMemory() / <span class="hljs-number">32</span>
+
+    <span class="hljs-meta">@Synchronized</span>
+    <span class="hljs-keyword">operator</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">get</span><span class="hljs-params">(key: <span class="hljs-type">Long</span>?)</span></span>: Bitmap? {
+        <span class="hljs-keyword">val</span> wrapper = cache[key]
+        <span class="hljs-keyword">return</span> wrapper?.bitmap
+    }
+
+    <span class="hljs-meta">@Synchronized</span>
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">put</span><span class="hljs-params">(key: <span class="hljs-type">Long</span>, bitmap: <span class="hljs-type">Bitmap</span>?)</span></span> {
+        <span class="hljs-keyword">val</span> capacity = Config.memoryCacheCapacity
+        <span class="hljs-keyword">if</span> (bitmap == <span class="hljs-literal">null</span> || capacity &lt;= <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">return</span>
+        }
+        <span class="hljs-keyword">var</span> wrapper: BitmapWrapper? = cache[key]
+        <span class="hljs-keyword">if</span> (wrapper == <span class="hljs-literal">null</span>) {
+            wrapper = BitmapWrapper(bitmap)
+            cache[key] = wrapper
+            sum += wrapper.bytesCount.toLong()
+            <span class="hljs-keyword">if</span> (sum &gt; capacity) {
+                trimToSize(capacity * <span class="hljs-number">9</span> / <span class="hljs-number">10</span>)
+            }
+        }
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">trimToSize</span><span class="hljs-params">(size: <span class="hljs-type">Long</span>)</span></span> {
+        <span class="hljs-keyword">val</span> iterator = cache.entries.iterator()
+        <span class="hljs-keyword">while</span> (iterator.hasNext() &amp;&amp; sum &gt; size) {
+            <span class="hljs-keyword">val</span> entry = iterator.next()
+            <span class="hljs-keyword">val</span> wrapper = entry.value
+            WeakCache.put(entry.key, wrapper.bitmap)
+            iterator.remove()
+            sum -= wrapper.bytesCount.toLong()
+        }
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>LinkedHashMap 构造函数的第三个参数：accessOrder，传入true时， 元素会按访问顺序排列，最后访问的在遍历器最后端。<br>
+进行淘汰时，移除遍历器前端的元素，直至缓存总大小降低到指定大小以下。</p>
+<p>有时候需要加载比较大的图片，占用内存较高，放到<strong>LruCache</strong>可能会“挤掉”其他一些bitmap;<br>
+或者有时候滑动列表生成大量的图片，也有可能会“挤掉”一些bitmap。<br>
+这些被挤出<strong>LruCache</strong>的bitmap有可能很快又会被用上，但在<strong>LruCache</strong>中已经索引不到了，如果要用，需重新解码。<br>
+值得指出的是，被挤出<strong>LruCache</strong>的bitmap，在GC时并不一定会被回收，如果bitmap还被引用，则不会被回收；<br>
+但是不管是否被回收，在<strong>LruCache</strong>中都索引不到了。</p>
+<p>我们可以将一些可能短暂使用的大图片，以及这些被挤出<strong>LruCache</strong>的图片，放到弱引用的容器中。<br>
+在被回收之前，还是可以根据key去索引到bitmap。</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">internal</span> <span class="hljs-keyword">object</span> WeakCache {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> cache = HashMap&lt;<span class="hljs-built_in">Long</span>, BitmapWeakReference&gt;()
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> queue = ReferenceQueue&lt;Bitmap&gt;()
+
+    <span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BitmapWeakReference</span> <span class="hljs-keyword">internal</span> <span class="hljs-keyword">constructor</span></span>(
+            <span class="hljs-keyword">internal</span> <span class="hljs-keyword">val</span> key: <span class="hljs-built_in">Long</span>,
+            bitmap: Bitmap,
+            q: ReferenceQueue&lt;Bitmap&gt;) : WeakReference&lt;Bitmap&gt;(bitmap, q)
+
+    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">cleanQueue</span><span class="hljs-params">()</span></span> {
+        <span class="hljs-keyword">var</span> ref: BitmapWeakReference? = queue.poll() <span class="hljs-keyword">as</span> BitmapWeakReference?
+        <span class="hljs-keyword">while</span> (ref != <span class="hljs-literal">null</span>) {
+            cache.remove(ref.key)
+            ref = queue.poll() <span class="hljs-keyword">as</span> BitmapWeakReference?
+        }
+    }
+
+    <span class="hljs-meta">@Synchronized</span>
+    <span class="hljs-keyword">operator</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">get</span><span class="hljs-params">(key: <span class="hljs-type">Long</span>?)</span></span>: Bitmap? {
+        cleanQueue()
+        <span class="hljs-keyword">val</span> reference = cache[key]
+        <span class="hljs-keyword">return</span> reference?.<span class="hljs-keyword">get</span>()
+    }
+
+    <span class="hljs-meta">@Synchronized</span>
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">put</span><span class="hljs-params">(key: <span class="hljs-type">Long</span>, bitmap: <span class="hljs-type">Bitmap</span>?)</span></span> {
+        <span class="hljs-keyword">if</span> (bitmap != <span class="hljs-literal">null</span>) {
+            cleanQueue()
+            <span class="hljs-keyword">val</span> reference = cache[key]
+            <span class="hljs-keyword">if</span> (reference == <span class="hljs-literal">null</span>) {
+                cache[key] = BitmapWeakReference(key, bitmap, queue)
+            }
+        }
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>以上实现中，BitmapWeakReference是WeakReference的子类，除了引用Bitmap的功能之外，还记录着key, 以及关联了ReferenceQueue;<br>
+当Bitmap被回收时，BitmapWeakReference会被放入ReferenceQueue，<br>
+我们可以遍历ReferenceQueue，移除ReferenceQueue的同时，取出其中记录的key, 到cache中移除对应的记录。<br>
+利用WeakReference和ReferenceQueue的机制，索引对象的同时又不至于内存泄漏，类似用法在WeakHashMap和Glide源码中都出现过。</p>
+<p>最后，综合<strong>LruCache</strong>和<strong>WeakCache</strong>，统一索引：</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">internal</span> <span class="hljs-keyword">object</span> MemoryCache {
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">getBitmap</span><span class="hljs-params">(key: <span class="hljs-type">Long</span>)</span></span>: Bitmap? {
+        <span class="hljs-keyword">var</span> bitmap = LruCache[key]
+        <span class="hljs-keyword">if</span> (bitmap == <span class="hljs-literal">null</span>) {
+            bitmap = WeakCache[key]
+        }
+        <span class="hljs-keyword">return</span> bitmap
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">putBitmap</span><span class="hljs-params">(key: <span class="hljs-type">Long</span>, bitmap: <span class="hljs-type">Bitmap</span>, toWeakCache: <span class="hljs-type">Boolean</span>)</span></span> {
+        <span class="hljs-keyword">if</span> (toWeakCache) {
+            WeakCache.put(key, bitmap)
+        } <span class="hljs-keyword">else</span> {
+            LruCache.put(key, bitmap)
+        }
+    }
+    <span class="hljs-comment">// ......</span>
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>声明内存缓存策略：</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">object</span> MemoryCacheStrategy{
+    const <span class="hljs-keyword">val</span> NONE = <span class="hljs-number">0</span>
+    const <span class="hljs-keyword">val</span> WEAK = <span class="hljs-number">1</span>
+    const <span class="hljs-keyword">val</span> LRU = <span class="hljs-number">2</span>
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p><strong>NONE</strong>: 不缓存到内存<br>
+<strong>WEAK</strong>： 缓存到WeakCache<br>
+<strong>LRU</strong>：缓存到LRUCache</p>
+<h3 class="heading" data-id="heading-11">4.2.2  磁盘缓存</h3>
+<p>曲面提到，Glide有两种磁盘缓存：“原图缓存”和“结果缓存”，<br>
+Doodle也仿照类似的策略，可以选择缓存原图和结果。<br>
+原图缓存指的是Http请求下来的未经解码的文件；<br>
+结果缓存指经过解码，剪裁，变换等，变成最终的bitmap之后，通过**bitmap.compress()**压缩保存。<br>
+其中，后者通常比前者更小，而且解码时不需要再次剪裁和变换等，所以从结果缓存获取bitmap通常要比从原图获取快得多。</p>
+<p>为了尽量使得api相似，Doodle设置直接用Glide v3的缓存策略定义(Glide v4有一些变化）。</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">object</span> DiskCacheStrategy {
+    const <span class="hljs-keyword">val</span> NONE = <span class="hljs-number">0</span>
+    const <span class="hljs-keyword">val</span> SOURCE = <span class="hljs-number">1</span>
+    const <span class="hljs-keyword">val</span> RESULT = <span class="hljs-number">2</span>
+    const <span class="hljs-keyword">val</span> ALL = <span class="hljs-number">3</span>
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p><strong>NONE</strong>: 不缓存到磁盘
+<strong>SOURCE</strong>: 只缓存原图
+<strong>RESULT</strong>: 只缓存结果
+<strong>ALL</strong>: 既缓存原图，也缓存结果。</p>
+<p>Doodle的HttpClient是用的OkHttp, 所以网络缓存，包括原图的缓存就交给OkHttp了，<br>
+至于本地的图片源，本就在SD卡，只是各种形式而已，也就无所谓缓存了。</p>
+<p>结果缓存，Doodle没有用DiskLruCache, 而是自己实现了磁盘缓存。<br>
+DiskLruCache是比较通用的磁盘缓存解决方案，笔者觉得对于简单地存个图片文件可以更精简一些，所以自己设计了一个更专用的方案。</p>
+<p>其实磁盘缓存的管理最主要是设计记录日志，方案要点如下：<br>
+1、一条记录存储key(long)和最近访问时间(long)，一条记录16字节；<br>
+2、每条记录依次排列，由于比较规整，可以根据偏移量随机读写；<br>
+3、用mmap方式映射日志文件，以4K为单位映射。<br></p>
+<p>文件记录之外，内存中还需要一个HashMap记录key到"文件记录"的映射, 其中，文件记录对象如下：</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">JournalValue</span> <span class="hljs-keyword">internal</span> <span class="hljs-keyword">constructor</span></span>(
+            <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> key: <span class="hljs-built_in">Long</span>,
+            <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> accessTime: <span class="hljs-built_in">Long</span>,
+            <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> fileLen: <span class="hljs-built_in">Long</span>,
+            <span class="hljs-keyword">internal</span> <span class="hljs-keyword">var</span> offset: <span class="hljs-built_in">Int</span>) : Comparable&lt;JournalValue&gt; {
+        <span class="hljs-comment">// ...</span>
+    }
+<span class="copy-code-btn">复制代码</span></code></pre><p>只需记录key, 访问时间，文件大小，以及记录在日志文件中的位置即可。<br>
+那文件名呢？文件命名为key的十六进制，所以可以根据key运算出文件名。</p>
+<p>运作机制：<br>
+访问<strong>DiskCache</strong>时，先读取日志文件，填充HashMap;<br>
+后面的访问中，只需读取HashMap就可以知道有没有对应的磁盘缓存；<br>
+存入一个“结果文件”则往HashMap存入记录，同时更新日志文件。<br>
+这种机制其实有点像SharePreferences, 二级存储，文件读一次之后接下来都是写入。<br></p>
+<p>相对而言，该方案的优点为：<br>
+1、节省空间，一页（4K）能记录256个文件；<br>
+2、格式规整，解析快；<br>
+3、mmap映射，可批量记录，自动定时写入磁盘，降低磁盘IO消耗；<br>
+当容量超出限制需要淘汰时，根据访问时间，先删除最久没被访问的文件；<br>
+除了实现LRU淘汰规则外，还可实现最大保留时间，删除一些太久（时间可指定）没用到的图片文件。</p>
+<p>虽然名为磁盘缓存，其实不仅仅缓存文件，“文件记录”也很关键，二者关系犹如文件内容和文件的元数据, 相辅相成。</p>
+<h2 class="heading" data-id="heading-12">4.3 解码</h2>
+<p>SDK提供了BitmapFactory，提供各种API，从图片源解码成bitmap，但这仅是图片解码的最基础的工作；<br>
+图片解码，前前后后要准备各种材料，留心各种细节，是图片加载过程中最繁琐的步骤之一。</p>
+<h3 class="heading" data-id="heading-13">4.3.1 解析数据源</h3>
+<p>前面提到，图片的来源有多种，我们需要识别图片来源，<br>
+然后根据各自的特点提供统一的处理方法，为后续的具体解码工作提供方便。</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">internal</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Source</span> : <span class="hljs-type">Closeable {</span></span>
+    <span class="hljs-comment">// 魔数，提供文件格式的信息</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">val</span> magic: <span class="hljs-built_in">Int</span>
+    <span class="hljs-comment">// 旋转方向，EXIF专属信息</span>
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">val</span> orientation: <span class="hljs-built_in">Int</span>
+
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">abstract</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">decode</span><span class="hljs-params">(options: <span class="hljs-type">BitmapFactory</span>.<span class="hljs-type">Options</span>)</span></span>: Bitmap?
+    <span class="hljs-keyword">internal</span> <span class="hljs-keyword">abstract</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">decodeRegion</span><span class="hljs-params">(rect: <span class="hljs-type">Rect</span>, options: <span class="hljs-type">BitmapFactory</span>.<span class="hljs-type">Options</span>)</span></span>: Bitmap?
+
+    <span class="hljs-keyword">internal</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FileSource</span> <span class="hljs-keyword">constructor</span></span>(<span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> file: File) : Source() {
+        <span class="hljs-comment">//...</span>
+    }
+
+    <span class="hljs-keyword">internal</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AssetSource</span></span>(<span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> assetStream: AssetManager.AssetInputStream) : Source() {
+        <span class="hljs-comment">//...</span>
+    }
+
+    <span class="hljs-keyword">internal</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StreamSource</span>  <span class="hljs-keyword">constructor</span></span>(inputStream: InputStream) : Source() {
+        <span class="hljs-comment">//...</span>
+    }
+
+    <span class="hljs-keyword">companion</span> <span class="hljs-keyword">object</span> {
+        <span class="hljs-keyword">private</span> const <span class="hljs-keyword">val</span> ASSET_PREFIX = <span class="hljs-string">"file:///android_asset/"</span>
+        <span class="hljs-keyword">private</span> const <span class="hljs-keyword">val</span> FILE_PREFIX = <span class="hljs-string">"file://"</span>
+
+        <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">valueOf</span><span class="hljs-params">(src: <span class="hljs-type">Any</span>?)</span></span>: Source {
+            <span class="hljs-keyword">if</span> (src == <span class="hljs-literal">null</span>) {
+                <span class="hljs-keyword">throw</span> IllegalArgumentException(<span class="hljs-string">"source is null"</span>)
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">when</span> (src) {
+                <span class="hljs-keyword">is</span> File -&gt; FileSource(src)
+                <span class="hljs-keyword">is</span> AssetManager.AssetInputStream -&gt; AssetSource(src)
+                <span class="hljs-keyword">is</span> InputStream -&gt; StreamSource(src)
+                <span class="hljs-keyword">else</span> -&gt; <span class="hljs-keyword">throw</span> IllegalArgumentException(<span class="hljs-string">"unsupported source "</span> + src.javaClass.simpleName)
+            }
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">parse</span><span class="hljs-params">(request: <span class="hljs-type">Request</span>)</span></span>: Source {
+            <span class="hljs-keyword">val</span> path = request.path
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">when</span> {
+                path.startsWith(<span class="hljs-string">"http"</span>) -&gt; {
+                    <span class="hljs-keyword">val</span> builder = okhttp3.Request.Builder().url(path)
+                    <span class="hljs-keyword">if</span> (request.diskCacheStrategy and DiskCacheStrategy.SOURCE == <span class="hljs-number">0</span>) {
+                        builder.cacheControl(CacheControl.Builder().noCache().noStore().build())
+                    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (request.onlyIfCached) {
+                        builder.cacheControl(CacheControl.FORCE_CACHE)
+                    }
+                    valueOf(Downloader.getSource(builder.build()))
+                }
+                path.startsWith(ASSET_PREFIX) -&gt; valueOf(Doodle.appContext.assets.<span class="hljs-keyword">open</span>(path.substring(ASSET_PREFIX.length)))
+                path.startsWith(FILE_PREFIX) -&gt; valueOf(File(path.substring(FILE_PREFIX.length)))
+                <span class="hljs-keyword">else</span> -&gt; valueOf(Doodle.appContext.contentResolver.openInputStream((request.uri ?: Uri.parse(path))))
+            }
+        }
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>以上代码，从资源id, path, 和Uri等形式，最终转换成FileSource, AssetSource, StreamSource等。<br>
+FileSource: 本地文件<br>
+AssetSource：asset文件，drawable/raw资源图片<br>
+StreamSource：网络文件，ContentProvider提供的图片文件，如相机，相册等。</p>
+<p>其中，网络文件从OkHttp的网络请求获得，如果缓存了原图, 则会获得FileSource。<br>
+其实各种图片源最终都可以转化为InputStream，例如AssetInputStream其实就是InputStream的一种,  文件也可以转化为FileInputStream。<br>
+那为什么区分开来呢？ 这一切都要从读取图片头信息开始讲。</p>
+<h3 class="heading" data-id="heading-14">4.3.2 预读头信息</h3>
+<p>解码过程中通常需要预读一些头信息，如文件格式，图片分辨率等，作为接下来解码策略的参数，例如用图片分辨率来计算压缩比例。<br>
+当<strong>inJustDecodeBounds</strong>设置为false时， BitmapFactory不会返回bitmap, 而是仅仅读取文件头信息，其中最重要的是图片分辨率。</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">val</span> options = BitmapFactory.Options()
+options.inJustDecodeBounds = <span class="hljs-literal">false</span>
+BitmapFactory.decodeStream(inputStream, <span class="hljs-literal">null</span>, options)
+<span class="copy-code-btn">复制代码</span></code></pre><p>读取了头信息，计算解码参数之后，将<strong>inJustDecodeBounds</strong>设置为true，<br>
+再次调用<strong>BitmapFactory.decodeStream</strong>即可获取所需bitmap。<br>
+可是，有的InputStream不可重置读取位置，同时<strong>BitmapFactory.decodeStream</strong>方法要求从头开始读取。<br>
+那先关闭流，然后再次打开不可以吗？ 可以，不过效率极低，尤其是网络资源时，不敢想象……</p>
+<p>有的InputStream实现了mark(int)和reset()方法，就可以通过标记和重置支持重新读取。<br>
+这一类InputStream会重载markSupported()方法，并返回true, 我们可以据此判断InputStream是否支持重读。</p>
+<p>幸运的是AssetInputStream就支持重读；<br>
+不幸的是FileInputStream居然不支持，OkHttp的byteStream()返回InputStream也不支持。</p>
+<p>对于文件，我们通过搭配RandomAccessFile和FileDescriptor来重新重读；<br>
+而对于其他的InputStream，只能曲折一点，通过缓存已读字节来支持重新读取。<br>
+SDK提供的BufferedInputStream就是这样一种思路， 通过设置一定大小的缓冲区，以滑动窗口的形式提供缓冲区内重新读取。<br>
+遗憾的是，BufferedInputStream的mark函数需指定readlimit，缓冲区会随着需要预读的长度增加而扩容，但是不能超过readlimit；<br>
+若超过readlimit，则读取失败，从而解码失败。</p>
+<pre><code class="hljs java copyable" lang="java">    <span class="hljs-comment">/**
+     * <span class="hljs-doctag">@param</span> readlimit the maximum limit of bytes that can be read before
+     *                  the mark position becomes invalid.
+     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">mark</span><span class="hljs-params">(<span class="hljs-keyword">int</span> readlimit)</span> </span>{
+        marklimit = readlimit;
+        markpos = pos;
+    }
+<span class="copy-code-btn">复制代码</span></code></pre><p>于是readlimit设置多少就成了考量的因素了。<br>
+Picasso早期版本设置64K, 结果遭到大量的反馈说解码失败，因为有的图片需要预读的长度不止64K。<br>
+从Issue的回复看，Picasso的作者也很无奈，最终妥协地将readlimit设为MAX_INTEGER（预读完成再关闭mark）。<br>
+但是即使如此，后面还是有反馈有的图片无法预读到图片的大小。<br>
+笔者很幸运地遇到了这种情况，经调试代码，最终发现Android 6.0的BufferedInputStream，<br>
+其skip函数的实现有问题，每次skip都会扩容，即使skip后的位置还在缓冲区内。<br>
+造成的问题是有的图片预读时需多次调用skip函数，然后缓冲区就一直double直至抛出OutOfMemoryError……<br>
+不过Picasso最终还是把图片加载出来了，因为其catch了Throwable, 然后重新直接解码（不预读大小）；<br>
+虽然加载出来了，但是代价不少：只能全尺寸加载，以及前面预读时申请（虽然最终会被GC）的大量内存，所造成的内存抖动。</p>
+<p>Glide没有这个问题，因为Glide自己实现了类似BufferedInputStream功能的InputStream，完美地绕过了这个坑；<br>
+Doodle则是copy了Android 8.0的SDK的BufferedInputStream， 精简代码，加入一些缓冲区复用的代码等，可以说是改装版BufferedInputStream。<br></p>
+<p>回头看前面一节的问题，为什么不统一用“改装版BufferedInputStream”来解码？<br>
+因为有的图片预读的长度很长，需要开辟较大的缓冲区，从这个角度看，FileSource和AssetSource更节约内存。</p>
+<h3 class="heading" data-id="heading-15">4.3.3 图片压缩</h3>
+<p>有时候需要显示的bitmap比原图的分辨率小。<br>
+比方说原图是 4096 * 4096, 如果按照ARGB_8888的配置全尺寸解码出来，需要占用64M的内存！<br>
+不过app中所需得bitmap通常会小很多， 这时就要压缩了。<br>
+比方说需要300 * 300的bitmap, 该怎么做呢？<br>
+网上通常的说法是设置 <strong>options.inSampleSize</strong> 来降采样。<br>
+阅读SDK文档，inSampleSize 需是整数，而且是2的倍数，<br>
+不是2的倍数时，会被 <strong>“be rounded down to the nearest power of 2”</strong>。<br>
+比方说前面的 4096 * 4096 的原图，<br>
+当inSampleSize = 16时，解码出256 * 256 的bitmap；<br>
+当inSampleSize = 8时，解码出512 * 512 的bitmap。<br>
+即使是inSampleSize = 8，所需内存也只有原来的1/64(1M），效果还是很明显的。</p>
+<p>Picasso和Glide v3就是这么降采样的。<br>
+如果你发现解码出来的图片是300 * 300 （比如使用Picasso时调用了fit()函数），应该是有后续的处理（通过Matrix 和 Bitmap.createBitmap 继续缩放）。</p>
+<p>那能否直接解码出300 * 300的图片呢？ 可以的。<br>
+查看 <a target="_blank" href="https://link.juejin.im?target=http%3A%2F%2Fandroidxref.com%2F8.0.0_r4%2Fxref%2Fframeworks%2Fbase%2Fcore%2Fjni%2Fandroid%2Fgraphics%2FBitmapFactory.cpp" rel="nofollow noopener noreferrer">BitmapFactory.cpp</a> 的源码，其中有一段：</p>
+<pre><code class="hljs cpp copyable" lang="cpp"><span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> density = env-&gt;GetIntField(options, gOptions_densityFieldID);
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> targetDensity = env-&gt;GetIntField(options, gOptions_targetDensityFieldID);
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> screenDensity = env-&gt;GetIntField(options, gOptions_screenDensityFieldID);
+<span class="hljs-keyword">if</span> (density != <span class="hljs-number">0</span> &amp;&amp; targetDensity != <span class="hljs-number">0</span> &amp;&amp; density != screenDensity) {
+   scale = (<span class="hljs-keyword">float</span>) targetDensity / density;
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>对应BitmapFactory.Options的两个关键参数：inDensity 和 inTargetDensity。<br>
+上面的例子，设置inTargetDensity=300， inDensity=4096(还要设置inScale=true), 则可解码出300 * 300的bitmap。<br>
+额外提一下，Glide v4也换成这种压缩策略了。</p>
+<p>平时设计给切图，要放对文件夹，也是这个道理。<br>
+比如设计给了144 * 144（xxhdpi） 的icon, 如果不小心放到hdpi的资源目录下；<br>
+假如机器的dpi在320dpi ~ 480dpi之间（xxhdpi），则解码出来的bitmap是288 * 288的分辨率，；<br>
+如果刚好ImageView又是wrap_content设置的宽高，视觉上会比预期的翻了一番-_-。</p>
+<p>言归正传，解码的过程为，通过获取图片的原始分辨率，结合Request的width和height, 以及ScaleType, <br>
+计算出最终要解码的宽高， 设置inDensity和inTargetDensity然后decode。<br>
+当然，有时候decode出来之后还要做一些加工，比方说ScaleType为<strong>CENTER_CROP</strong>而图片宽高又不相等，<br>
+则需要在decode之后进行裁剪，取出中间部分的像素。</p>
+<p>关于ScaleType，Doodle是直接获取ImageView的ScaleType, 所以无需再特别调用函数指定；<br>
+当然也提供了指定ScaleType的API, 对于target不是ImageView时或许会用到。</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">scaleType</span><span class="hljs-params">(scaleType: <span class="hljs-type">ImageView</span>.<span class="hljs-type">ScaleType</span>)</span></span>
+<span class="copy-code-btn">复制代码</span></code></pre><p>还有就是，解码阶段的压缩是向下采样的。<br>
+比如，如果原图只有100 * 100, 但是ImageView是200 * 200，最终也是解码出100 * 100的bitmap。<br>
+不过ImageView假如是<strong>CENTER_CROP</strong>或者<strong>FIX_XY</strong>等ScaleType，显示时通常会在渲染阶段自行缩放的。<br>
+如果确实就是需要200 * 200的分辨率，可以在解码后的变换（Transformation）阶段处理。<br></p>
+<h3 class="heading" data-id="heading-16">4.3.4 图片旋转</h3>
+<p>相信不少开发都遇到拍照后图片旋转的问题(尤其是三星的手机）。<br>
+网上有不少关于此问题的解析，这是其中一篇：<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fblog.csdn.net%2Fnetdxy%2Farticle%2Fdetails%2F49108489" rel="nofollow noopener noreferrer">关于图片EXIF信息中旋转参数Orientation的理解</a></p>
+<p>Android SDK提供了<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fdeveloper.android.com%2Freference%2Fandroid%2Fmedia%2FExifInterface" rel="nofollow noopener noreferrer">ExifInterface</a>&nbsp;来获取Exif信息，Picasso正是用此API获取旋转参数的。<br>
+很可惜ExifInterface要到 API level 24 才支持通过InputStream构造对象，低于此版本，仅支持通过文件路径构造对象。<br>
+故此，Picasso当前版本仅在传入参数是文件路径（或者文件的Uri）时可处理旋转问题。</p>
+<p>Glide自己实现了头部解析，主要是获取文件类型和exif旋转信息。<br>
+Doodle抽取了Glide的HeaderParse，并结合工程做了一些精简和代码优化,  嗯， 又一个“改装版”。<br>
+decode出bitmap之后，根据获取的旋转信息，调用<strong>setRotate</strong>和<strong>postScale</strong>进行对应的旋转和翻转，即可还原正确的显示。</p>
+<h3 class="heading" data-id="heading-17">4.3.5 变换</h3>
+<p>解码出bitmap之后，有时候还需要做一些处理，如圆形剪裁，圆角，滤镜等。<br>
+Picasso和Glide都提供了类似的API：Transformation</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Transformation</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">transform</span><span class="hljs-params">(source: <span class="hljs-type">Bitmap</span>)</span></span>: Bitmap?
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">key</span><span class="hljs-params">()</span></span>: String
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>实现变换比较简单，实现Transformation接口，处理source，返回处理后的bitmap即可；<br>
+当然，还要在key()返回变换的标识，通常写变换的名称就好，如果有参数, 需拼接上参数。<br>
+Transformation也是决定bitmap长什么样的因素之一，所以需要重载key(), 作为Request的key的一部分。<br>
+Transformation可以设置多个，处理顺序会按照设置的先后顺序执行。</p>
+<p>Doodle预置了三个常用的Transformation。<br>
+<strong>CircleTransformation</strong>：圆形剪裁，如果宽高不相等，会先取中间部分(类似CENTER_CROP)；<br>
+<strong>RoundedTransformation</strong>：圆角剪裁，可指定半径；<br>
+<strong>ResizeTransformation</strong>：大小调整，宽高缩放到指定大小。</p>
+<p>需要指出的一点是, Request中指定大小之后并不总是能够解码出指定大小的bitmap,<br>
+如果原图分辨率小于指定大小，基于向下采样的策略，并不会主动缩放到指定的大小（前面有提到）。<br>
+若需要确定大小的bitmap, 可应用ResizeTransformation。</p>
+<p>更多的变换，可以到<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fgithub.com%2Fwasabeef%2Fglide-transformations" rel="nofollow noopener noreferrer">glide-transformations</a>寻找，<br>
+虽然不能直接导入引用， 但是处理方法是类似的，改造一下就可使用-_-</p>
+<h3 class="heading" data-id="heading-18">4.3.6 GIF图</h3>
+<p>GIF有静态的，也有动态的。
+BitmapFactory支持解码GIF图片的第一帧，所以各个图片框架都支持GIF缩率图。<br>
+至于GIF动图，Picasso当前是不支持的，Glide支持，但据反馈有些GIF动图Glide显示不是很流畅。<br>
+Doodle本身也没有实现GIF动图的解码，但是留了拓展接口，结合第三方GIF解码库，&nbsp;可实现GIF动图的加载和显示。<br>
+GIF解码库，推荐&nbsp;<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fgithub.com%2Fkoral--%2Fandroid-gif-drawable" rel="nofollow noopener noreferrer">android-gif-drawable</a>。</p>
+<p>具体用法：
+在App启动时， 注入GIF解码的实现类（实现GifDecoder 接口）：</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin">    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">initApplication</span><span class="hljs-params">(context: <span class="hljs-type">Application</span>)</span></span> {
+        Doodle.init(context)
+                <span class="hljs-comment">// ... 其他配置</span>
+                .setGifDecoder(gifDecoder)
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> gifDecoder = <span class="hljs-keyword">object</span> : GifDecoder {
+        <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">decode</span><span class="hljs-params">(bytes: <span class="hljs-type">ByteArray</span>)</span></span>: Drawable {
+            <span class="hljs-keyword">return</span> GifDrawable(bytes)
+        }
+    }
+<span class="copy-code-btn">复制代码</span></code></pre><p>使用时和加载到普通的ImageView没区别，如果图片源是GIF图片，会自动调用gifDecoder进行解码。</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin">Doodle.load(url).into(gifImageView)
+<span class="copy-code-btn">复制代码</span></code></pre><p>当然也可以指定不需要显示动图， 调用asBitmap()方法即可。</p>
+<h3 class="heading" data-id="heading-19">4.3.7 图片复用</h3>
+<p>很多文章讲图片优化时都会提到两个点，压缩和图片复用。<br>
+Doodle在设计阶段也考虑了图片复用，并且也实现了，但实现后一直纠结其收益和成本-_-<br></p>
+<ul>
+<li>1、正在使用的图片不能被复用，所以要添加引用计数策略，附加代码很多；</li>
+<li>2、即使图片没有被引用，根据局部性原理，该图片可能稍后有可能被访问，所以也不应该马上被复用；</li>
+<li>3、大多数情况下，符合复用条件(不用一段时间，尺寸符合要求）的并不多；</li>
+<li>4、占用一些额外的计算资源。</li>
+</ul>
+<p>最终，在看了帖子 <a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fwww.reddit.com%2Fr%2Fandroiddev%2Fcomments%2F8aabvb%2Fpicasso_vs_glide%2F" rel="nofollow noopener noreferrer">picasso_vs_glide</a> 之后，下决心移除了图片复用的代码。<br>
+以下该帖子中，Picasso的作者<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fwww.reddit.com%2Fuser%2FJakeWharton" rel="nofollow noopener noreferrer">JakeWharton</a> 的原话：<br></p>
+<blockquote>
+<p>Slight correction here: "Glide reuses bitmaps period". Picasso does not at all. Nor do we have plans to. This is actually a performance optimization in some cases as we can retained cached images longer. It'd be nice to support both modes with programmer hints, but since ImageDecoder doesn't even support re-use I see no point to adding it.</p>
+</blockquote>
+<p>Doodle定位是小而美的轻量级图片框架，过程中移除了不少价值不高的功能和复杂的实现。<br>
+有舍必有得，编程与生活，莫不如此。</p>
+<h2 class="heading" data-id="heading-20">4.4 线程调度</h2>
+<p>图片获取和解码都是耗时的操作，需放在异步执行；<br>
+而通常需要同时请求多张图片，故此，线程调度不可或缺。</p>
+<p>Doodle的线程调度依赖于笔者的另一个项目<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fgithub.com%2FNo89757%2FTask" rel="nofollow noopener noreferrer">Task</a>,<br> 具体内容详见：《<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fwww.jianshu.com%2Fp%2F8afb6cf64eec" rel="nofollow noopener noreferrer">如何实现一个线程调度框架</a>》（又发了一波广告？-_-）。<br>
+简单的说，主要用到了Task的几个特性：</p>
+<ul>
+<li>1、支持优先级;</li>
+<li>2、支持生命周期（在Activity/Fragment销毁时取消任务）;</li>
+<li>3、支持根据 Activity/Fragment 的显示/隐藏动态调整优先级;</li>
+<li>4、支持任务去重。</li>
+</ul>
+<p>关于任务去重，主要是以Request的key作为任务的tag, 相同tag的任务串行执行，<br>
+如此，当第一个任务完成，后面的任务读缓存即可，避免了重复计算。<br>
+对于网络图片源的任务，则以URL作为tag, 以免重复下载。<br>
+此外，线程池，在UI线程回调结果，在当前线程获取结果等操作，都能基于Task简单地实现。</p>
+<h2 class="heading" data-id="heading-21">4.5 Dispatcher</h2>
+<p>从Request，到开始解码，从解码完成，到显示图片， 之间不少零碎的处理。<br>
+把这些处理都放到一个类中，却不知道怎么命名了，且命名为Dispatcher吧。<br></p>
+<p>都有哪些处理呢？<br></p>
+<ul>
+<li>1、检查ImageView有没有绑定任务（启动任务后会将Request放入ImageView的tag中），<br>
+如果有，判断是否相同（根据请求的key）, 相同且前面的任务在执行，则取消之；</li>
+<li>2、启动任务前显示占位图（如果设置了的话）；<br></li>
+<li>3、任务结束，如果任务失败，显示错误图片；</li>
+<li>4、如果加载成功且设置了过渡动画，执行动画；</li>
+<li>5、各种target的回调；</li>
+<li>6、任务的暂停和开始。</li>
+</ul>
+<p>其中，最后一点，在显示有大量数据源的RecycleView或者ListView时，<br>
+执行快速滑动时最好能暂停任务，停下来才恢复加载，这样能节省很多不必要的请求。</p>
+<p>简而言之，Dispatcher有两个职责：<br>
+1、桥接的作用，连接外部于内部组件（有点像主板）；<br>
+2、处理结果的反馈（如图片的显示）。</p>
+<h1 class="heading" data-id="heading-22">五、回顾</h1>
+<p>第三章梳理了流程和架构；
+第四章分解了各部分功能实现；
+这一章我们做一下回顾和梳理。</p>
+<h2 class="heading" data-id="heading-23">5.1 依赖关系</h2>
+<p>先回顾一下图片框架的架构：
+</p><figure><img class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/20/1668eab21c798bf5?imageView2/0/w/1280/h/960/ignore-error/1" data-width="917" data-height="949" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;917&quot; height=&quot;949&quot;&gt;&lt;/svg&gt;"><figcaption></figcaption></figure><p></p>
+<ul>
+<li>Doodle作为框架的入口，提供全局参数配置（Config）以及单个图片的请求（Request）;</li>
+<li>Request被很多类所依赖，事实上，Request贯穿了整个请求过程。
+添加功能时，一般也是从Request开始，添加变量和方法，然后在后面的流程中寻找注入点，插入控制代码，完成功能添加。</li>
+<li>Dispatcher和Worker是相互依赖的关系，表现为Dispatcher发起启动Worker, Worker将结果反馈给Dispatcher。</li>
+<li>Downloader给Source提供图片文件的InputStream, 图片下载的具体执行为Downloader中的OkHttpClient。、</li>
+</ul>
+<p>整个框架以Doodle为起点，以Worker为核心，类之间调用不会太深， 总体上结构还是比较紧凑的。<br>
+了解这几个类，就基本上了解整个框架的构成了。</p>
+<h2 class="heading" data-id="heading-24">5.2 执行流</h2>
+<p>这一节，我们结合各个核心类，再次梳理一下执行流程：</p>
+<p></p><figure><img class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/20/1668eab24ad231c1?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1130" data-height="960" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1130&quot; height=&quot;960&quot;&gt;&lt;/svg&gt;"><figcaption></figcaption></figure><p></p>
+<p>上图依然是简化版的执行流，但弄清楚了基本流程，其他细枝末节的流程也都好理解了。</p>
+<p>1、图片加载流程，从框架的**Doodle.load()**开始，返回Request对象；</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">object</span> Doodle {
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">load</span><span class="hljs-params">(path: <span class="hljs-type">String</span>)</span></span>: Request {
+        <span class="hljs-keyword">return</span> Request(path)
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>2、封装Request参数之后，以into收尾，由Dispatcher启动请求；</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Request</span> </span>{
+	<span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">into</span><span class="hljs-params">(target: <span class="hljs-type">ImageView</span>?)</span></span> 
+		fillSizeAndLoad(viewWidth, viewHeight)
+	}
+	
+	<span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">fillSizeAndLoad</span><span class="hljs-params">(targetWidth: <span class="hljs-type">Int</span>, targetHeight: <span class="hljs-type">Int</span>)</span></span> {
+		Dispatcher.start(<span class="hljs-keyword">this</span>)
+	}
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>3、先尝试从内存缓存获取bitmap, 无则开启异步请求</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">internal</span> <span class="hljs-keyword">object</span> Dispatcher {
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">start</span><span class="hljs-params">(request: <span class="hljs-type">Request</span>?)</span></span> {
+        <span class="hljs-keyword">val</span> bitmap = MemoryCache.getBitmap(request.key)
+        <span class="hljs-keyword">if</span> (bitmap == <span class="hljs-literal">null</span>) {
+            <span class="hljs-keyword">val</span> loader = Worker(request, imageView)
+            loader.priority(request.priority)
+                    .hostHash(request.hostHash)
+                    .execute()
+        }
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>4、核心的工作都在Worker中执行，包括获取文件（解析，下载），解码，变换，及缓存图片等</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">internal</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Worker</span></span>(<span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> request: Request, imageView: ImageView?) : UITask&lt;<span class="hljs-built_in">Void</span>, <span class="hljs-built_in">Void</span>, Any&gt;() {
+   <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> fromMemory = <span class="hljs-literal">false</span>
+   <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> fromDiskCache = <span class="hljs-literal">false</span>
+
+   <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">doInBackground</span><span class="hljs-params">(<span class="hljs-keyword">vararg</span> params: <span class="hljs-type">Void</span>)</span></span>: Any? {
+       <span class="hljs-keyword">var</span> bitmap: Bitmap? = <span class="hljs-literal">null</span>
+       <span class="hljs-keyword">var</span> source: Source? = <span class="hljs-literal">null</span>
+       <span class="hljs-keyword">try</span> {
+           bitmap = MemoryCache.getBitmap(key) <span class="hljs-comment">// 检查内存缓存</span>
+           <span class="hljs-keyword">if</span> (bitmap == <span class="hljs-literal">null</span>) {
+               <span class="hljs-keyword">val</span> filePath = DiskCache[key] <span class="hljs-comment">// 检查磁盘缓存（结果缓存）</span>
+               fromDiskCache = !TextUtils.isEmpty(filePath)
+               source = <span class="hljs-keyword">if</span> (fromDiskCache) Source.valueOf(File(filePath!!)) <span class="hljs-keyword">else</span> Source.parse(request) <span class="hljs-comment">// 解析</span>
+               bitmap = Decoder.decode(source, request, fromDiskCache) <span class="hljs-comment">// 解码</span>
+               bitmap = transform(request, bitmap) <span class="hljs-comment">// 变换</span>
+               <span class="hljs-keyword">if</span> (bitmap != <span class="hljs-literal">null</span>) {
+                   <span class="hljs-keyword">if</span> (request.memoryCacheStrategy != MemoryCacheStrategy.NONE) {
+                       <span class="hljs-keyword">val</span> toWeakCache = request.memoryCacheStrategy == MemoryCacheStrategy.WEAK
+                       MemoryCache.putBitmap(key, bitmap, toWeakCache) <span class="hljs-comment">// 缓存到内存</span>
+                   }
+                   <span class="hljs-keyword">if</span> (!fromDiskCache &amp;&amp; request.diskCacheStrategy and DiskCacheStrategy.RESULT != <span class="hljs-number">0</span>) {
+                       storeResult(key, bitmap) <span class="hljs-comment">// 缓存到磁盘</span>
+                   }
+               }
+           }
+           <span class="hljs-keyword">return</span> bitmap
+       } <span class="hljs-keyword">catch</span> (e: Throwable) {
+           LogProxy.e(TAG, e)
+       } <span class="hljs-keyword">finally</span> {
+           Utils.closeQuietly(source)
+       }
+       <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
+   }
+
+   <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">onPostExecute</span><span class="hljs-params">(result: <span class="hljs-type">Any</span>?)</span></span> {
+       <span class="hljs-keyword">val</span> imageView = target
+       <span class="hljs-keyword">if</span> (imageView != <span class="hljs-literal">null</span>) {
+           imageView.tag = <span class="hljs-literal">null</span>
+       }
+       <span class="hljs-comment">// 显示结果</span>
+       Dispatcher.feedback(request, imageView, result, <span class="hljs-literal">false</span>)
+   }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><p>以上代码中，有两点需要提一下：</p>
+<ul>
+<li>Dispatcher启动Worker之前已经检查内存缓存了，为什么Worker中又检查一次？
+因为可能存在多个请求的bitmap是相同的（key所决定），只是target不同，然后Worker会串行执行这些请求；
+当第一个请求结束，图片已经放到内存缓存了，接下来的请求可以从内存缓存中直接获取bitmap,无需再次解码。</li>
+<li>为什么没有看到Downloader下载文件？
+Downloader出现在Source.parse(request)方法中，主要是返回一个InputStream;
+文件的下载过程在发生在Decoder.decode()方法中，一遍下载一边解码。</li>
+</ul>
+<p>5、回归Dispatcher, 刷新ImageView</p>
+<pre><code class="hljs kotlin copyable" lang="kotlin"><span class="hljs-keyword">internal</span> <span class="hljs-keyword">object</span> Dispatcher {
+    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">feedback</span><span class="hljs-params">(request: <span class="hljs-type">Request</span>, imageView: <span class="hljs-type">ImageView</span>? ...)</span></span> {
+		<span class="hljs-keyword">if</span> (bitmap != <span class="hljs-literal">null</span>) {
+			imageView.setImageBitmap(bitmap)
+		} 
+    }
+}
+<span class="copy-code-btn">复制代码</span></code></pre><h1 class="heading" data-id="heading-25">六、API</h1>
+<p>前面说了这么多实现细节，那到底最终都实现了些什么功能呢？<br>
+看有什么功能，看接口层的三个类即可。</p>
+<h2 class="heading" data-id="heading-26">6.1 Doodle (框架入口）</h2>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>init(Context) : Config</td>
+<td>初始化，传入context, 返回全局配置</td>
+</tr>
+<tr>
+<td>trimMemory(int)</td>
+<td>整理内存(LruCache)，传入ComponentCallbacks2的不同level有不同的策略</td>
+</tr>
+<tr>
+<td>clearMemory()</td>
+<td>移除LruCache中所有bitmap</td>
+</tr>
+<tr>
+<td>load(String): Request</td>
+<td>传入图片路径，返回Request</td>
+</tr>
+<tr>
+<td>load(int): Request</td>
+<td>传入资源ID，返回Request</td>
+</tr>
+<tr>
+<td>load(Uri): Request</td>
+<td>传入URI，返回Request</td>
+</tr>
+<tr>
+<td>downloadOnly(String): File?</td>
+<td>仅下载图片文件，不解码。此方法会走网络请求，不可再UI线程调用</td>
+</tr>
+<tr>
+<td>getSourceCacheFile(url: String): File?</td>
+<td>获取原图缓存，无则返回null。不走网络请求，可以在UI线程调用</td>
+</tr>
+<tr>
+<td>cacheBitmap(String,Bitmap,Boolean)</td>
+<td>缓存bitmap到Doodle的MemoryCache, 相当于开放MemoryCache, 复用代码，统一管理。</td>
+</tr>
+<tr>
+<td>getCacheBitmap(String): Bitmap?</td>
+<td>获取缓存在Cache中的bitmap</td>
+</tr>
+<tr>
+<td>pauseRequest()</td>
+<td>暂停往任务队列中插入请求，对RecycleView快速滑动等场景，可调用此函数</td>
+</tr>
+<tr>
+<td>resumeRequest()</td>
+<td>恢复请求</td>
+</tr>
+<tr>
+<td>notifyEvent(Any, int)</td>
+<td>发送页面生命周期事件(通知页面销毁以取消请求等）</td>
+</tr>
+</tbody>
+</table>
+<h2 class="heading" data-id="heading-27">6.2 Config （全局配置）</h2>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>setUserAgent(String)</td>
+<td>设置User-Agent头，网络请求将自动填上此Header</td>
+</tr>
+<tr>
+<td>setDiskCachePath(String)</td>
+<td>设置结果缓存的存储路径</td>
+</tr>
+<tr>
+<td>setDiskCacheCapacity(Long)</td>
+<td>设置结果缓存的容量</td>
+</tr>
+<tr>
+<td>setDiskCacheMaxAge(Long)</td>
+<td>设置结果缓存的最大保留时间（从最近一次访问算起），默认30天</td>
+</tr>
+<tr>
+<td>setSourceCacheCapacity(Long)</td>
+<td>设置原图缓存的容量</td>
+</tr>
+<tr>
+<td>setMemoryCacheCapacity(Long)</td>
+<td>设置内存缓存的容量，默认为maxMemory的1/6</td>
+</tr>
+<tr>
+<td>setCompressFormat(Bitmap.CompressFormat)</td>
+<td>设置结果缓存的压缩格式， 默认为PNG</td>
+</tr>
+<tr>
+<td>setDefaultBitmapConfig(Bitmap.Config)</td>
+<td>设置默认的Bitmap.Config，默认为ARGB_8888</td>
+</tr>
+<tr>
+<td>setGifDecoder(GifDecoder)</td>
+<td>设置GIF解码器</td>
+</tr>
+</tbody>
+</table>
+<h2 class="heading" data-id="heading-28">6.3 Request （图片请求）</h2>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sourceKey(String)</td>
+<td>设置数据源的key <br> url默认情况下作为Request的key的一部分，有时候url有动态的参数，使得url频繁变化，从而无法缓存。<br>此时可以设置sourceKey,提到path作为Request的key的一部分。</td>
+</tr>
+<tr>
+<td>override(int, int)</td>
+<td>指定剪裁大小<br>并不最终bitmap等大小并不一定等于override指定的大小（优先按照 ScaleType剪裁，向下采样），<br>若需确切大小的bitmap可配合ResizeTransformation实现。</td>
+</tr>
+<tr>
+<td>scaleType(ImageView.ScaleType)</td>
+<td>指定缩放类型 <br> 如果target为ImageView则会自动从ImageView获取。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>memoryCacheStrategy(int)</td>
+<td>设置内存缓存策略，默认LRU策略</td>
+</tr>
+<tr>
+<td>diskCacheStrategy(int)</td>
+<td>设置磁盘缓存策略，默认ALL</td>
+</tr>
+<tr>
+<td>noCache()</td>
+<td>不做任何缓存，包括磁盘缓存和内存缓存</td>
+</tr>
+<tr>
+<td>onlyIfCached(boolean)</td>
+<td>指定网络请求是否只从缓存读取（原图缓存）</td>
+</tr>
+<tr>
+<td>noClip()</td>
+<td>直接解码，不做剪裁和压缩</td>
+</tr>
+<tr>
+<td>config(Bitmap.Config)</td>
+<td>指定单个请求的Bitmap.Config</td>
+</tr>
+<tr>
+<td>transform(Transformation)</td>
+<td>设置解码后的图片变换，可以连续调用（会按顺序执行）</td>
+</tr>
+<tr>
+<td>priority(int)</td>
+<td>请求优先级</td>
+</tr>
+<tr>
+<td>keepOriginalDrawable()</td>
+<td>默认情况下请求开始会先清空ImageView之前的Drawable, 调用此方法后会保留之前的Drawable</td>
+</tr>
+<tr>
+<td>placeholder(int)</td>
+<td>设置占位图，在结果加载完成之前会显示此drawable</td>
+</tr>
+<tr>
+<td>placeholder(Drawable)</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>error(int)</td>
+<td>设置加载失败后的占位图</td>
+</tr>
+<tr>
+<td>error(Drawable)</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>goneIfMiss()</td>
+<td>加载失败后imageView.visibility = View.GONE</td>
+</tr>
+<tr>
+<td>animation(int)</td>
+<td>设置加载成功后的过渡动画</td>
+</tr>
+<tr>
+<td>animation(Animation)</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>fadeIn(int)</td>
+<td>加载成功后显示淡入动画</td>
+</tr>
+<tr>
+<td>crossFate(int)</td>
+<td>这个动画效果是原图从透明度100到0， bitmap从0到100。<br>当设置placeholder且内存缓存中没有指定图片时， placeholder为原图。<br>如果没有设置placeholder,  效果和fadeIn差不多。<br>需要注意的是，这个动画在原图和bitmap宽高不相等时，动画结束时图片会变形。<br>因此，慎用crossFade。<br></td>
+</tr>
+<tr>
+<td>alwaysAnimation(Boolean)</td>
+<td>默认情况下仅在图片是从磁盘或者网络加载出来时才做动画，可通过此方法设置总是做动画</td>
+</tr>
+<tr>
+<td>asBitmap()</td>
+<td>当设置了GifDecoder时，默认情况下只要图片是GIF图片，则用GifDecoder解码。<br>调用此方法后，只取Gif文件第一帧，返回bitmap</td>
+</tr>
+<tr>
+<td>host(Any)</td>
+<td>参加<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fwww.jianshu.com%2Fp%2F8afb6cf64eec" rel="nofollow noopener noreferrer">Task</a>的host</td>
+</tr>
+<tr>
+<td>cacheInterceptor(CacheInterceptor)</td>
+<td>(原图）缓存拦截器，可自定义单个请求的缓存路径，自己管理缓存，以免被LRU或者过时规则删除</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>preLoad()</td>
+<td>预加载</td>
+</tr>
+<tr>
+<td>get(get) : Bitmap?</td>
+<td>当前线程获取图片，加载时阻塞当前线程</td>
+</tr>
+<tr>
+<td>into(SimpleTarget)</td>
+<td>加载图片后通过SimpleTarget回调图片(加载是不阻塞当前线程)</td>
+</tr>
+<tr>
+<td>into(ImageView, Callback)</td>
+<td>加载图片图片到ImageView，同时通过Callback回调。<br>如果Callback中返回true, 说明已经处理该bitmap了，则Doodle不会再setBitmap到ImageView了。</td>
+</tr>
+<tr>
+<td>into(ImageView?)</td>
+<td>加载图片图片到ImageView</td>
+</tr>
+</tbody>
+</table>
+<h1 class="heading" data-id="heading-29">七、总结</h1>
+<p>本文从架构，流程等方面入手，详细分析了图片加载框架的各种实现细节。<br>
+从文中可以看出，实现过程大量借鉴了Glide和Picasso,  在此对Glide和Picasso的开源工作者表示敬意和感谢。<br>
+这里就不做太详细的对比了，这里只比较下方法数和包大小（功能和性能不太好比较）。</p>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>版本</th>
+<th>方法数</th>
+<th>包大小</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Glide</td>
+<td>4.8.0</td>
+<td>3193</td>
+<td>691k</td>
+</tr>
+<tr>
+<td>Picasso</td>
+<td>2.71828</td>
+<td>527</td>
+<td>119k</td>
+</tr>
+<tr>
+<td>Doodle</td>
+<td>1.0.8</td>
+<td>419</td>
+<td>100k</td>
+</tr>
+</tbody>
+</table>
+<p>Doodle先是用Java写的，后面用Kotlin改写，方法数从200+变400+，包大小从60几K变为100K，真是作啊-_-<br>
+Picasso 停在2.71828（对数e≈2.71828, 刚开始还以为作者弃疗了~）好久了，说要出Picasso 3, 但是时间过去N久了也没见影；<br>
+从完备度和稳定性而言，Glide都要优于Picasso，毕竟一直有大量的反馈以及持续的维护。<br>
+Doodle在完备度上是不输Picasso的，并且相对前二者有一些微创新；<br>
+但毕竟是新项目，一个人的力量有限，必然会有不足的地方。<br>
+感兴趣的读者可以参与进来，欢迎提建议和提代码。</p>
+<p>项目已发布到jcenter和github, 项目地址：<a target="_blank" href="https://link.juejin.im?target=https%3A%2F%2Fgithub.com%2FNo89757%2FDoodle" rel="nofollow noopener noreferrer">github.com/No89757/Doo…</a> <br>
+看多遍不如跑一遍，可以Download下来运行一下，会比看文章有更多的收获。</p>
+</div></article><div data-v-13f76525="" data-v-3f216172="" class="tag-list-box"><div data-v-13f76525="" data-v-3f216172="" class="tag-list-title">关注下面的标签，发现更多相似文章</div><div data-v-13f76525="" data-v-3f216172="" st:block="tagList" class="tag-list"><a data-v-13f76525="" href="/tag/Android" target="_blank" rel="" st:name="tag" class="item" data-v-3f216172=""><div data-v-b2db8566="" data-v-009ea7bb="" data-v-13f76525="" data-src="https://lc-gold-cdn.xitu.io/7bab0e1e66ea386e6f94.png?imageView2/2/w/42/h/42/q/85/interlace/1" class="lazy thumb tag-icon" style="background-image: none; background-size: contain;"></div><div data-v-13f76525="" class="tag-title">Android</div></a><a data-v-13f76525="" href="/tag/%E6%9E%B6%E6%9E%84" target="_blank" rel="" st:name="tag" class="item" data-v-3f216172=""><div data-v-b2db8566="" data-v-009ea7bb="" data-v-13f76525="" data-src="https://lc-gold-cdn.xitu.io/f27d811ad7e2b2a0bc24.png?imageView2/2/w/42/h/42/q/85/interlace/1" class="lazy thumb tag-icon" style="background-image: none; background-size: contain;"></div><div data-v-13f76525="" class="tag-title">架构</div></a><a data-v-13f76525="" href="/tag/Glide" target="_blank" rel="" st:name="tag" class="item" data-v-3f216172=""><div data-v-b2db8566="" data-v-009ea7bb="" data-v-13f76525="" data-src="https://lc-gold-cdn.xitu.io/6df837b19b6d6c2ca948.png?imageView2/2/w/42/h/42/q/85/interlace/1" class="lazy thumb tag-icon" style="background-image: none; background-size: contain;"></div><div data-v-13f76525="" class="tag-title">Glide</div></a><a data-v-13f76525="" href="/tag/Picasso" target="_blank" rel="" st:name="tag" class="item" data-v-3f216172=""><div data-v-b2db8566="" data-v-009ea7bb="" data-v-13f76525="" data-src="https://lc-gold-cdn.xitu.io/5559d7d23940b5ceffcb.png?imageView2/2/w/42/h/42/q/85/interlace/1" class="lazy thumb tag-icon" style="background-image: none; background-size: contain;"></div><div data-v-13f76525="" class="tag-title">Picasso</div></a></div></div><div data-v-13f76525="" data-v-3f216172="" st:block="banner" class="article-banner"><a data-v-13f76525="" data-v-3f216172="" st:name="link" st:state="https://juejin.im/post/5acf3a3ff265da2374115df5" class="banner-title" href="https://juejin.im/post/5acf3a3ff265da2374115df5" target="_blank">掘金招聘运营经理、内容运营</a><div data-v-13f76525="" data-v-3f216172="" class="banner-content">加入掘金和开发者一起成长。发送简历到 hr@xitu.io，期待你的加入！</div></div><!----><!----><div data-v-4f97d566="" data-v-13f76525="" class="comment-list-box" id="comment-box" data-v-3f216172=""><div data-v-4f97d566="" class="title">评论</div><div data-v-1cbbd4f0="" data-v-4f97d566="" class="comment-form comment-form"><div data-v-1cbbd4f0="" class="avatar-box"><div data-v-b2db8566="" data-v-1b9df826="" data-v-1cbbd4f0="" data-src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjM2cHgiIGhlaWdodD0iMzZweCIgdmlld0JveD0iMCAwIDM2IDM2IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbG5zOnNrZXRjaD0iaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoL25zIj4KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggMy4zLjMgKDEyMDgxKSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4KICAgIDx0aXRsZT5kZWZhdWx0X2dyYXZhdGFyPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGRlZnM+PC9kZWZzPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+CiAgICAgICAgPGcgaWQ9ImRlZmF1bHRfZ3JhdmF0YXIiIHNrZXRjaDp0eXBlPSJNU0FydGJvYXJkR3JvdXAiPgogICAgICAgICAgICA8ZyBpZD0iUmVjdGFuZ2xlLTIxMC0rLUltcG9ydGVkLUxheWVycy1Db3B5LUNvcHkiIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiPgogICAgICAgICAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS0yMTAiIGZpbGw9IiNEOEQ4RDgiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiI+PC9yZWN0PgogICAgICAgICAgICAgICAgPHBhdGggZD0iTTI3Ljg2OTAzMjEsMjYuODUzNjU2OCBMOCwyNi44NTM2NTY4IEM4LDI1Ljg0OTQ1MTQgOC40NzE4MjUsMjQuMTEwOTQ2NiAxMS41MTg5MDQ1LDIyLjM4ODMxNzYgQzEyLjE1Nzg5NiwyMi4wMjcxMjEzIDE1LjM0Mzk1MTIsMjAuMDk2MTA5OCAxNS42MTU5Njc3LDE5LjYzNzE3MjEgQzE1LjkyNDU4MjgsMTkuMTE3MjA4MSAxNi4wMTA2Mzg5LDE4LjQ3NjE4MzcgMTUuNDIwMTE1OCwxNy41MzI1MDg1IEMxNS4zNzI2MzY2LDE3LjQ1NjEwMTYgMTQuNDM0OTIxNSwxNi4wMDgzMzkxIDE0LjE0NTEwMDMsMTUuMDMwNDI5NyBDMTMuOTQwMzQ2LDE0LjMzODMwMiAxMy45MTc1OTU1LDEzLjU0NTQ1NjEgMTMuOTE3NTk1NSwxMi43MTM0MTQ0IEMxMy45MTc1OTU1LDkuODM2MjQ3MDIgMTUuNzIyMzAxNCw4IDE3Ljk0ODM4NTYsOCBDMjAuMTc0NDY5OSw4IDIxLjk3OTE3NTgsOS44MzYyNDcwMiAyMS45NzkxNzU4LDEyLjcxMzQxNDQgQzIxLjk3OTE3NTgsMTMuMzk5MDkyMiAyMS45NjYzMTY4LDE0LjA1NTk5MzMgMjEuODQ3MTI0MSwxNC42NTM4NTI3IEMyMS42Mzk4OTcsMTUuNjkwMzA3NyAyMC43NzU4NzM2LDE3LjAwNTU5ODQgMjAuNTg4NDI5NSwxNy4zMzA1NzU5IEMyMC41NDM5MTc3LDE3LjQwNzQ3OSAyMC41MDc4MTM3LDE3LjQ2NzUxMyAyMC40ODUwNjMzLDE3LjUwMTI1MTEgQzIwLjA3OTAxNjgsMTguMTA3MDQ4OSAxOS45NjI3OTE2LDE4LjU1MzU4MjkgMjAuMDAwODczOSwxOC45MTUyNzU1IEMyMC4wNDQzOTY1LDE5LjMyODU2NzUgMjAuMzEzOTQwMSwxOS42MTYzMzM4IDIwLjY2NzA2NywxOS44NTQ0ODUzIEMyMS4wMzQ1MzY2LDIwLjEwMjA2MzYgMjQuMDExODgxLDIyLjE0OTY3IDI0LjM3Nzg2NjgsMjIuMzg4MzE3NiBDMjYuODcxNTE2MywyNC4wMTY2NzgzIDI3Ljg2OTAzMjEsMjUuNjA2MzM4NSAyNy44NjkwMzIxLDI2Ljg1MzY1NjggTDI3Ljg2OTAzMjEsMjYuODUzNjU2OCBaIiBpZD0iSW1wb3J0ZWQtTGF5ZXJzLUNvcHkiIGZpbGw9IiNGRkZGRkYiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiPjwvcGF0aD4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" class="lazy avatar avatar" title="" style="background-image: none;"></div></div><div data-v-1cbbd4f0="" class="form-box"><div data-v-1cbbd4f0="" class="input-box"><div data-v-1cbbd4f0="" contenteditable="true" spellcheck="false" placeholder="输入评论..." class="rich-input empty"><br data-v-1cbbd4f0=""></div><!----></div><!----></div><input data-v-1cbbd4f0="" type="file" class="hidden"></div><!----><!----></div></div><!----><div data-v-13f76525="" data-v-3f216172="" st:block="recommended" class="main-area recommended-area shadow"><div data-v-13f76525="" data-v-3f216172="" class="recommended-entry-list-title">相关推荐</div><ul data-v-f0edcf22="" data-v-13f76525="" st:block="entryList" class="entry-list recommended-entry-list" data-v-3f216172=""><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bcad2aa5188255c6e70977c|1" class="entry"><a data-v-6b46a625="" href="/post/5bcad2875188255c8b6f2478" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="57d35e54bf22ec005fa540eb" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/57d35e54bf22ec005fa540eb" target="_blank" rel="" st:name="user" st:state="57d35e54bf22ec005fa540eb" data-v-311d2efa="">fansonq</a></div></li><li data-v-6b46a625="" class="item">1天前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/Android" target="_blank" rel="" st:name="tag" st:state="5597838ee4b08a686ce2319d" class="tag">Android</a><a data-v-6b46a625="" href="/tag/%E6%9E%B6%E6%9E%84" target="_blank" rel="" st:name="tag" st:state="55cdb52740ac79db3570607f" class="tag">架构</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bcad2875188255c8b6f2478" target="_blank" rel="" st:name="title" class="title">使用策略模式优雅引用第三方框架</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-6b46a625="" class="count">21</span></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bcad2875188255c8b6f2478#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><span data-v-6b46a625="" class="count">11</span></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><!----></div></a></div></div></li><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bcd04fef265da0ad221c485|2" class="entry"><a data-v-6b46a625="" href="/post/5bcc7151f265da0ab41e8f6e" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="58368cd967f3560065f31ac3" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/58368cd967f3560065f31ac3" target="_blank" rel="" st:name="user" st:state="58368cd967f3560065f31ac3" data-v-311d2efa="">Tangpj</a></div></li><li data-v-6b46a625="" class="item">4小时前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/GitHub" target="_blank" rel="" st:name="tag" st:state="555e9abee4b00c57d9956152" class="tag">GitHub</a><a data-v-6b46a625="" href="/tag/Android" target="_blank" rel="" st:name="tag" st:state="5597838ee4b08a686ce2319d" class="tag">Android</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bcc7151f265da0ab41e8f6e" target="_blank" rel="" st:name="title" class="title">听说你还不会用Dagger2？Dagger2 For Android最佳实践教程</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-6b46a625="" class="count">51</span></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bcc7151f265da0ab41e8f6e#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><span data-v-6b46a625="" class="count">13</span></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><div data-v-b2db8566="" data-v-009ea7bb="" data-v-6b46a625="" data-src="https://user-gold-cdn.xitu.io/2018/10/21/166969c584f48a66?imageView2/1/w/120/h/120/q/85/interlace/1" class="lazy thumb thumb" style="background-image: none; background-size: cover;"></div></div></a></div></div></li><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bca6bbff265da0aeb713a85|3" class="entry"><a data-v-6b46a625="" href="/post/5bca698751882576676f606a" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="59abef0af265da246c4a3de1" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/59abef0af265da246c4a3de1" target="_blank" rel="" st:name="user" st:state="59abef0af265da246c4a3de1" data-v-311d2efa="">Horizon757</a></div></li><li data-v-6b46a625="" class="item">2天前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/Android" target="_blank" rel="" st:name="tag" st:state="5597838ee4b08a686ce2319d" class="tag">Android</a><a data-v-6b46a625="" href="/tag/%E6%9E%B6%E6%9E%84" target="_blank" rel="" st:name="tag" st:state="55cdb52740ac79db3570607f" class="tag">架构</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bca698751882576676f606a" target="_blank" rel="" st:name="title" class="title">如何实现一个图片加载框架</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-6b46a625="" class="count">3</span></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bca698751882576676f606a#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><!----></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><!----></div></a></div></div></li><!----><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bcd22d2e51d457ac61c11ea|4" class="entry"><a data-v-6b46a625="" href="/post/5bcd22ba6fb9a05d3c8030a1" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="590943745c497d0058547b57" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/590943745c497d0058547b57" target="_blank" rel="" st:name="user" st:state="590943745c497d0058547b57" data-v-311d2efa="">少年阿涛</a></div></li><li data-v-6b46a625="" class="item">2小时前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/Google" target="_blank" rel="" st:name="tag" st:state="555e9adae4b00c57d99562a4" class="tag">Google</a><a data-v-6b46a625="" href="/tag/Android" target="_blank" rel="" st:name="tag" st:state="5597838ee4b08a686ce2319d" class="tag">Android</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bcd22ba6fb9a05d3c8030a1" target="_blank" rel="" st:name="title" class="title">Android Paging分页库的学习（一）—— 结合本地数据进行分页加载</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-6b46a625="" class="count">4</span></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bcd22ba6fb9a05d3c8030a1#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><!----></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><!----></div></a></div></div></li><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bc9a599f265da0a8f35f8ba|5" class="entry"><a data-v-6b46a625="" href="/post/5bc9a43fe51d450e623856d6" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="5701032139b0570054111222" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/5701032139b0570054111222" target="_blank" rel="" st:name="user" st:state="5701032139b0570054111222" data-v-311d2efa="">weiminsir</a></div></li><li data-v-6b46a625="" class="item">2天前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/Android" target="_blank" rel="" st:name="tag" st:state="5597838ee4b08a686ce2319d" class="tag">Android</a><a data-v-6b46a625="" href="/tag/%E5%BC%80%E6%BA%90" target="_blank" rel="" st:name="tag" st:state="5597a3cae4b08a686ce5d0fb" class="tag">开源</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bc9a43fe51d450e623856d6" target="_blank" rel="" st:name="title" class="title"> Android AudioRecord录音 并websocket实时传输,AudioTrack 播放wav 音频,Speex加密</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-6b46a625="" class="count">1</span></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bc9a43fe51d450e623856d6#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><span data-v-6b46a625="" class="count">1</span></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><!----></div></a></div></div></li><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bcae143e51d450e580bb79f|6" class="entry"><a data-v-6b46a625="" href="/post/5bcae11c5188255c59673d20" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="5858b19e1b69e6006caef4d3" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/5858b19e1b69e6006caef4d3" target="_blank" rel="" st:name="user" st:state="5858b19e1b69e6006caef4d3" data-v-311d2efa="">爱布偶的zzy</a></div></li><li data-v-6b46a625="" class="item">1天前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/%E7%AE%97%E6%B3%95" target="_blank" rel="" st:name="tag" st:state="55cd843d60b203b0519307a9" class="tag">算法</a><a data-v-6b46a625="" href="/tag/%E8%BF%90%E7%BB%B4" target="_blank" rel="" st:name="tag" st:state="5602d88360b27db45a7f3bdc" class="tag">运维</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bcae11c5188255c59673d20" target="_blank" rel="" st:name="title" class="title">聊聊负载均衡</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-6b46a625="" class="count">1</span></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bcae11c5188255c59673d20#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><!----></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><div data-v-b2db8566="" data-v-009ea7bb="" data-v-6b46a625="" data-src="https://user-gold-cdn.xitu.io/2018/10/20/166907f92f0aecbe?imageView2/1/w/120/h/120/q/85/interlace/1" class="lazy thumb thumb" style="background-image: none; background-size: cover;"></div></div></a></div></div></li><!----><!----><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bcc6f34e51d457ab36ceaae|4" class="entry"><a data-v-6b46a625="" href="/post/5bcc6ebb6fb9a05d2b6df31f" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="583fbb43ac502e006be46509" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/583fbb43ac502e006be46509" target="_blank" rel="" st:name="user" st:state="583fbb43ac502e006be46509" data-v-311d2efa="">developerHaoz</a></div></li><li data-v-6b46a625="" class="item">15小时前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/Android" target="_blank" rel="" st:name="tag" st:state="5597838ee4b08a686ce2319d" class="tag">Android</a><a data-v-6b46a625="" href="/tag/%E5%9B%BE%E7%89%87%E8%B5%84%E6%BA%90" target="_blank" rel="" st:name="tag" st:state="5597b529e4b08a686ce77b57" class="tag">图片资源</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bcc6ebb6fb9a05d2b6df31f" target="_blank" rel="" st:name="title" class="title">Android 刘海屏适配总结</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-6b46a625="" class="count">45</span></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bcc6ebb6fb9a05d2b6df31f#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><span data-v-6b46a625="" class="count">1</span></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><!----></div></a></div></div></li><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bcd26b351882577e8309cb5|5" class="entry"><a data-v-6b46a625="" href="/post/5bcd267e51882576bd40443b" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="5811c3f2570c3500680d09d5" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/5811c3f2570c3500680d09d5" target="_blank" rel="" st:name="user" st:state="5811c3f2570c3500680d09d5" data-v-311d2efa="">顾林海</a></div></li><li data-v-6b46a625="" class="item">2小时前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/Android" target="_blank" rel="" st:name="tag" st:state="5597838ee4b08a686ce2319d" class="tag">Android</a><a data-v-6b46a625="" href="/tag/OKHttp" target="_blank" rel="" st:name="tag" st:state="582ec6fd128fe100696072ed" class="tag">OKHttp</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bcd267e51882576bd40443b" target="_blank" rel="" st:name="title" class="title">Android小知识-剖析OkHttp中的同步请求</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-6b46a625="" class="count">1</span></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bcd267e51882576bd40443b#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><!----></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><!----></div></a></div></div></li><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bcd22f8e51d457a4b4f8f3d|6" class="entry"><a data-v-6b46a625="" href="/post/5bcd22e76fb9a05d3a4b6f05" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="590943745c497d0058547b57" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/590943745c497d0058547b57" target="_blank" rel="" st:name="user" st:state="590943745c497d0058547b57" data-v-311d2efa="">少年阿涛</a></div></li><li data-v-6b46a625="" class="item">2小时前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/Google" target="_blank" rel="" st:name="tag" st:state="555e9adae4b00c57d99562a4" class="tag">Google</a><a data-v-6b46a625="" href="/tag/Android" target="_blank" rel="" st:name="tag" st:state="5597838ee4b08a686ce2319d" class="tag">Android</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bcd22e76fb9a05d3a4b6f05" target="_blank" rel="" st:name="title" class="title">Android Paging分页库的学习（二）—— 结合Room数据库进行分页加载</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><!----></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bcd22e76fb9a05d3a4b6f05#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><!----></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><!----></div></a></div></div></li><li data-v-f0edcf22="" class="item"><div data-v-9f3d7718="" data-v-f0edcf22="" class="entry-box"><div data-v-6b46a625="" data-v-9f3d7718="" st:block="entry" st:state="5bcd3466f265da0aa06f2d13|7" class="entry"><a data-v-6b46a625="" href="/post/5bcd32f26fb9a05cd8495ddc" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-6b46a625="" class="content-box"><div data-v-6b46a625="" class="info-box"><div data-v-6b46a625="" class="info-row meta-row"><ul data-v-6b46a625="" class="meta-list"><!----><!----><li data-v-6b46a625="" class="item post">专栏</li><li data-v-6b46a625="" class="item username clickable"><div data-v-311d2efa="" data-v-6b46a625="" st:block="userPopover" st:state="5812fdda128fe100557cac91" class="user-popover-box"><!----><a data-v-6b46a625="" href="/user/5812fdda128fe100557cac91" target="_blank" rel="" st:name="user" st:state="5812fdda128fe100557cac91" data-v-311d2efa="">DamonRen</a></div></li><li data-v-6b46a625="" class="item">1小时前</li><li data-v-6b46a625="" class="item tag"><a data-v-6b46a625="" href="/tag/Android" target="_blank" rel="" st:name="tag" st:state="5597838ee4b08a686ce2319d" class="tag">Android</a><a data-v-6b46a625="" href="/tag/C++" target="_blank" rel="" st:name="tag" st:state="559a721ee4b08a686d257366" class="tag">C++</a></li><!----></ul></div><div data-v-6b46a625="" class="info-row title-row"><!----><!----><a data-v-6b46a625="" href="/post/5bcd32f26fb9a05cd8495ddc" target="_blank" rel="" st:name="title" class="title">AndroidStudio使用NDK编译C/C++代码使用原生库</a></div><div data-v-6b46a625="" class="info-row action-row"><ul data-v-6b46a625="" class="action-list"><li data-v-6b46a625="" st:name="likeBtn" class="item like clickable"><a data-v-6b46a625="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><!----></a></li><li data-v-6b46a625="" st:name="commentBtn" class="item comment clickable"><a data-v-6b46a625="" href="/post/5bcd32f26fb9a05cd8495ddc#comment" target="_blank" rel="" class="title-box"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHRpdGxlPjc1MzFEREU0LTZCMzgtNDI4Ny04QTJBLUY2ODVGMDgzNUFGQzwvdGl0bGU+PGRlZnM+PHJlY3QgaWQ9ImEiIHg9IjU5IiB5PSI1NCIgd2lkdGg9IjU0IiBoZWlnaHQ9IjI1IiByeD0iMSIvPjxtYXNrIGlkPSJiIiB4PSIwIiB5PSIwIiB3aWR0aD0iNTQiIGhlaWdodD0iMjUiIGZpbGw9IiNmZmYiPjx1c2UgeGxpbms6aHJlZj0iI2EiLz48L21hc2s+PC9kZWZzPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02OCAtNTYpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik03MiA2MXY4LjAzOGg0LjQ0NEw4MS4xMTEgNzJ2LTIuOTYySDg0VjYxeiIvPjx1c2Ugc3Ryb2tlPSIjRURFRUVGIiBtYXNrPSJ1cmwoI2IpIiBzdHJva2Utd2lkdGg9IjIiIHhsaW5rOmhyZWY9IiNhIi8+PC9nPjwvc3ZnPg==" class="icon"><!----></a></li><li data-v-6b46a625="" st:name="shareBtn" title="分享" class="item share clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QjFBMjZEODAtQ0ZCRC00REIyLThCQTAtODc0MEVBMTE2RTExPC90aXRsZT48ZyBzdHJva2U9IiNBQUIwQkEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0iTTEwLjUyNCAzLjQxM3Y4LjIzNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMy4wMjcgNy41MDhjLjgxMyAwIDEuNjc4LS4wMSAxLjY3OC0uMDEuNDQ5IDAgLjgxMi4zNzYuODEyLjgyNmwtLjAwNSA2LjM2YS44MTkuODE5IDAgMCAxLS44MTEuODI2SDYuMzFhLjgyMi44MjIgMCAwIDEtLjgxMS0uODI2bC4wMDUtNi4zNmMwLS40NTYuMzYtLjgyNS44MTItLjgyNWwxLjY4OS4wMDZNOC4zNzMgNS4xMTFsMi4xNDMtMi4wOSAyLjE0MyAyLjA3Ii8+PC9nPjwvc3ZnPg==" class="icon"><div data-v-6b46a625="" class="share-panel"><div data-v-6b46a625="" st:name="shareItem" st:state="weibo" class="share-item weibo"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MTYzQzFFRDAtNDA0My00REMyLUEwRTQtNEQ1NDI2MjFFNkIzPC90aXRsZT48ZyBmaWxsPSIjRDUyQjJBIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy4yNzUgMTEuMTgzYy0uMjY3LS4wNzctLjQ1LS4xMy0uMzEtLjQ3LjMwMy0uNzM3LjMzNC0xLjM3My4wMDUtMS44MjctLjYxNS0uODUxLTIuMy0uODA1LTQuMjMyLS4wMjMgMCAwLS42MDYuMjU3LS40NTEtLjIwOC4yOTctLjkyNC4yNTItMS42OTktLjIxLTIuMTQ1LTEuMDQ4LTEuMDE1LTMuODM0LjAzOC02LjIyNCAyLjM1LTEuNzkgMS43My0yLjgyOCAzLjU2Ni0yLjgyOCA1LjE1MiAwIDMuMDM2IDQuMDIyIDQuODggNy45NTggNC44OCA1LjE2IDAgOC41OTEtMi45IDguNTkxLTUuMjAyIDAtMS4zOTEtMS4yMS0yLjE4LTIuMjk5LTIuNTA3em0tNi4yODEgNi42MjJjLTMuMTQuMy01Ljg1Mi0xLjA3NC02LjA1Ni0zLjA2OS0uMjA0LTEuOTk0IDIuMTc4LTMuODU0IDUuMzE4LTQuMTU1IDMuMTQtLjMgNS44NTEgMS4wNzMgNi4wNTUgMy4wNjcuMjA0IDEuOTk2LTIuMTc3IDMuODU2LTUuMzE3IDQuMTU3ek0yMC43MDEgNS42MjljLTEuMjQ2LTEuMzM3LTMuMDg0LTEuODQ2LTQuNzgtMS40OTdhLjcwMy43MDMgMCAwIDAtLjU2LjgzNGMuMDg0LjM4LjQ3LjYyMi44NjMuNTQgMS4yMDctLjI0NyAyLjUxMy4xMTUgMy4zOTggMS4wNjVhMy4zNyAzLjM3IDAgMCAxIC43NDcgMy4zNzkuNjk4LjY5OCAwIDAgMCAuNDY4Ljg4NWMuMzgxLjEyLjc5LS4wODMuOTE0LS40NTJ2LS4wMDJhNC43MzkgNC43MzkgMCAwIDAtMS4wNS00Ljc1MiIvPjxwYXRoIGQ9Ik0xOC43ODggNy4zYTIuNDk1IDIuNDk1IDAgMCAwLTIuMzI5LS43MjkuNjA1LjYwNSAwIDAgMC0uNDguNzE5LjYyNC42MjQgMCAwIDAgLjc0MS40NjRjLjQwNC0uMDgyLjg0Mi4wMzggMS4xMzkuMzU2LjI5Ny4zMTguMzc2Ljc1Mi4yNDkgMS4xMzJhLjYwMi42MDIgMCAwIDAgLjQwMy43NjIuNjMuNjMgMCAwIDAgLjc4Ny0uMzkgMi4zMDYgMi4zMDYgMCAwIDAtLjUxLTIuMzE1TTExLjMwNyAxMi4xMTdjLTEuNDk0LS4zNzctMy4xODMuMzQ0LTMuODMyIDEuNjE4LS42NjEgMS4zLS4wMjIgMi43NDIgMS40ODggMy4yMTMgMS41NjQuNDg4IDMuNDA3LS4yNiA0LjA0OC0xLjY2Mi42MzItMS4zNzEtLjE1Ny0yLjc4My0xLjcwNC0zLjE3em0tMS4xNCAzLjMxOGMtLjMwNC40NjktLjk1NS42NzQtMS40NDUuNDU4LS40ODMtLjIxMy0uNjI1LS43NTgtLjMyMS0xLjIxNS4zLS40NTUuOTI4LS42NTggMS40MTUtLjQ2LjQ5Mi4yMDIuNjQ5Ljc0My4zNSAxLjIxN3ptMS0xLjI0M2EuNDYxLjQ2MSAwIDAgMS0uNTQzLjE5M2MtLjE4Ny0uMDc0LS4yNDYtLjI3Ny0uMTQtLjQ1NmEuNDU1LjQ1NSAwIDAgMSAuNTMtLjE5MmMuMTkuMDY3LjI1OC4yNzIuMTUzLjQ1NXoiLz48L2c+PC9zdmc+" class="icon">微博</div><div data-v-6b46a625="" st:name="shareItem" st:state="wechat" class="share-item wechat"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+MkRDRERCOTktQkY5QS00RkFFLTk4RjgtNzdCNDFERkIyNkY1PC90aXRsZT48cGF0aCBkPSJNOS4wNzQgM0M1LjIxIDIuOTQzIDIgNS44MzkgMiA5LjI1NWMwIDEuOTcyLjkxIDMuNjgzIDIuNjY5IDQuOTM5IDAgMC0uNjQ1IDIuMTcxLS42MzYgMi4yMTUuMDEuMDQzLjE1LjEyOS4xOTguMS4wNS0uMDI3IDIuMzMyLTEuNDE2IDIuMzMyLTEuNDE2IDEuNzQ5LjYxMyAyLjc2OS40MDkgMi44MjcuNDA1YTQuNjE0IDQuNjE0IDAgMCAxLS4xNTktMi4wOTljLjY4Mi00LjAwNSA0LjcwMi01LjI1MSA2LjkwNS01LjAzOS0uNjA4LTIuODkyLTMuMjUtNS4zLTcuMDYyLTUuMzU4em02LjcyNSA1Ljg0Yy0zLjQwNyAwLTYuMTI1IDIuMjkyLTYuMTI1IDUuMjE4IDAgMi45MzIgMi41ODUgNS4zNTkgNi4xMyA1LjM3OS43MTMuMDA0IDEuNzc1LS4xODMgMi40OTEtLjQ4OSAwIDAgMS43MTMgMS4wNiAxLjgxIDEuMDUyYS4xNi4xNiAwIDAgMCAuMTQ4LS4xNTJjLjAwNC0uMDY2LS41NDYtMS43Mi0uNTQ2LTEuNzIgMS40Ny0xLjE3NSAyLjA4NS0yLjQ3IDIuMDg1LTQuMTIgMC0yLjkyNy0yLjc3NS01LjE2OS01Ljk5My01LjE2OXpNNi4zOSA2LjI4OGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDEuOTM2LjkxOC45MzYuNTA2IDAgLjkxNy0uNDE5LjkxNy0uOTM2YS45MjcuOTI3IDAgMCAwLS45MTctLjkzNnptNS41NTUgMGEuOTI3LjkyNyAwIDAgMC0uOTE4LjkzNmMwIC41MTcuNDExLjkzNi45MTguOTM2LjUwNyAwIC45MTgtLjQxOS45MTgtLjkzNmEuOTI3LjkyNyAwIDAgMC0uOTE4LS45MzZ6bTEuNjEyIDQuOTc5YS44MjEuODIxIDAgMCAwLS44MTEuODNjMCAuNDU4LjM2My44My44MTEuODNhLjgyMS44MjEgMCAwIDAgLjgxMi0uODMuODIxLjgyMSAwIDAgMC0uODEyLS44M3ptNC4zNDIgMGEuODIxLjgyMSAwIDAgMC0uODEyLjgzYzAgLjQ1OC4zNjMuODMuODEyLjgzYS44MjEuODIxIDAgMCAwIC44MTItLjgzLjgyMS44MjEgMCAwIDAtLjgxMi0uODN6IiBmaWxsPSIjMDBDODBDIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=" class="icon">微信扫一扫<div data-v-6b46a625="" class="qr-code-box"><img data-v-6b46a625="" src="" class="qr-code"></div></div></div></li><li data-v-6b46a625="" title="收藏" st:name="collectBtn" class="item collect clickable hover"><img data-v-6b46a625="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik04LjEzNiAxMi40NDZjLS4zNTItLjE5NS0uOTIyLS4xOTUtMS4yNzQgMGwtMi41MzcgMS4zOTdjLS43MDQuMzg2LTEuMTY0LjAzMy0xLjAzLS43ODZMMy43OCAxMC4xYy4wNjctLjQxLS4xMDktLjk3OC0uMzk1LTEuMjdMMS4zMzQgNi43MzZjLS41Ny0uNTgyLS4zOTEtMS4xNS4zOTQtMS4yN2wyLjgzNS0uNDNjLjM5My0uMDYxLjg1NS0uNDEyIDEuMDMtLjc4NmwxLjI2OC0yLjY5MWMuMzUzLS43NDYuOTI0LS43NDQgMS4yNzUgMGwxLjI3IDIuNjkxYy4xNzUuMzc0LjYzNy43MjYgMS4wMzEuNzg1bDIuODM2LjQzMmMuNzg2LjExOS45NjIuNjkuMzkzIDEuMjdMMTEuNjE0IDguODNjLS4yODUuMjkyLS40NjIuODYtLjM5NSAxLjI3bC40ODUgMi45NTdjLjEzNS44MjItLjMyOSAxLjE3Mi0xLjAzLjc4NmwtMi41MzgtMS4zOTd6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" class="icon"><!----></li><!----></ul></div></div><!----></div></a></div></div></li><li data-v-f0edcf22="" class="item"><!----></li><!----></ul></div><div data-v-01f8f25d="" data-v-13f76525="" st:block="sidebar" class="sidebar sidebar" data-v-3f216172=""><div data-v-70a2cd6d="" data-v-72a03554="" data-v-01f8f25d="" class="sidebar-block author-block shadow"><div data-v-70a2cd6d="" class="block-title">关于作者</div><div data-v-70a2cd6d="" class="block-body"><a data-v-72a03554="" href="/user/59abef0af265da246c4a3de1" target="_blank" rel="" class="user-item item" data-v-70a2cd6d=""><div data-v-b2db8566="" data-v-1b9df826="" data-v-72a03554="" data-src="https://user-gold-cdn.xitu.io/2017/9/4/99570a2ee1b1cf607608ecb6c8b7c76d?imageView2/1/w/100/h/100/q/85/interlace/1" class="lazy avatar avatar loaded" title="" style="background-image: url(https://user-gold-cdn.xitu.io/2017/9/4/99570a2ee1b1cf607608ecb6c8b7c76d?imageView2/1/w/100/h/100/q/85/interlace/1);"></div><div data-v-72a03554="" class="info-box"><div data-v-72a03554="" class="username">Horizon757</div><!----></div></a><!----><div data-v-72a03554="" data-v-70a2cd6d="" class="stat-item item"><svg data-v-72a03554="" data-v-70a2cd6d="" xmlns="http://www.w3.org/2000/svg" width="25" height="26" viewBox="0 0 25 26" class="zan"><g data-v-72a03554="" data-v-70a2cd6d="" fill="none" fill-rule="evenodd" transform="translate(0 .57)"><ellipse data-v-72a03554="" data-v-70a2cd6d="" cx="12.5" cy="12.57" fill="#E1EFFF" rx="12.5" ry="12.57"></ellipse> <path data-v-72a03554="" data-v-70a2cd6d="" fill="#7BB9FF" d="M8.596 11.238V19H7.033C6.463 19 6 18.465 6 17.807v-5.282c0-.685.483-1.287 1.033-1.287h1.563zm4.275-4.156A1.284 1.284 0 0 1 14.156 6c.885.016 1.412.722 1.595 1.07.334.638.343 1.687.114 2.361-.207.61-.687 1.412-.687 1.412h3.596c.38 0 .733.178.969.488.239.317.318.728.21 1.102l-1.628 5.645a1.245 1.245 0 0 1-1.192.922h-7.068v-7.889c1.624-.336 2.623-2.866 2.806-4.029z"></path></g></svg> <span data-v-72a03554="" data-v-70a2cd6d="" class="content">获得赞数<span data-v-72a03554="" data-v-70a2cd6d="" class="count">217</span></span></div><div data-v-72a03554="" data-v-70a2cd6d="" class="stat-item item"><svg data-v-72a03554="" data-v-70a2cd6d="" width="25" height="25" viewBox="0 0 25 25" class="icon stat-view-icon"><g data-v-72a03554="" data-v-70a2cd6d="" fill="none" fill-rule="evenodd"><circle data-v-72a03554="" data-v-70a2cd6d="" cx="12.5" cy="12.5" r="12.5" fill="#E1EFFF"></circle> <path data-v-72a03554="" data-v-70a2cd6d="" fill="#7BB9FF" d="M4 12.5S6.917 7 12.75 7s8.75 5.5 8.75 5.5-2.917 5.5-8.75 5.5S4 12.5 4 12.5zm8.75 2.292c1.208 0 2.188-1.026 2.188-2.292 0-1.266-.98-2.292-2.188-2.292-1.208 0-2.188 1.026-2.188 2.292 0 1.266.98 2.292 2.188 2.292z"></path></g></svg> <span data-v-72a03554="" data-v-70a2cd6d="" class="content">获得阅读数<span data-v-72a03554="" data-v-70a2cd6d="" class="count">3563</span></span></div></div></div><div data-v-1f85cb5f="" data-v-17a8ac96="" data-v-01f8f25d="" class="index-book-collect" place="post" category="5562b410e4b00c57d9b94a92"><div data-v-1f85cb5f="" class="header"><div data-v-1f85cb5f="" class="title">掘金小册</div><div data-v-1f85cb5f="" class="controllers"><div data-v-1f85cb5f="" class="arrow icon ion-chevron-left"></div><div data-v-1f85cb5f="" class="arrow icon ion-chevron-right"></div></div></div><div data-v-1f85cb5f="" class="slide-book transition--next"><div data-v-133abdc5="" data-v-1f85cb5f="" class="slide-book-list item"><a data-v-133abdc5="" href="/book/5b63fdba6fb9a04fde5ae6d0" class="item"><div data-v-133abdc5="" class="poster"><div data-v-b2db8566="" data-v-009ea7bb="" data-v-133abdc5="" data-src="https://user-gold-cdn.xitu.io/2018/9/11/165c7a188e490e48?imageView2/1/w/104/h/144/q/95/interlace/1" class="lazy thumb poster-img loaded" style="background-image: url(https://user-gold-cdn.xitu.io/2018/9/11/165c7a188e490e48?imageView2/1/w/104/h/144/q/95/interlace/1); background-size: cover;"></div></div><div data-v-133abdc5="" class="content-text"><div data-v-133abdc5="" class="title">基于 hapi 的 Node.js 小程序后端开发实践指南</div><div data-v-133abdc5="" class="price"><div data-v-133abdc5="" class="new">新人价 ￥4.95</div><div data-v-133abdc5="" class="delete">￥9.9</div></div></div></a><a data-v-133abdc5="" href="/book/5a261d8f5188253ee45b4b21" class="item"><div data-v-133abdc5="" class="poster"><div data-v-b2db8566="" data-v-009ea7bb="" data-v-133abdc5="" data-src="https://user-gold-cdn.xitu.io/2017/12/19/1606e20aea39c319?imageView2/1/w/104/h/144/q/95/interlace/1" class="lazy thumb poster-img loaded" style="background-image: url(https://user-gold-cdn.xitu.io/2017/12/19/1606e20aea39c319?imageView2/1/w/104/h/144/q/95/interlace/1); background-size: cover;"></div></div><div data-v-133abdc5="" class="content-text"><div data-v-133abdc5="" class="title">详解 Laravel 源码中优秀的设计模式</div><div data-v-133abdc5="" class="price"><div data-v-133abdc5="" class="new">新人价 ￥9.95</div><div data-v-133abdc5="" class="delete">￥19.9</div></div></div></a></div></div><div data-v-1f85cb5f="" class="book-newuser"><div data-v-1f85cb5f="" class="newuser-title"><span data-v-1f85cb5f="">新人专享好礼</span></div><div data-v-1f85cb5f="" class="giftbag"><img data-v-1f85cb5f="" src="https://b-gold-cdn.xitu.io/v3/static/img/45.b99ea03.svg"><div data-v-1f85cb5f="" class="content-text"><div data-v-1f85cb5f="" class="title">送你<span data-v-1f85cb5f="" class="highlight">45元</span>买小册</div><div data-v-1f85cb5f="" class="btn-box"><div data-v-1f85cb5f="" class="btn-giftbag">立即领取</div></div></div></div></div></div><!----><!----><div data-v-01f8f25d="" class="sticky-block-box"><div data-v-70a2cd6d="" data-v-f6632f66="" data-v-01f8f25d="" class="sidebar-block related-entry-sidebar-block shadow" st:block="relatedEntrySidebarBlock"><div data-v-70a2cd6d="" class="block-title">相关文章</div><div data-v-70a2cd6d="" class="block-body"><div data-v-f6632f66="" data-v-70a2cd6d="" class="entry-list"><a data-v-f6632f66="" href="/post/5bcad2875188255c8b6f2478" target="_blank" rel="" st:name="link" class="item" data-v-70a2cd6d=""><div data-v-f6632f66="" class="entry-title">使用策略模式优雅引用第三方框架</div><div data-v-f6632f66="" class="entry-meta-box"><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">21</span></div><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik0yIDR2OC4wMzhoNC40NDRMMTEuMTExIDE1di0yLjk2MkgxNFY0eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">11</span></div></div></a><a data-v-f6632f66="" href="/post/5bcc7151f265da0ab41e8f6e" target="_blank" rel="" st:name="link" class="item" data-v-70a2cd6d=""><div data-v-f6632f66="" class="entry-title">听说你还不会用Dagger2？Dagger2 For Android最佳实践教程</div><div data-v-f6632f66="" class="entry-meta-box"><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">51</span></div><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik0yIDR2OC4wMzhoNC40NDRMMTEuMTExIDE1di0yLjk2MkgxNFY0eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">13</span></div></div></a><a data-v-f6632f66="" href="/post/5bcd22ba6fb9a05d3c8030a1" target="_blank" rel="" st:name="link" class="item" data-v-70a2cd6d=""><div data-v-f6632f66="" class="entry-title">Android Paging分页库的学习（一）—— 结合本地数据进行分页加载</div><div data-v-f6632f66="" class="entry-meta-box"><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">4</span></div><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik0yIDR2OC4wMzhoNC40NDRMMTEuMTExIDE1di0yLjk2MkgxNFY0eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">0</span></div></div></a><a data-v-f6632f66="" href="/post/5bc9a43fe51d450e623856d6" target="_blank" rel="" st:name="link" class="item" data-v-70a2cd6d=""><div data-v-f6632f66="" class="entry-title"> Android AudioRecord录音 并websocket实时传输,AudioTrack 播放wav 音频,Speex加密</div><div data-v-f6632f66="" class="entry-meta-box"><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">1</span></div><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik0yIDR2OC4wMzhoNC40NDRMMTEuMTExIDE1di0yLjk2MkgxNFY0eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">1</span></div></div></a></div></div></div><div data-v-70a2cd6d="" data-v-197940e0="" data-v-01f8f25d="" class="sidebar-block catalog-block pure"><nav data-v-3269f0ad="" data-v-197940e0="" class="article-catalog" data-v-70a2cd6d="" style=""><div data-v-3269f0ad="" class="catalog-title">目录</div><div data-v-3269f0ad="" class="catalog-body"><ul data-v-3269f0ad="" class="catalog-list" style="margin-top: 0px;"><li data-v-3269f0ad="" class="item d1"><a href="#heading-0" title="一、前言">一、前言</a><!----></li><li data-v-3269f0ad="" class="item d1"><a href="#heading-1" title="二、 框架命名">二、 框架命名</a><!----></li><li data-v-3269f0ad="" class="item d1"><a href="#heading-2" title="三、流程&amp;架构">三、流程&amp;架构</a><ul class="sub-list"><li class="item d2"><a href="#heading-3" title="3.1 加载流程">3.1 加载流程</a><!----></li><li class="item d2"><a href="#heading-4" title="3.2 基本架构">3.2 基本架构</a><!----></li></ul></li><li data-v-3269f0ad="" class="item d1"><a href="#heading-5" title="四、功能实现">四、功能实现</a><ul class="sub-list"><li class="item d2"><a href="#heading-6" title="4.1 API设计">4.1 API设计</a><ul class="sub-list"><li class="item d3"><a href="#heading-7" title="4.1.1 全局参数">4.1.1 全局参数</a><!----></li><li class="item d3"><a href="#heading-8" title="4.1.2 图片请求">4.1.2 图片请求</a><!----></li></ul></li><li class="item d2"><a href="#heading-9" title="4.2 缓存设计">4.2 缓存设计</a><ul class="sub-list"><li class="item d3"><a href="#heading-10" title="4.2.1 内存缓存">4.2.1 内存缓存</a><!----></li><li class="item d3"><a href="#heading-11" title="4.2.2  磁盘缓存">4.2.2  磁盘缓存</a><!----></li></ul></li><li class="item d2"><a href="#heading-12" title="4.3 解码">4.3 解码</a><ul class="sub-list"><li class="item d3"><a href="#heading-13" title="4.3.1 解析数据源">4.3.1 解析数据源</a><!----></li><li class="item d3"><a href="#heading-14" title="4.3.2 预读头信息">4.3.2 预读头信息</a><!----></li><li class="item d3"><a href="#heading-15" title="4.3.3 图片压缩">4.3.3 图片压缩</a><!----></li><li class="item d3"><a href="#heading-16" title="4.3.4 图片旋转">4.3.4 图片旋转</a><!----></li><li class="item d3"><a href="#heading-17" title="4.3.5 变换">4.3.5 变换</a><!----></li><li class="item d3"><a href="#heading-18" title="4.3.6 GIF图">4.3.6 GIF图</a><!----></li><li class="item d3"><a href="#heading-19" title="4.3.7 图片复用">4.3.7 图片复用</a><!----></li></ul></li><li class="item d2"><a href="#heading-20" title="4.4 线程调度">4.4 线程调度</a><!----></li><li class="item d2"><a href="#heading-21" title="4.5 Dispatcher">4.5 Dispatcher</a><!----></li></ul></li><li data-v-3269f0ad="" class="item d1"><a href="#heading-22" title="五、回顾">五、回顾</a><ul class="sub-list"><li class="item d2"><a href="#heading-23" title="5.1 依赖关系">5.1 依赖关系</a><!----></li><li class="item d2"><a href="#heading-24" title="5.2 执行流">5.2 执行流</a><!----></li></ul></li><li data-v-3269f0ad="" class="item d1"><a href="#heading-25" title="六、API">六、API</a><ul class="sub-list"><li class="item d2"><a href="#heading-26" title="6.1 Doodle (框架入口）">6.1 Doodle (框架入口）</a><!----></li><li class="item d2"><a href="#heading-27" title="6.2 Config （全局配置）">6.2 Config （全局配置）</a><!----></li><li class="item d2"><a href="#heading-28" title="6.3 Request （图片请求）">6.3 Request （图片请求）</a><!----></li></ul></li><li data-v-3269f0ad="" class="item d1"><a href="#heading-29" title="七、总结">七、总结</a><!----></li></ul></div></nav></div></div></div><div data-v-2febaf4d="" data-v-13f76525="" class="article-suspended-panel article-suspended-panel" data-v-3f216172=""><div data-v-2febaf4d="" badge="3" class="like-btn panel-btn like-adjust with-badge"></div><div data-v-2febaf4d="" badge="0" class="comment-btn panel-btn comment-adjust"></div><div data-v-2febaf4d="" class="collect-btn panel-btn"><!----></div><div data-v-2febaf4d="" class="share-title">分享</div><div data-v-2febaf4d="" class="weibo-btn share-btn panel-btn"></div><div data-v-2febaf4d="" class="qq-btn share-btn panel-btn"></div><div data-v-2febaf4d="" class="wechat-btn share-btn panel-btn"><img data-v-2febaf4d="" src="" class="wechat-qr-code-img shadow" style="display: none;"></div></div><div data-v-f0e3c22e="" data-v-13f76525="" class="image-viewer-box" data-v-3f216172=""><!----></div></div></main></div><div data-v-19078e6d="" data-v-6ede48a3="" class="recommend-box"><div data-v-19078e6d="" class="extension"><div data-v-19078e6d="" data-growing-container="true" data-growing-title="掘金插件" class="link"><div data-v-19078e6d="" class="title">掘金浏览器插件 - 下载插件，送你<span data-v-19078e6d="" class="price">45元</span>买小册</div></div><div data-v-19078e6d="" class="ion-close"></div></div><!----></div></div>
+      
+      <script type="text/javascript" src="https://b-gold-cdn.xitu.io/v3/static/js/manifest.20254fa563d3539b68bf.js"></script><script type="text/javascript" src="https://b-gold-cdn.xitu.io/v3/static/js/vendor.e6fd81aa1499049a5bee.js"></script><script type="text/javascript" src="https://b-gold-cdn.xitu.io/v3/static/js/app.a99a1e8180beec940a3f.js"></script>
+    </body></html>
