@@ -1,0 +1,755 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<title>NVIDIA Turing架构解析：追光逐影，成败未定 | 雷锋网</title>
+    <meta itemprop="image" content="https://www.leiphone.com/resWeb/images/common/metaLogo.jpg" />
+            <link rel="dns-prefetch" href="https://www.leiphone.com">
+        <link rel="dns-prefetch" href="https://home.leiphone.com">
+        <link rel="dns-prefetch" href="https://m.leiphone.com">
+        <link rel="dns-prefetch" href="https://leiphone.com">
+        <meta name="baidu-site-verification" content="qBnDqyynv4" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2018-09-28T20:50:25+08:00"/>
+    <meta property="article:author" content="任然"/>
+    <meta property="article:published_first" content="雷锋网, https://www.leiphone.com/news/201809/dkoKhdvEXjivRA3p.html" />
+    	<meta name="google-site-verification" content="4c2S0LRoSpcyGiNmASqakMSa7yVC9C8Jnu-IRNyq5oU" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=1">
+    <meta property="qc:admins" content="10002525706451007656375" />
+    <link rel="alternate" media="only screen and(max-width: 640px)" href="https://m.leiphone.com" />
+            	<meta name="keywords" content="" />
+	<meta name="description" content="近日，NVIDIA终于揭开了全新Turing架构细节的面纱" />
+    <meta name="sogou_site_verification" content="ilkqV8FehD"/>
+    <meta name="renderer" content="webkit">
+	<link rel="cannoical" href="https://www.leiphone.com/news/201809/dkoKhdvEXjivRA3p.html">    <link rel="stylesheet"  type="text/css" href="https://www.leiphone.com/resWeb/css/common/common.css?20180504" media="all" />
+    <script type="text/javascript">
+        window.mobilecheck = function() {
+            
+            // var ua=window.navigator.userAgent;
+            // if(ua.indexOf('iPhone')>=0||ua.indexOf('iPod')>=0||ua.indexOf('ndroid')>=0){
+            //     return true;
+            // }
+
+            var check = false;
+            (function(a,b){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
+            return check;
+        }
+        var check = mobilecheck();
+        if(check && (window.location.host == 'www.leiphone.com')){
+            window.location.href="//m.leiphone.com" + window.location.pathname + window.location.search;
+        }else if(!check && (window.location.host == 'm.leiphone.com')){
+            window.location.href="//www.leiphone.com" + window.location.pathname + window.location.search;
+        }
+    </script>
+    <!--  
+	<script type='text/javascript'>window.BWEUM||(BWEUM={});BWEUM.info = {"stand":true,"agentType":"browser","agent":"bi-collector.oneapm.com/static/js/bw-send-411.4.5.js","beaconUrl":"bi-collector.oneapm.com/beacon","licenseKey":"fqiyF~7R36YyFnEB","applicationID":2284957};</script><script type="text/javascript" src="//bi-collector.oneapm.com/static/js/bw-loader-411.4.5.js"></script>
+	-->
+    <script>
+                    //百度统计开始
+            var _hmt = _hmt || [];
+            (function() {
+                var hm = document.createElement("script");
+                hm.src = "//hm.baidu.com/hm.js?0f7e8686c8fcc36f05ce11b84012d5ee";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+            })();
+            //百度统计结束
+        
+        var SCRIPT_URL 	= "https://www.leiphone.com/";
+		var BASE_URL 	= "https://www.leiphone.com/";
+		var HOME_URL 	= "https://home.leiphone.com/";
+		var IS_LOGIN 	= "1";
+        var LEIPHONE_HOME_URL = USER_CENTER  = "https://home.leiphone.com/";
+        var HAITAO_URL  = "https://haitao.leiphone.com";
+        var TRYOUT_URL  = "https://tryout.igao7.com/";
+        var PRODUCT_URL = "https://product.igao7.com/";
+	</script>
+
+	<!--[if IE]>
+    <script>
+       (function(){var e="abbr, article, aside, audio, canvas, datalist, details, dialog, eventsource, figure, footer, header, hgroup, mark, menu, meter, nav, output, progress, section, time, video".split(', ');var i=e.length;while(i--){document.createElement(e[i])}})()
+    </script>
+    <![endif]-->
+
+    <!--<script src="/resWeb/js/libs/sea.js"></script>-->
+    <script src="https://www.leiphone.com/resWeb/js/libs/jquery-sea.js"></script>
+    <script src="https://www.leiphone.com/resCommon/js/yp_tipBoxes/tips.js"></script>
+    <script>
+        seajs.config({
+            map:[
+                ['.js','.js?20180515']
+            ]
+        });
+        seajs.use('https://www.leiphone.com/resWeb/js/common/global',function(){
+                    });
+        document.domain = "leiphone.com";
+         // 英鹏账号登录回调
+        function yingpengIslogin_callback(){
+            seajs.use('https://www.leiphone.com/resWeb/js/common/com_login',function(user) {
+              user.init();
+            });
+        }
+    </script>
+
+</head>
+<body>
+<!-- 顶栏广告位 -->
+<div class="top-banner">
+    <a href="https://www.leiphone.com/banner/updateClickNum/id/1408" target="_blank" title="智能驾驶峰会">
+        <img src="https://static.leiphone.com/uploads/new/banner/5bc44a9f08577.jpg" alt="智能驾驶峰会">
+    </a>
+    <em class="closeBanner"></em>
+</div>
+
+<div class="explorer" id="low-explorer">
+    <div class="inner">
+        <em class="warn ico"></em>
+        <span>您正在使用IE低版浏览器，为了您的雷锋网账号安全和更好的产品体验，强烈建议使用更快更安全的浏览器</span>
+        <span class="ico exp-ico1"></span>
+        <span class="ico exp-ico2"></span>
+        <span class="ico exp-ico3"></span>
+        <span class="ico exp-ico4"></span>
+        <span class="ico exp-ico5"></span>
+    </div>
+</div>
+<!--[if lte IE 8]>
+    <script>
+       (function(){var e=['abbr', 'article', 'aside', 'audio', 'canvas', 'datalist', 'details', 'dialog', 'eventsource', 'figure', 'footer', 'header', 'hgroup', 'mark', 'menu', 'meter', 'nav', 'output', 'progress', 'section', 'time', 'video'];for(var i = e.length; i--;) document.createElement(e[i])})()
+
+       //低版本浏览器
+        document.getElementById("low-explorer").style.display = 'block';
+
+    </script>
+<![endif]-->
+
+
+
+<!-- header start-->
+<header class="yp-header">
+    <div class="yp-header-top clr">
+        <a class="yp-header-logo" href="https://www.leiphone.com">
+            <img src="https://www.leiphone.com/resWeb/images/common/lph-headerlogo.png"  alt="雷锋网">
+                        <span>读懂<em>智能</em>&未来</span>
+        </a>
+        <!-- navi -->
+
+        <div class="yp-header-menu">
+            <ul>
+                <li class="first">
+                    <a href="https://www.leiphone.com" class="sub_a">首页</a>
+                </li>
+                <li>
+                    <a href="http://www.gair.link"  target="_blank" class="sub_a">AI研习社<em class="newIcon"></em></a>
+                </li>
+                <li>
+                    <a href="https://www.leiphone.com/AiWeights"  target="_blank" class="sub_a">AI影响因子</a>
+                </li>
+                <li>
+                    <a href="https://www.leiphone.com/events"  class="sub_a">活动</a>
+                </li>
+                <li>
+                    <a href="https://www.leiphone.com/specials"  class="sub_a">专题</a>
+                </li>
+                <li>
+                    <a href="https://www.leiphone.com/specialEdition/list"  target="_blank" class="sub_a">精选</a>
+                </li>
+                <li class="borleft aiB">
+                <div class="line"></div>
+                    <!-- <a href="http://www.mooc.ai/?f=leiphone"  target="_blank" class="sub_a">AI慕课学院</a> -->
+                </li>
+                <li class="ej borleft ig">
+                    <a href="http://www.igao7.com" target="_blank" class="sub_a">爱搞机</a>
+                                    </li>
+                <!-- <li  class="ej borleft ig">
+                    <a href="https://haitao.leiphone.com" class="sub_a">极客购</a>
+                </li> -->
+            </ul>
+            <a href="javascript:;" class="contribute"><em></em>申请专栏作者</a>
+        </div>
+        <!-- 用户登录 -->
+        <div class="yp-header-user-box">
+            <div class="yp-header-user">
+                <!-- <input type="hidden" id="is_login_tag_status" value="1"> -->
+                <div class="user-main user-haslg">
+                    <div class="avatar"><img width="36" height="36" src="https://www.leiphone.com/resWeb/home/images/member/noLogin.jpg" alt=""></div>
+                </div>
+                <div class="user-link">
+                    <ul>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- 用户消息 -->
+        <div class="yp-header-message">
+            <a href="https://home.leiphone.com/notices" class="bell">
+                 <i class="ico"></i>
+                 <em class="count"></em>   
+            </a>
+        </div>
+        <div class="yp-header-search">
+           <form method="GET" name="allSearchForm" action="https://www.leiphone.com/search" style="height: 100%;">
+                <input type="hidden" name="site" value="">
+                <input class="text" type="text" name="s" autocomplete="off" value="">
+                <input class="submit" type="submit" value="">
+                <input class="submit2" type="submit" value="">
+            </form>
+        </div>
+        <a href="https://www.leiphone.com/search" class="miniSearch"></a>
+        
+    </div>
+</header>   
+<!-- header end-->
+<nav class="yp-secNav">
+    <div class="wrapper">
+        <a href="https://www.leiphone.com/category/sponsor"  class=" ">业界</a>
+        <a href="https://www.leiphone.com/category/ai"  class=" ">人工智能</a>
+        <a href="https://www.leiphone.com/category/transportation"  class=" ">智能驾驶</a>
+        <a href="https://www.leiphone.com/category/aijuejinzhi"  class=" ">AI+</a>
+        <a href="https://www.leiphone.com/category/fintech"  class=" "> Fintech&区块链</a>
+        <a href="https://www.leiphone.com/category/aihealth"  class=" ">未来医疗</a>
+        <a href="https://www.leiphone.com/category/letshome"  class=" ">网络安全</a>
+        <a href="https://www.leiphone.com/category/arvr"  class=" ">AR/VR</a>
+        <a href="https://www.leiphone.com/category/robot"  class=" ">机器人</a>
+        <a href="https://www.leiphone.com/category/yanxishe"  class=" ">开发者</a>
+        <a href="https://www.leiphone.com/category/weiwu"  class=" ">智能硬件</a>
+        <a href="https://www.leiphone.com/category/iot"  class=" ">物联网</a>
+        <a href="https://gair.leiphone.com?from=leifengwang2018" target="_blank" class="">GAIR</a>
+    </div>
+</nav>
+
+<link rel="stylesheet" type="text/css" href="https://www.leiphone.com/resCommon/css/artCont_web_admin.css">
+<link rel="stylesheet" type="text/css" href="https://www.leiphone.com/resWeb/css/detail/main.css?20180515" media="all" />
+<script type="text/javascript">
+    var ARTICLE_CATEGORY = '14';
+    var ADMIN_URL = 'https://yingpeng.leiphone.com/';
+</script>
+
+<div class="wrapper">
+    <div class="lph-Nowsite clr">
+        <a href='https://www.leiphone.com'><em class='ico'></em></a>
+        <em class='arro'></em>
+        <a href="https://www.leiphone.com/category/sponsor">业界</a>
+        <em class='arro'></em>
+        <a href="#">正文</a>
+    </div>
+</div>
+
+<!-- 发送私信 -->
+<div class="sendMsg-pop">
+    <a href="javascript:;" class="closePop"><em></em></a>
+    <div class="title">发私信给<span>任然</span></div>
+    <div class="main">
+        <textarea placeholder='私信内容'></textarea>
+    </div>
+    <div class="btns">
+        <a href="javascript:;" class="send-button">发送</a>
+    </div>
+</div>
+<!-- 评论数 -->
+<a href="#lph-comment-179626" class="cmtNums" >
+    <em></em>
+    <p>0</p>
+</a>
+<div class="lph-overlay"></div>
+<!-- 当载入markdown的时候加载 -->
+<script type="text/javascript">
+    var link = "dkoKhdvEXjivRA3p";
+</script>
+<!-- 文章详情页 -->
+<div class="lphArticle-detail" data-article_url="https://www.leiphone.com/news/201809/dkoKhdvEXjivRA3p.html"
+data-article_id="179626" data-article_unique="dkoKhdvEXjivRA3p"
+data-article_seo_title="NVIDIA Turing架构解析：追光逐影，成败未定 | 雷锋网" data-article_seo_keywords=""
+data-article_seo_description="近日，NVIDIA终于揭开了全新Turing架构细节的面纱" data-comment_type="2"
+data-collect_type="2" data-author_id="24028"
+data-author_name="任然" data-article_cmtNum="0">
+    <div class="article-template">
+        <div class="article-title">
+            <div class="inner">
+                <h1 class="headTit">
+                    NVIDIA Turing架构解析：追光逐影，成败未定                </h1>
+                <div class="msg">
+                    <table>
+                        <tr>
+                            <td class="aut">
+                                本文作者：<a href="https://www.leiphone.com/author/renran255" target="_blank" rel="nofollow">任然</a>
+                            </td>
+                                                        <td class="time">
+                                2018-09-28 20:50                            </td>
+                                                                                  <!--   <td class='cmtNum'>
+                                <a href="https://www.leiphone.com/news/201809/dkoKhdvEXjivRA3p.html#lph-comment-179626">0条评论</a>
+                            </td> -->
+                        </tr>
+                    </table>
+                </div>
+                <div class="article-lead">
+                    <em></em>导语：近日，NVIDIA终于揭开了全新Turing架构细节的面纱                </div>
+            </div>
+        </div>
+        <div class="info">
+            <div class="wrapper clr">
+                <div class="article-left">
+                     <div class="lph-article-comView">
+                                                 
+                         <!-- AI影响因子 -->
+                        <!-- xhBPeYDbNuuRZkwy -->
+                                                <!-- AI影响因子 -->
+                        <!-- 正文内容 -->
+                        <p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae127818502.jpg?imageView2/0/w/740/h/740"/></p><p>雷锋网<span style="color:#FD5D3C;">(公众号：雷锋网)</span>消息，自NVIDIA的Turing架构问世已经过去了一个多月时间，GeForce RTX 20系列的发布以及实时光线跟踪技术的推出，让NVIDIA将使用多年的“GeForce GTX”更名为“GeForce RTX“，并彻底改变了游戏显卡。实时光线跟踪、RT Core、Tensor核心、AI功能（即DLSS）、光线跟踪API，所有这些都汇集在一起，为游戏开发和GeForce显卡的未来发展指明了新方向。</p><p>与过去推出的产品大不相同，NVIDIA已将其最新显卡的介绍内容分为两部分：架构和性能。近日，NVIDIA终于揭开了全新Turing架构细节的面纱，虽然一些有趣的方面尚未得到官方解释，还有一些环节需要与客观数据一起深入研究，但也让我们有机会深入了解那项为GeForce RTX冠名的技术：光线追踪。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae124f008e3.png?imageView2/0/w/740/h/740"/></p><p>虽然使用Turing的实时光线追踪功能需要借助DirectX的光线追踪（DXR）API、NVIDIA的OptiX引擎或未发布的Vulkan光线追踪扩展，而用于游戏的DXR还没有发布给终端用户，但鉴于NVIDIA传统上具有开发人员和中间件（例如GameWorks）的强大生态系统，他们希望利用高端游戏来激发消费者对混合渲染（光栅化+光线跟踪）的支持。</p><p>正如之前所说，NVIDIA正在通过混合渲染来努力推动消费级GPU实现脱胎换骨的转变。而使NVIDIA迈出这一步的背后原因，除开“实时光线追踪是计算机图形学的圣杯”这一点之外，还有很多超越了图形纯粹主义的其他潜在动机。</p><h3><span style="color: #F79646;">光线追踪第一课：what&amp;why</span></h3><p>由于NVIDIA用于光线追踪的RT Core是Turing架构的两项技术基石之一，因此在我们深入了解Turing架构之前，最好先讨论清楚什么是光线追踪，以及为什么NVIDIA会在其上投入如此多的芯片资源。</p><p>简而言之，光线追踪是一种渲染方式，可模拟光在现实世界中的表现（反射、折射等）。实现它的最大问题在于它近乎于无底洞一样夸张的性能的需求，如果使用最原始的方法来尝试计算场景中每个光源发出的所有光线，将会在场景中追踪到无穷无尽的光线。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae129e6f741.png?imageView2/0/w/740/h/740"/></p><p>多年以来，算法工程师们为光线追踪开发了许多优化措施，其中最重要的是把“光照”这一简单的概念颠倒过来，不是从光源开始追踪光线，而是从屏幕、从观测者的视点逆向追踪光线，这样便可以只计算实际到达屏幕的光线，大幅缩减所需的计算量。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae12d12ec16.png?imageView2/0/w/740/h/740"/></p><p>然而即便使用了包括此法在内的许多优化方式，光线追踪对性能的需求依然高的惊人。除了最基本、最粗糙的光线追踪之外，其他任何情况都依然超出了实时渲染的范围。这些优化技术仅仅是让光线追踪可以在计算机上以相对“合理”的时间完成，当然这个“合理”是以小时或天来衡量的，这要取决于场景的复杂程度以及你所期望达到的渲染效果。实际上到目前为止，光线追踪一直被主要是3D动画电影等“离线”场景。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae133059520.png?imageView2/0/w/740/h/740"/></p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae1358eb3fd.png?imageView2/0/w/740/h/740"/></p><h3><span style="color: #F79646;">光栅化渲染的是是非非</span></h3><p>光线追踪的高成本意味着它还不能用于实时图像渲染，因此计算机行业从一开始便使用了一种名为光栅化的渲染方法。</p><p>虽然名字沾一个“光”字，但整个光栅化渲染中其实根本没有“光线”的概念。光栅化（Rasterization）指的是3D几何转换为2D像素的过程，所有的画面特效都只是针对一个个像素的操作。</p><p>当游戏开始渲染一帧画面时，首先由CPU生成游戏场景中所有物体的顶点，然后把所有顶点的坐标信息发送给GPU内的几何单元。几何单元以屏幕位置为基准构建出可视空间，将这些顶点按照坐标安置到空间中，紧接着将顶点连接成线框，构造出物体的轮廓，然后在表面覆盖上一层带有带光照信息的底层纹理作为蒙皮。到这一步，我们的游戏画面便初具几何形态。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae1383c5235.jpg?imageView2/0/w/740/h/740"/></p><p>接下来便是整个光栅化渲染流程的核心：光栅化，GPU内的光栅化单元（Rasterizer）依照线透视关系，将整个可视空间从三维立体形态压成一张二维平面。之后流处理器再根据场景中物体之间的几何位置关系，通过各种渲染算法，确定哪些像素亮&amp;有多亮，哪些像素暗&amp;有多暗，哪些像素是高光，哪些像素是阴影。</p><p>在流处理器忙着计算像素信息的同时，GPU内的纹理单元也开始将预设的“整张”纹理材质剪裁成画面所需的形状。最后，流处理器和纹理单元分别把计算好的像素信息和剪裁好的纹理材质递交给处于GPU后端的ROPs，ROPs将二者混合填充为最终画面并输出。除此之外，游戏中雾化、景深、动态模糊和抗锯齿等后处理特效，也是由ROPs完成的。</p><p>看到这里应该明白，我们看到的每一帧游戏画面，都是GPU画给你的一张3D立体画而已。3D立体画看起来真不真实，取决于绘画者的水平如何；而光栅化渲染出来的画面真不真实，取决于渲染算法是否先进和完善。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae1395ac6d7.jpg?imageView2/0/w/740/h/740"/></p><h3><span style="color: #F79646;">混合渲染，光线追踪回归</span></h3><p>光栅化的简单和快速决定了其对现实世界中画面的模拟是有限的，这也导致了光栅化普遍存在光照、反射和阴影不自然等缺陷。如果光栅化是如此不准确，游戏如何进一步提高其图像质量？</p><p>当然可以继续这么走下去，光栅化解决这些问题并非不可能，只是所需要的计算性能将会高速膨胀。就像撒一个谎要用十个谎来圆一样，某些情况下想用光栅化渲染生成逼真的画面，甚至比光线追踪的自然过程更复杂。</p><p>换句话说，与其在光栅化这种本质是视觉欺骗的渲染方式上消耗这么多性能，何不把这些努力投入另一种可以准确渲染虚拟世界的技术上？</p><p>2018年，整个计算机行业都在思考这一问题。而对于NVIDIA来说，前进的道路不再是纯粹的光栅化，而是混合渲染：将光栅化与光线追踪相结合，其想法是在有意义的地方使用光线跟踪——用于照明、阴影和其他所有涉及光的相互作用的内容，然后使用传统的光栅化来处理其他一切，这也正是Turing架构的核心思想所在。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae13c439a54.jpg?imageView2/0/w/740/h/740"/></p><p>这意味着开发人员可以两全其美，根据需求平衡光栅化的高性能和光线追踪的高质量，而无需立即从光栅化跳转到光线追踪并失去前者的所有性能优势。到目前为止，NVIDIA及其合作伙伴所展示的案例都是很容易实现的，比如精确的实时反射和更好的全局光照，但显而易见混合渲染可以扩展到任何与光照相关操作。</p><p>然而，NVIDIA、微软和其他公司也不得不为其从零开始建立一个生态系统，他们不仅要向开发人员推销光线追踪的优点，而且还要教开发人员如何以有效的方式实现它。</p><p>不过我们现在依旧可以可以先来讨论一下光线追踪，看看NVIDIA如何通过构建专用硬件单元，将实时光线追踪变为现实。</p><h3><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae13f29fa2d.png?imageView2/0/w/740/h/740" style="font-size: 16px;"/></h3><h3><span style="color: #F79646;">边界体积层次结构</span></h3><p>可以说，NVIDIA在Turing上下了很大的赌注，传统的GPU架构可以高速处理光栅化渲染，但并不擅长光线追踪这项任务。因此NVIDIA必须为光线追踪增设专用硬件单元，而这些额外的晶体管和电力消耗却对传统的光栅化渲染没有直接的助益。</p><p>这部分专用硬件单元很大程度上将被用于解决光线追踪的最基本问题：判定光线与物体的相交情况。这个问题最常见的解决方案是将三角形存储在一个非常适合光线追踪的数据结构中，这种数据结构称为BVH（边界体积层次结构）。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae141c4265c.png?imageView2/0/w/740/h/740"/></p><p>从概念上讲，BVH相对简单，它并不是检测每个多边形以判断是否与光线相交，而是检测场景的一部分以查看是否与光线相交。如果场景某部分与光线相交，则将其细分为较小的部分并再次检测，依次继续下去直至单个多边形，此时光线检测得到解决。</p><p>对于计算机科学家来说，这听起来很像二元搜索的应用，而且确实如此。每次检测都允许丢弃大量选项（在光线追踪中为多边形）作为可能的答案，便可以在很短的时间内到达正确的多边形。BVH反过来又存储在本质上是树数据结构的东西中，每次细分（边界框）都存储为其父边界框的子节点。</p><p><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae14338f58f.png?imageView2/0/w/740/h/740"/><br/></p><p>现在BVH的问题是，虽然它从根本上减少了所需判断的光线相交量，但这些针对的都是单独一条光线，当每个像素都需要多条光线经过时，每条光线都需要进行大量检测，它的计算量依然不低。这也是为什么使用专门的光线追踪单元进行硬件加速如此重要的原因。</p><h3><span style="color: #F79646;">继承Volta精神的Turing架构</span></h3><p>我们来看看这次的Turing架构，新的Turing SM看起来与上一代的Pascal SM非常不同，但了解Volta架构的人肯定能注意到Turing SM与Volta SM是非常相似的。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae1465266d2.png?imageView2/0/w/740/h/740"/></p><p>与Volta一样，Turing SM被划分为4个子核（或处理块），每个子核具有单个warp调度器和调度单元，而Pascal的2个分区设置是每个子核的warp调度器具有两个相对的调度端口。</p><p>从广义上讲，这样的变化意味着Volta和Turing失去了在一个时钟周期内从线程发出第二条非依赖指令的能力。Turing可能与Volta在两个周期内执行指令相同，但调度程序可以在每个周期发出独立指令，因此Turing最终可以通过这种方式维护双向指令级并行（ILP），同时仍然具有两倍于Pascal的调度程序数量。</p><p>正如我们在Volta中看到的那样，这些变化与新的调度/执行模型紧密相连，而Turing也有独立的线程调度模型。与Pascal不同的是，Volta和Turing都有每个线程的调度资源，有一个程序计数器和每个线程的堆栈来跟踪线程的状态，以及一个收敛优化器来智能的将活动的同warp线程分组到SIMT单元中。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae148576dcc.png?imageView2/0/w/740/h/740"/></p><p>就CUDA和ALU（算术逻辑单元）而言，Turing子核具有16个INT32单元，16个FP32单元和2个Tensor单元，与Volta子核的设置相同。使用像Volta这样的拆分INT/FP数据路径模型，Turing还可以同时执行FP和INT指令，而这与RT Core密切相关。Turing与Volta的不同之处在于Turing没有FP64单元，其FP64的吞吐量只有FP32的1/32。</p><p>虽然这些细节可能更偏向于技术方面，但Volta的这种设计似乎是为了最大化Tensor Core的性能，而最大限度的减少了破坏性并行性或与其他计算工作负载的协调。对于Turing的第二代Tensor Core和RT Core来说情况也是如此，其中4个独立调度的子核和粒度线程处理对于在混合游戏导向工作负载下实现最高性能非常有用。</p><p>在内存方面，Turing的每个子核都有一个类似Volta的L0指令缓存，具有相同大小的64 KB寄存器文件。在Volta中，这对于减少Tensor Core的延迟很重要，而在Turing中这可能同样有利于RT Core。Turing SM每个子核也有4个加载/存储单元，低于Volta中的8个，但仍然保持4个纹理单元。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae14a47f655.png?imageView2/0/w/740/h/740"/></p><p>新的L1数据高速缓存和共享内存（SMEM）进一步向上扩展，它已被改进并统一为单个可分区内存块，这是Volta的另一项创新。对于Turing来说，这看起来是一个组合的96 KB L1/SMEM，传统图形工作负载分为64KB专用图形着色器RAM和32 KB纹理高速缓存和寄存器文件溢出区域。同时，计算工作负载可以将L1/SMEM划分最多64 KB作为L1，其余32 KB作为SMEM，反之亦然（Volta的SMEM最高可配置为96 KB）。</p><h3><span style="color: #F79646;">RT Core：混合渲染和实时光线跟踪</span></h3><p>在Turing上，光线追踪并不能完全取代传统的光栅化渲染，而是作为“混合渲染”的一部分而存在，而且“实时”也只能在每个像素只通过少量光线并辅以大量降噪的情况下实现。</p><p>出于性能原因，现阶段开发人员将有意识和有针对性的利用光线追踪来实现光栅化无法实现的部分逼真效果，例如全局照明、环境光遮蔽、阴影、反射和折射等。光线追踪同样也可以限于场景中的特定对象，并且使用光栅化和z缓冲代替主光线投射，而仅对次光线进行光线跟踪。</p><p><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae1524b4dde.png?imageView2/0/w/740/h/740"/><br/></p><p>凭借光线追踪在计算机图形领域的重要性，NVIDIA Research相当长一段时间内一直在研究各种BVH实现，以及探索光线跟踪加速的架构问题。不过NVIDIA并未透露有关RT Core或其BVH实现的许多细节。</p><p>RT Core与Tensor Core不同，Tensor Core更像是与FP和INT核心一起的FMA阵列，而RT Core更像是典型的卸载IP块。与子核中的纹理单元非常相似，RT Core的指令被路由到子核之外，在从SM接收到光线探测器后，RT核心继续自主遍历BVH并执行光线相交检测。</p><p>这种类型的“遍历和交叉”固定函数光线追踪加速器是一个众所周知的概念，多年来已经有很多实现，因为遍历和交叉检测是计算密集程度最高的两种任务。相比之下，在着色器中遍历BVH将需要每条光线投射数千个指令槽，所有这些都用于检测BVH中的边界框交叉点。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae154a3f1a6.png?imageView2/0/w/740/h/740"/></p><p>RT Core还处理一些内存操作的分组和调度，以最大化跨多个光线的内存吞吐量。与许多其他工作负载一样，内存带宽是光线追踪的一个常见瓶颈，也是NVIDIA Research多篇论文讨论的焦点。考虑到光线追踪会产生非常不规则和随机的内存访问，SIP块中可能还有一些内存和光线缓冲区。</p><h3><span style="color: #F79646;">Tensor Cores：将深度学习推理用于游戏渲染</span></h3><p>尽管Tensor Cores是Volta的典型特征，但此番Turing上搭载的第二代Tensor Core却是青出于蓝。</p><p>第二代Tensor Core的主要变化是增加了用于推理的INT8和INT4精度模式，通过新的硬件数据路径启用，并执行点积累积为INT32积。INT8模式的运算速度是FP16的两倍，或每个时钟2048次整数运算；INT4模式的运算速度是FP16速率的四倍，或每个时钟4096次整数运算。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae156c3282b.png?imageView2/0/w/740/h/740"/></p><p>第二代Tensor Core仍然具有FP16模式，并且能够支持纯FP16模式而没有FP32累加器。虽然CUDA 10还没有出来，但增强的WMMA操作应该能够解释任何其他差异，例如操作数的额外可接受矩阵大小。</p><p>GeForce RTX和Turing所带来的不仅是RTX这一全新品牌命名，还有将Turing的所有功能归为一体的NVIDIA RTX平台，包括：</p><blockquote><p>NVIDIA RTX平台：包含所有Turing功能的通用平台，包括高级着色器</p><p>NVIDIA RTX光线追踪技术：RTX平台下光线追踪技术的名称</p><p>GameWorks Raytracing：光线追踪降噪模块的GameWorks SDK</p><p>GeForce RTX：使用NVIDIA RTX实时光线追踪与游戏相关的品牌</p><p>GeForce RTX：显卡品牌</p></blockquote><p>NGX在技术上隶属于RTX平台，其最具代表性的是DLSS（深度学习超级采样）技术。DLSS使用专为游戏而设的DNN（深度神经网络），使用超高质量的64倍超级采样图像或真实画面进行训练，进而通过Tensor Core来推断高质量的抗锯齿结果。标准模式下，DLSS以较低的输入样本推断出高倍抗锯齿的结果，在目标分辨率上可达到与TAA相似的效果。</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae1589bf3ca.png?imageView2/0/w/740/h/740"/></p><p>由于涉及深度学习，NVIDIA正在将纯粹的计算/专业功能推向消费者领域。在Turing上，Tensor Core可以加速DLSS等特性，也可以加速某些基于AI的降噪器，以清理和校正实时光线追踪渲染的画面。</p><h3><span style="color: #F79646;">雷锋网小结</span></h3><p>Turing架构和Geforce RTX的发布，标志着计算机图形学在消费级市场上开始从虚假的视觉欺骗向着真实的追光逐影发展。到目前为止，业界对它们的赞誉也一直是毫不吝惜。<br/></p><p>虽然Turing架构增设了专用的光线追踪单元RT Core，并辅以Tensor Core来进行AI降噪，但在冷静客观的思考下，根据雷锋网的了解，<span style="color: #FF0000;">在1080P分辨率下，光线追踪具备基本可用性的入门门槛是每帧画面包含1亿条光线，如果以60fps为标准，就需要GPU达到每秒至少能处理60亿条光线的计算能力。</span></p><p>回过头来看刚刚发布的Geforce RTX 2080Ti/2080/2070三款显卡，它们的光线追踪性能分别是每秒处理100亿/80亿/60亿条光线，并且NVIDIA似乎表示未来更低的Geforce RTX/GTX 2060等显卡将不再支持光线追踪。</p><p>不知这是不是巧合，<span style="color: #FF0000;">Geforce RTX 2070的光线追踪性能刚刚好压在了上面所述具备基本可用性的入门门槛上</span>，这样来看，更低端的显卡不支持光线追踪也是情有可原。</p><p>此外，也许是目前的光线追踪算法过于追求简化，对光影关系的还原仍有可能出现错误。例如在NVIDIA用战地V这款游戏演示RTX效果时，汽车对于火光的反射便出现了一处错误，红框处的车灯罩是背对着车后的火光的，从角度上来看完全不应该有火光的反射：</p><p style="text-align: center;"><img alt="NVIDIA Turing架构解析：追光逐影，成败未定"  src="https://static.leiphone.com/uploads/new/images/20180928/5bae2184db122.jpg?imageView2/0/w/740/h/740"/></p><p>且根据最近流出的性能测试来看，即便是最高端的Geforce&nbsp;RTX 2080Ti在开启光线追踪后，也仅能在1080P下将帧数维持45fps左右，显然还要大幅低于理论性能。种种情况表明，现阶段的光线追踪依然徘徊在“有可用性”的门槛边缘，Turing和Geforce RTX显卡是否已经迈过了这一脚，真的还不好说……</p><p>via：<a href="https://www.anandtech.com/show/13282/nvidia-turing-architecture-deep-dive" target="_blank" rel=nofollow>Anandtech</a><br/></p>
+                                                <p>雷锋网版权文章，未经授权禁止转载。详情见<a href="http://dwz.cn/4ErMxZ" rel="nofollow" target="_blank">转载须知</a>。</p>
+                                               
+                                                <!-- 正文内容结束 -->
+                    </div>
+
+                    <!-- 分享 -->
+                    <div class="pageActive clr">
+                        <div class="mark-like-btn ">
+                            <a class="collect collect-no" href="javascript:;"><i></i><span>4</span>人收藏</a>
+                        </div>
+                        <!-- Baidu Button BEGIN -->
+                        <div  class="bdsharebuttonbox"  data-tag="share_179626">
+                            <span class="s-txt">分享：</span>
+                            <a href="javascript:void()" onclick="openYNote('https://www.leiphone.com/news/201809/dkoKhdvEXjivRA3p.html','NVIDIA Turing架构解析：追光逐影，成败未定', 'https://static.leiphone.com/uploads/new/article/pic/201809/5bae236d59aed.png','leiphone','NVIDIA Turing架构解析：追光逐影，成败未定')" class="youdao " title="收藏此篇文章到有道云笔记"><i></i></a>
+                            <a class="bds_tsina weibo-btn  " data-cmd="tsina"  title="分享到新浪微博"></a>
+                            <a class="weixin-btn bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+                            <a class="bds_more more-btn" data-cmd="more"></a>
+                        </div>
+                        <script type="text/javascript">
+                            //在这里定义bds_config
+                            // var bds_config = {'snsKey':{'tsina':'2475906690'}};
+                            // var qcode = {
+                            //     api : "http://qr.liantu.com/api.php?text=",
+                            //     url :  window.location.href,
+                            //     exist : false,
+                            //     create : function(){
+                            //         if(!this.exist){
+                            //             var image = document.createElement('img');
+                            //             image.src = this.api + this.url;
+                            //             image.width = 120;
+                            //             this.exist = true;
+                            //             return image;
+                            //         }
+                            //     }
+                            // };
+                        </script>
+
+                    </div>
+                    <!-- 相关文章 -->
+                                        <!-- 推荐文章 -->
+                    <div class="realted-article clr recmdArticle" data-article_id="179626">
+                        <div class="list">
+                            <ul>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- 广告 -->
+                    
+                    <!-- 文章 评论  -->
+                    <!-- 评论 -->
+<div class="article-comment lp-comment" id="lph-comment-179626">
+    <div class="useComJs" >
+        <!-- <input id="lp_item_id" type="hidden" name="item_id" value="179626">
+        <input id="lp_item_type" type="hidden" name="type" value="2"> -->
+
+        <div class="h2 clr">
+            <h2>文章点评：</h2>
+            <!-- <strong class="h2-tip">
+                （您需要<a class="c-log" href="javascript:openPop('#lp-login-pop');">登录</a>后才能评论 <a href="https://home.leiphone.com/main/register" class="c-reg">没有账号</a> ？）</strong>
+            -->        
+        </div>
+        <div class="submit clr commentForm" id="">
+            <div class="text">
+                <textarea name="Comment[content]" placeholder="我有话要说……" ></textarea>
+            </div>
+            <div class="sub clr publishtosina">
+                <span class="emotionc emotion0" data-emotion="0">表情</span>
+                <label><input id="" type="checkbox" name="pushForWeibo"> 同步到新浪微博</label>
+                <div class="qqFace" style="position:absolute; display:none; z-index:10"></div>
+                <button type="submit" title="提交">提交</button>
+            </div>
+        </div>
+        <!-- <div class="jcWords">
+            <h3><strong>精彩评论</strong></h3>
+            <ul class="comment-say">
+                
+            </ul>
+        </div>
+        <div class="words">
+            <h3><strong>最新评论</strong><span></span>条评论<i></i></h3>
+            <ul class="comment-say">
+                
+            </ul>
+            <div id="comment-say-more" class="comment-say-more">
+
+                <span>加载更多</span>
+                <em>没有更多了</em>
+
+            </div>
+        </div> -->
+    </div>
+</div>
+<!-- 评论 -->
+
+
+
+                </div>
+
+                <script>
+    var codeAuthor_id   = "renran255";
+    var author_id       = "24028";
+</script>
+<div class="article-right">
+        <div class="aboutAur-main">
+        <div class="aboutAur-msg">
+            <a href="https://www.leiphone.com/author/renran255" class="avater" target="_blank" rel="nofollow">
+                <img src="https://www.leiphone.com/uploads/new/avatar/author_avatar/5af904d08ce7d_100_100.jpg" alt=""  width="80" height="80" />
+            </a>
+            <div class="name">
+                <a href="https://www.leiphone.com/author/renran255" target="_blank" rel="nofollow"><span>任然</span><em class='gold'></em></a>
+            </div>
+            <p class='profession'>编辑</p>
+            <div class="saying">
+                <em class='l-quote'></em>
+                <span>观点离经叛道的骨灰级硬件爱好者</span>
+                <em class='r-quote'></em>
+            </div>
+            <div class="operate-btn">
+                <table>
+                    <tr>
+                                                                        <td>
+                            <a href="mailto:renran@leiphone.com" class="eml sub_a" rel="nofollow"><em></em></a>
+                        </td>
+                                                                    </tr>
+                </table>
+            </div>
+            <div class="btns">
+                <a href="javascript:;">发私信</a>
+            </div>
+        </div>
+
+
+        <!-- 作者的文章 -->
+        
+<div class="mouthHot-article">
+    <div class="title">当月热门文章</div>
+        <div class="list">
+            <ul>
+                        <li>
+                <a href="https://www.leiphone.com/news/201810/QtLDqb2lUb2CjU5Q.html" title="深度解析苹果A12处理器：性能和能耗比令安卓旗舰SoC汗颜" target="_blank">深度解析苹果A12处理器：性能和能耗比令安卓旗舰SoC汗颜</a>
+            </li>
+                        <li>
+                <a href="https://www.leiphone.com/news/201810/kTvvHpEtHbavaElS.html" title="AMD的7nm处理器样品出锅了，不过似乎对Intel威胁不大" target="_blank">AMD的7nm处理器样品出锅了，不过似乎对Intel威胁不大</a>
+            </li>
+                        <li>
+                <a href="https://www.leiphone.com/news/201809/AuuQYj5UMhLwVNQF.html" title="百度“千城计划”落地长春，我国四大智慧城市群加速成形 | 智慧城市周报" target="_blank">百度“千城计划”落地长春，我国四大智慧城市群加速成形 | 智慧城市周报</a>
+            </li>
+                        <li>
+                <a href="https://www.leiphone.com/news/201809/K2pJBY0QdQJGkDdC.html" title="Cadence公布人工智能芯片Tensilica DNA 100，性能提升4.7倍，能耗比提升2.3倍" target="_blank">Cadence公布人工智能芯片Tensilica DNA 100，性能提升4.7倍，能耗比提升2.3倍</a>
+            </li>
+                        <li>
+                <a href="https://www.leiphone.com/news/201809/dkoKhdvEXjivRA3p.html" title="NVIDIA Turing架构解析：追光逐影，成败未定" target="_blank">NVIDIA Turing架构解析：追光逐影，成败未定</a>
+            </li>
+                    </ul>
+    </div>
+</div>
+       <!-- 作者文章结束 -->
+    </div>
+
+            <div class="weekly-choice hotNew-article">
+        <div class="rComTitle">
+            最新文章
+        </div>
+        <div class="list">
+            <ul class="justTxt">
+                                    <li>
+                        <a href="https://www.leiphone.com/news/201809/amneGfjKmtz17EJD.html" target="_blank">
+                            <em></em>雷锋网大招募！ </a>
+                    </li>
+                                    <li>
+                        <a href="https://www.leiphone.com/news/201810/nZUe0qC5IYcM642a.html" target="_blank">
+                            <em></em>母公司背书，浪潮与IBM10亿合资的IPS携POWER9全线新品亮相 </a>
+                    </li>
+                                    <li>
+                        <a href="https://www.leiphone.com/news/201810/xcHVipPc6SdMTrz6.html" target="_blank">
+                            <em></em>芯片热潮之下的前瞻思考 </a>
+                    </li>
+                                    <li>
+                        <a href="https://www.leiphone.com/news/201810/VMgwLiA7RMDbFRCx.html" target="_blank">
+                            <em></em>一场“没有”英特尔的服务器新品发布会 新华三和AMD在一起了？ </a>
+                    </li>
+                                    <li>
+                        <a href="https://www.leiphone.com/news/201810/dF58wiSNTClSd0Ns.html" target="_blank">
+                            <em></em>开源Android或将收费 </a>
+                    </li>
+                                    <li>
+                        <a href="https://www.leiphone.com/news/201810/HvnnbNJW4bufphRR.html" target="_blank">
+                            <em></em>重磅 | 李飞飞在斯坦福创建“以人为本人工智能研究院”，AI应是一种为善的力量 </a>
+                    </li>
+                            </ul>
+        </div>
+    </div>
+        <div class="serKesy-list">
+    <div class="rComTitle">
+        热门搜索
+    </div>
+    <div class="list clr">
+                <a href="https://www.leiphone.com/tag/机器人" target="_blank">机器人</a>
+                <a href="https://www.leiphone.com/tag/Instagram" target="_blank">Instagram</a>
+                <a href="https://www.leiphone.com/tag/安卓" target="_blank">安卓</a>
+                <a href="https://www.leiphone.com/tag/Nokia" target="_blank">Nokia</a>
+                <a href="https://www.leiphone.com/tag/RIM" target="_blank">RIM</a>
+                <a href="https://www.leiphone.com/tag/PC" target="_blank">PC</a>
+                <a href="https://www.leiphone.com/tag/云存储" target="_blank">云存储</a>
+                <a href="https://www.leiphone.com/tag/yahoo" target="_blank">yahoo</a>
+                <a href="https://www.leiphone.com/tag/电信" target="_blank">电信</a>
+                <a href="https://www.leiphone.com/tag/Office" target="_blank">Office</a>
+                <a href="https://www.leiphone.com/tag/无人车" target="_blank">无人车</a>
+            </div>
+</div>
+</div>
+
+
+
+            </div>
+        </div>
+    </div>
+    <div class="lineBg"></div>
+    <!-- 百度分享 -->
+    <script>
+
+        window._bd_share_config = {
+            common:{
+                bdMiniList:['tsina','weixin','more']
+            },
+            share : [
+                {
+                    bdText : 'NVIDIA Turing架构解析：追光逐影，成败未定',
+                    bdDesc : 'NVIDIA Turing架构解析：追光逐影，成败未定',
+                    bdUrl : 'https://www.leiphone.com/news/201809/dkoKhdvEXjivRA3p.html',
+                    bdPic : 'https://static.leiphone.com/uploads/new/article/pic/201809/5bae236d59aed.png',
+                    "tag" : "share_179626",
+                    "bdSize" : 24
+                },
+            ],
+        }
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='https://www.leiphone.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+
+    </script>
+</div>
+
+
+
+<script>
+    function openYNote(url, title, pic, vendor, summary) {
+        var target = 'http://note.youdao.com/memory/?url=' + encodeURIComponent(url) +
+            '&title=' + encodeURIComponent(title) + '&pic=' + encodeURIComponent(pic) +
+            '&product=' + encodeURIComponent('网页收藏') +
+            '&summary=' + encodeURIComponent(summary) + '&vendor=' + encodeURIComponent(vendor);
+        window.open(target);
+    }
+  seajs.use(['https://www.leiphone.com/resWeb/js/article' , 'https://www.leiphone.com/resWeb/js/load_articles']);
+
+
+
+   // document.getElementById('weixin-qt').insertBefore(qcode.create(),document.getElementById('weixin-qt-msg'));
+</script>
+
+<footer class='yp-footer'>
+    <!-- 友情链接，热门关键字 -->
+    <div class="yp-footer-link">
+        <div class="wrapper">
+            <div class="tab_tit clr">
+                                <a href="javascript:;">热门关键字</a>
+            </div>
+            <div class="tab_con">
+                <ul>
+                                        
+                                        <li class="cur">
+                                        
+                                                                                            <a href="http://www.leiphone.com/tags" target="_blank">热门标签</a>                                                                    <a href="http://www.leiphone.com/tag/人工智能 " target="_blank">人工智能 </a>                                                                    <a href="https://www.leiphone.com/tag/机器人" target="_blank">机器人</a>                                                                    <a href="https://www.leiphone.com/tag/机器学习" target="_blank">机器学习</a>                                                                    <a href="https://www.leiphone.com/tag/深度学习" target="_blank">深度学习</a>                                                                    <a href="https://www.leiphone.com/tag/金融科技" target="_blank">金融科技</a>                                                                    <a href="https://www.leiphone.com/tag/未来医疗" target="_blank">未来医疗</a>                                                                    <a href="https://www.leiphone.com/tag/智能驾驶" target="_blank">智能驾驶</a>                                                                    <a href="https://www.leiphone.com/tag/自动驾驶" target="_blank">自动驾驶</a>                                                                    <a href="https://www.leiphone.com/tag/计算机视觉" target="_blank">计算机视觉</a>                                                                    <a href="https://www.leiphone.com/tag/激光雷达" target="_blank">激光雷达</a>                                                                    <a href="https://www.leiphone.com/tag/图像识别" target="_blank">图像识别</a>                                                                    <a href="https://www.leiphone.com/tag/智能音箱" target="_blank">智能音箱</a>                                                                    <a href="https://www.leiphone.com/tag/区块链" target="_blank">区块链</a>                                                                    <a href="https://www.leiphone.com/tag/智能投顾" target="_blank">智能投顾</a>                                                                    <a href="https://www.leiphone.com/tag/医学影像" target="_blank">医学影像</a>                                                                    <a href="https://www.leiphone.com/tag/物联网" target="_blank">物联网</a>                                                                    <a href="https://www.leiphone.com/tag/IoT" target="_blank">IoT</a>                                                                    <a href="https://www.leiphone.com/tag/CV" target="_blank">CV</a>                                                                    <a href="http://www.leiphone.com/special/235/201609/57e4fe78a71ea.html" target="_blank">微信小程序平台</a>                                                                    <a href="http://www.leiphone.com/news/201701/ri7dDB7Fq0mMj1qh.html" target="_blank">微信小程序在哪</a>                                                                    <a href="http://www.leiphone.com/tag/CES 2017" target="_blank">CES 2017</a>                                                                    <a href="http://www.leiphone.com/tag/CES" target="_blank">CES</a>                                                                    <a href="http://www.leiphone.com/tag/2016年最值得购买的智能硬件" target="_blank">2016年最值得购买的智能硬件</a>                                                                    <a href="http://www.leiphone.com/news/201612/sI2n04bJ5aVzS5Pr.html" target="_blank">2016 互联网</a>                                                                    <a href="http://www.leiphone.com/tag/小程序" target="_blank">小程序</a>                                                                    <a href="http://www.leiphone.com/tag/微信朋友圈" target="_blank">微信朋友圈</a>                                                                    <a href="http://www.leiphone.com/news/201612/J8qZLCwViDpwygen.html" target="_blank">抢票软件</a>                                                                    <a href="http://www.leiphone.com/tag/智能手机" target="_blank">智能手机</a>                                                                    <a href="http://www.leiphone.com/tag/智能家居" target="_blank">智能家居</a>                                                                    <a href="http://www.leiphone.com/tag/智能手环" target="_blank">智能手环</a>                                                                    <a href="http://www.leiphone.com/tag/智能机器人" target="_blank">智能机器人</a>                                                                    <a href="http://www.leiphone.com/tag/智能电视" target="_blank">智能电视</a>                                                                    <a href="http://www.leiphone.com/tag/360智能硬件" target="_blank">360智能硬件</a>                                                                    <a href="http://www.leiphone.com/tag/智能摄像机" target="_blank">智能摄像机</a>                                                                    <a href="http://www.leiphone.com/news/201601/mQ8TFsppN7ROxYmS.html" target="_blank">智能硬件产品</a>                                                                    <a href="http://www.leiphone.com/tag/智能硬件发展" target="_blank">智能硬件发展</a>                                                                    <a href="http://www.leiphone.com/tag/智能硬件创业" target="_blank">智能硬件创业</a>                                                                    <a href="http://www.leiphone.com/tag/黑客" target="_blank">黑客</a>                                                                    <a href="http://www.leiphone.com/tag/白帽子" target="_blank">白帽子</a>                                                                    <a href="http://www.leiphone.com/tag/大数据" target="_blank">大数据</a>                                                                    <a href="http://www.leiphone.com/tag/云计算" target="_blank">云计算</a>                                                                    <a href="http://www.leiphone.com/tag/新能源汽车" target="_blank">新能源汽车</a>                                                                    <a href="http://www.leiphone.com/tag/无人驾驶" target="_blank">无人驾驶</a>                                                                    <a href="http://www.leiphone.com/tag/无人机" target="_blank">无人机</a>                                                                    <a href="http://www.leiphone.com/tag/大疆" target="_blank">大疆</a>                                                                    <a href="http://www.leiphone.com/tag/小米无人机" target="_blank">小米无人机</a>                                                                    <a href="http://www.leiphone.com/tag/特斯拉" target="_blank">特斯拉</a>                                                                    <a href="http://www.leiphone.com/tag/VR游戏" target="_blank">VR游戏</a>                                                                    <a href="http://www.leiphone.com/tag/VR电影" target="_blank">VR电影</a>                                                                    <a href="http://www.leiphone.com/tag/VR视频" target="_blank">VR视频</a>                                                                    <a href="http://www.leiphone.com/tag/VR眼镜" target="_blank">VR眼镜</a>                                                                    <a href="http://www.leiphone.com/tag/VR购物" target="_blank">VR购物</a>                                                                    <a href="http://www.leiphone.com/tag/AR" target="_blank">AR</a>                                                                    <a href="http://www.leiphone.com/tag/直播" target="_blank">直播</a>                                                                    <a href="http://www.leiphone.com/tag/扫地机器人" target="_blank">扫地机器人</a>                                                                    <a href="http://www.leiphone.com/tag/医疗机器人" target="_blank">医疗机器人</a>                                                                    <a href="http://www.leiphone.com/tag/工业机器人" target="_blank">工业机器人</a>                                                                    <a href="http://www.leiphone.com/tag/类人机器人" target="_blank">类人机器人</a>                                                                    <a href="http://www.leiphone.com/tag/聊天机器人" target="_blank">聊天机器人</a>                                                                    <a href="http://www.leiphone.com/news/201606/kyKJpmCelZrWE7K4.html" target="_blank">微信机器人</a>                                                                    <a href="http://www.leiphone.com/tag/微信小程序" target="_blank">微信小程序</a>                                                                    <a href="http://www.leiphone.com/tag/移动支付" target="_blank">移动支付</a>                                                                    <a href="http://www.leiphone.com/tag/支付宝" target="_blank">支付宝</a>                                                                    <a href="http://www.leiphone.com/tag/P2P" target="_blank">P2P</a>                                                                    <a href="http://www.leiphone.com/tag/区块链" target="_blank">区块链</a>                                                                    <a href="http://www.leiphone.com/tag/比特币" target="_blank">比特币</a>                                                                    <a href="http://www.leiphone.com/tag/风控" target="_blank">风控</a>                                                                    <a href="http://www.leiphone.com/tag/高盛" target="_blank">高盛</a>                                                                    <a href="http://www.leiphone.com/tag/人脸识别" target="_blank">人脸识别</a>                                                                    <a href="http://www.leiphone.com/tag/指纹识别" target="_blank">指纹识别</a>                                                                    <a href="http://www.leiphone.com/tag/黑科技" target="_blank">黑科技</a>                                                                    <a href="http://www.leiphone.com/news/201502/S5yH58slS9gpBrm4.html" target="_blank">谷歌地图</a>                                                                    <a href="http://www.leiphone.com/tag/谷歌" target="_blank">谷歌</a>                                                                    <a href="http://www.leiphone.com/tag/IBM" target="_blank">IBM</a>                                                                    <a href="http://www.leiphone.com/tag/微软" target="_blank">微软</a>                                                                    <a href="http://www.leiphone.com/tag/乐视" target="_blank">乐视</a>                                                                    <a href="http://www.leiphone.com/tag/百度" target="_blank">百度</a>                                                                    <a href="http://www.leiphone.com/tag/三星s8
+" target="_blank">三星s8</a>                                                                    <a href="http://www.leiphone.com/tag/腾讯" target="_blank">腾讯</a>                                                                    <a href="http://www.leiphone.com/list/三星Note8" target="_blank">三星Note8 </a>                                                                    <a href="http://www.leiphone.com/news/201610/oUUuMZtyi7H6xMGA.html" target="_blank">小米MIX</a>                                                                    <a href="http://www.leiphone.com/tag/小米Note" target="_blank">小米Note</a>                                                                    <a href="http://www.leiphone.com/tag/华为" target="_blank">华为</a>                                                                    <a href="http://www.leiphone.com/tag/小米" target="_blank">小米</a>                                                                    <a href="http://www.leiphone.com/tag/阿里巴巴" target="_blank">阿里巴巴</a>                                                                    <a href="http://www.leiphone.com/tag/苹果" target="_blank">苹果</a>                                                                    <a href="http://www.leiphone.com/tag/MacBook Pro" target="_blank">MacBook Pro</a>                                                                    <a href="http://www.leiphone.com/tag/iPhone" target="_blank">iPhone</a>                                                                    <a href="http://www.leiphone.com/tag/Facebook" target="_blank">Facebook</a>                                                                    <a href="http://www.leiphone.com/tag/GAIR" target="_blank">GAIR</a>                                                                    <a href="http://www.leiphone.com/tag/IROS" target="_blank">IROS</a>                                                                    <a href="http://www.leiphone.com/tag/双创周" target="_blank">双创周</a>                                                                    <a href="http://www.leiphone.com/tag/云栖大会" target="_blank">云栖大会</a>                                                                    <a href="https://www.iuplus.com" target="_blank">优葩</a>                                                                    <a href="http://www.leiphone.com/news/201610/qN5pHyh1kQUQEGtw.html" target="_blank">智能硬件公司</a>                                                                    <a href="http://www.leiphone.com/category/weiwu" target="_blank">智能硬件</a>                                                                    <a href="http://www.leiphone.com/news/201701/RnURKJ8H5PaG9g7y.html" target="_blank">QQ红包</a>                                                                    <a href="http://www.leiphone.com/news/201701/RnURKJ8H5PaG9g7y.html" target="_blank">支付宝红包</a>                                                                    <a href="http://www.leiphone.com/news/201701/cdANtd69SJLFwdXs.html" target="_blank">敬业福</a>                                                                                    
+                        <a href="https://www.leiphone.com/list/soreal" target="_blank">soreal</a><a href="https://www.leiphone.com/list/qi无线充电" target="_blank">qi无线充电</a><a href="https://www.leiphone.com/list/乔治·霍兹" target="_blank">乔治·霍兹</a><a href="https://www.leiphone.com/list/全景视频原理" target="_blank">全景视频原理</a><a href="https://www.leiphone.com/list/maker faire" target="_blank">maker faire</a><a href="https://www.leiphone.com/list/集群技术" target="_blank">集群技术</a><a href="https://www.leiphone.com/list/ios10越狱" target="_blank">ios10越狱</a><a href="https://www.leiphone.com/list/激光电视" target="_blank">激光电视</a><a href="https://www.leiphone.com/list/kuner扩容" target="_blank">kuner扩容</a><a href="https://www.leiphone.com/list/vr摄影机" target="_blank">vr摄影机</a><a href="https://www.leiphone.com/list/cncc 2016 ppt" target="_blank">cncc 2016 ppt</a><a href="https://www.leiphone.com/list/魅蓝note2拆机图解" target="_blank">魅蓝note2拆机图解</a><a href="https://www.leiphone.com/list/z3compact" target="_blank">z3compact</a><a href="https://www.leiphone.com/list/boogie board官网" target="_blank">boogie board官网</a><a href="https://www.leiphone.com/list/计算机常见算法归类总结" target="_blank">计算机常见算法归类总结</a>                        <a href="https://www.leiphone.com/list/" target="_blank">更多</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="yp-footer-msg">
+        <div class="wrapper clr">
+            <!-- links -->
+            <div class="links">
+                <a rel="nofollow" href="https://www.leiphone.com/us/contact">联系我们</a>
+                <a rel="nofollow" href="https://www.leiphone.com/us/index">关于我们</a>
+                <a rel="nofollow" href="https://www.leiphone.com/news/201611/0nOqnvNoxI6vX4L9.html">加入我们</a>
+                <a rel="nofollow" href="https://www.leiphone.com/us/feedback">意见反馈</a>
+                <a rel="nofollow" href="https://www.leiphone.com/contribute/index">投稿</a>
+            </div>
+            <!-- 下载app -->
+            <div class="downLoad-app">
+                <div class="qrcode">
+                    <!-- /site/download -->
+                    <img src="/resWeb/images/common/downCode.jpg" width="96" height="96" alt="" />
+                </div>
+                <div class="txt">
+                    <p>下载雷锋网客户端</p>
+                    <a rel="nofollow" href="https://itunes.apple.com/cn/app/lei-feng-wang-yi-dong-hu-lian/id579529120?mt=8" target="_blank" class='iPhone'><em></em>iPhone</a>
+                    <a rel="nofollow" href="https://android.myapp.com/myapp/detail.htm?apkName=com.leiphone.app" target="_blank" class='Android'><em></em>Android</a>
+                </div>
+            </div>
+            <!-- 关注-->
+            <div class="contact">
+                <a rel="nofollow" href="mailto:web@leiphone.com " class='eml sub_a'><em></em></a>
+                <a rel="nofollow" href="https://www.weibo.com/p/1006062118746300" target="_blank" class='sina sub_a'><em></em></a>
+            </div>
+        </div>
+    </div>
+    <!-- copyRight -->
+    <div class="yp-copyright">
+        <div class="wrapper">
+            <p>Copyright © 2011-2018 www.leiphone.com 雷锋网-移动互联网智能终端第一媒体 All Rights Reserved <a target="_blank" style="color:#9baab6;" href="https://www.miitbeian.gov.cn">粤ICP备11095991号-1</a>
+<!--                 <a  key ="54914497efbfb06e545f711c"  logo_size="83x30"  logo_type="realname"  href="https://www.anquan.org" ><script src="https://static.anquan.org/static/outer/js/aq_auth.js"></script></a> -->
+                &nbsp;&nbsp;
+                <a href="http://szcert.ebs.org.cn/0ee69ac3-f114-4bd9-9ea1-a5a04f7cd44b" rel="nofollow" target="_blank"><img src="https://www.leiphone.com/resWeb/images/common/govIcon.gif" width="29" height="40"></a>
+<!--                <script id="ebsgovicon" src="https://szcert.ebs.org.cn/govicon.js?id=0ee69ac3-f114-4bd9-9ea1-a5a04f7cd44b&width=29&height=40&type=1" type="text/javascript" charset="utf-8"></script>                &nbsp;&nbsp;-->
+                <a rel="nofollow" href="https://www.leiphone.com/resWeb/images/ICP.jpg" target="_blank" style="color:#9baab6">ICP证粤B2-20150332</a>
+                <a rel="nofollow" href="http://www.qiniu.com/" target="_blank" rel="nofollow" style="float:right">
+                    <img src="https://www.leiphone.com/resWeb/images/common/hzs4.png">
+                </a>
+            </p>
+        </div>
+    </div>
+</footer>
+<div id="lph-footer-gotoBar">
+    <div class="gotoTop">   
+        <a href="javascript:;" class="top" data-goto="0" data-start="100"><em></em></a>
+    </div>
+</div>
+
+<!-- 遮罩层 -->
+<div class="lph-overlay"></div>
+    <!-- 右上角持续提示，邮箱未绑定的时候输出 -->
+    <div class="yzEmail_tip yzEmail_tip1" id="bandEmailTip">
+        <em></em>
+        <span>为了您的账户安全，请<a class="bbtn" href="javascript:;">验证邮箱</a></span>
+        <i class="close"></i>
+    </div>
+
+    <!-- 右上角持续提示，邮箱发送但未验证的时候输出 -->
+    <div class="yzEmail_tip yzEmail_tip2" id="sendEmailTip">
+        <span style="text-align: center;">您的邮箱还未验证,完成可获20积分哟！</span>
+        <p class="links"><a class="rbtn" href="javascript:;">重发邮箱</a><a class="sbtn" href="javascript:;">修改邮箱</a></p>
+        <i class="close"></i>
+    </div>
+
+    <!-- 记cookie弹窗，邮箱未绑定的时候弹出 -->
+    <div class="yzEmail_box yzEmail_box1 lph-pops" id="sendEmailBox">
+        <div class="head">请验证您的邮箱</div>
+        <div class="box">
+            <span class="tipp"><!-- *邮箱 --></span>
+            <input class="inp" id="sendEmail_input" placeholder="输入您的邮箱" value="" >
+            <!-- <strong>验证邮件已发送，请您查收</strong> -->
+            <a class="btn" href="javascript:;" target="_blank" id="sendEmail_btn"><i></i><em>立即验证</em></a>
+            <div class="error"></div>
+        </div>
+        <!-- <div class="boxOk">
+            <strong>验证邮件已发送，请您查收</strong>
+        </div> -->
+        <i class="close"></i>
+    </div>
+
+    <!-- 记cookie弹窗，已发送邮件但未验证 -->
+    <div class="yzEmail_box yzEmail_box2 lph-pops" id="setPwBox">
+        <div class="head">完善账号信息</div>
+        <div class="top">
+            <span>您的账号已经绑定，现在您可以<a href="javascript:;">设置密码</a>以方便用邮箱登录</span>
+        </div>
+        <div class="btm">
+            <input class="inp" type="password" id="" placeholder="输入您的密码" value="" >
+            <a class="btn" href="javascript:;" target="_blank" id=""><i></i><em>立即设置</em></a>
+            <a class="clo" href="javascript:;">以后再说</a>
+            <div class="error"></div>
+        </div>
+        <i class="close"></i>
+    </div>
+
+<!-- 申请专栏作者 -->
+<form id="applyAutor" onsubmit="return false">
+    <div class="applyAutor-pop">   
+        <i class="close"></i> 
+        <div class="title">请填写申请人资料</div>
+        <div class="main">
+            <div class="rows clr">
+               <span class="name">姓名</span>
+               <input type="text" id="name" name="MemberAuthorType[name]" value="">
+               <span class="error"></span>
+            </div>
+            <div class="rows clr">
+               <span class="name">电话</span>
+               <input type="text" id="phone" name="MemberAuthorType[phone]" value="">
+               <span class="error"></span>
+            </div>
+            <div class="rows clr">
+               <span class="name">邮箱</span>
+               <input type="text" id="eml" name="MemberAuthorType[email]" value="">
+               <span class="error"></span>
+            </div>
+            <div class="rows clr">
+               <span class="name">微信号</span>
+               <input type="text" id="weixin" name="MemberAuthorType[wechat]" value="">
+               <span class="error"></span>
+            </div>
+            <div class="rows clr">
+               <span class="name">作品链接</span>
+               <input type="text" id="job" name="MemberAuthorType[link]" value="">
+            </div>
+            <div class="rows clr">
+               <span class="name">个人简介</span>
+               <textarea id="description" name="MemberAuthorType[description]"></textarea>
+            </div>
+            <div class="rows clr rows-last">
+                <input type="submit" value="提 交" id="subBtn">
+                <input type="button" value="取 消" id="clsBtn">
+            </div>
+        </div>
+    </div>  
+</form>
+<!--<!-- 公告 -->
+<!--<div class="server-mask"></div>-->
+<!--<div class="server-pop">-->
+<!--    <em id='serCls'></em>-->
+<!--    <div class="tit">关于网站服务器维护的公告</div>-->
+<!--    <div class="main">-->
+<!--        <p>尊敬的雷锋网用户：</p>-->
+<!--        <p>&nbsp;&nbsp;&nbsp;&nbsp;由于网站服务器维护升级，雷锋网将在7月14日22:00-24:00 暂时关闭网站。由此给您带来的不便，我们深表歉意。特此公告!</p>-->
+<!--        <p class="txtR mt10">雷锋网</p>-->
+<!--        <p class="txtR">2017年7月13日</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<script>
+    // 四站登录
+    with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src=BASE_URL+'/resWeb/home/js/login/yp_login.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<!-- 优路跟踪代码 -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5HDG4H');</script>
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        }
+        else{
+            bp.src = 'https://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+             
+    })();
+</script>
+</body>
+</html>

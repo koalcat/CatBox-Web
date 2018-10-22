@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><script type="text/javascript">window.NREUM||(NREUM={}),__nr_require=function(e,n,t){function r(t){if(!n[t]){var o=n[t]={exports:{}};e[t][0].call(o.exports,function(n){var o=e[t][1][n];return r(o||n)},o,o.exports)}return n[t].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<t.length;o++)r(t[o]);return r}({1:[function(e,n,t){function r(){}function o(e,n,t){return function(){return i(e,[c.now()].concat(u(arguments)),n?null:this,t),n?void 0:this}}var i=e("handle"),a=e(3),u=e(4),f=e("ee").get("tracer"),c=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var p=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],d="api-",l=d+"ixn-";a(p,function(e,n){s[n]=o(d+n,!0,"api")}),s.addPageAction=o(d+"addPageAction",!0),s.setCurrentRouteName=o(d+"routeName",!0),n.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,n){var t={},r=this,o="function"==typeof n;return i(l+"tracer",[c.now(),e,t],r),function(){if(f.emit((o?"":"no-")+"fn-start",[c.now(),r,o],t),o)try{return n.apply(this,arguments)}catch(e){throw f.emit("fn-err",[arguments,this,e],t),e}finally{f.emit("fn-end",[c.now()],t)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,n){m[n]=o(l+n)}),newrelic.noticeError=function(e){"string"==typeof e&&(e=new Error(e)),i("err",[e,c.now()])}},{}],2:[function(e,n,t){function r(e,n){if(!o)return!1;if(e!==o)return!1;if(!n)return!0;if(!i)return!1;for(var t=i.split("."),r=n.split("."),a=0;a<r.length;a++)if(r[a]!==t[a])return!1;return!0}var o=null,i=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var u=navigator.userAgent,f=u.match(a);f&&u.indexOf("Chrome")===-1&&u.indexOf("Chromium")===-1&&(o="Safari",i=f[1])}n.exports={agent:o,version:i,match:r}},{}],3:[function(e,n,t){function r(e,n){var t=[],r="",i=0;for(r in e)o.call(e,r)&&(t[i]=n(r,e[r]),i+=1);return t}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],4:[function(e,n,t){function r(e,n,t){n||(n=0),"undefined"==typeof t&&(t=e?e.length:0);for(var r=-1,o=t-n||0,i=Array(o<0?0:o);++r<o;)i[r]=e[n+r];return i}n.exports=r},{}],5:[function(e,n,t){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,n,t){function r(){}function o(e){function n(e){return e&&e instanceof r?e:e?f(e,u,i):i()}function t(t,r,o,i){if(!d.aborted||i){e&&e(t,r,o);for(var a=n(o),u=v(t),f=u.length,c=0;c<f;c++)u[c].apply(a,r);var p=s[y[t]];return p&&p.push([b,t,r,a]),a}}function l(e,n){h[e]=v(e).concat(n)}function m(e,n){var t=h[e];if(t)for(var r=0;r<t.length;r++)t[r]===n&&t.splice(r,1)}function v(e){return h[e]||[]}function g(e){return p[e]=p[e]||o(t)}function w(e,n){c(e,function(e,t){n=n||"feature",y[t]=n,n in s||(s[n]=[])})}var h={},y={},b={on:l,addEventListener:l,removeEventListener:m,emit:t,get:g,listeners:v,context:n,buffer:w,abort:a,aborted:!1};return b}function i(){return new r}function a(){(s.api||s.feature)&&(d.aborted=!0,s=d.backlog={})}var u="nr@context",f=e("gos"),c=e(3),s={},p={},d=n.exports=o();d.backlog=s},{}],gos:[function(e,n,t){function r(e,n,t){if(o.call(e,n))return e[n];var r=t();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,n,{value:r,writable:!0,enumerable:!1}),r}catch(i){}return e[n]=r,r}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(e,n,t){function r(e,n,t,r){o.buffer([e],r),o.emit(e,n,t)}var o=e("ee").get("handle");n.exports=r,r.ee=o},{}],id:[function(e,n,t){function r(e){var n=typeof e;return!e||"object"!==n&&"function"!==n?-1:e===window?0:a(e,i,function(){return o++})}var o=1,i="nr@id",a=e("gos");n.exports=r},{}],loader:[function(e,n,t){function r(){if(!E++){var e=x.info=NREUM.info,n=l.getElementsByTagName("script")[0];if(setTimeout(s.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&n))return s.abort();c(y,function(n,t){e[n]||(e[n]=t)}),f("mark",["onload",a()+x.offset],null,"api");var t=l.createElement("script");t.src="https://"+e.agent,n.parentNode.insertBefore(t,n)}}function o(){"complete"===l.readyState&&i()}function i(){f("mark",["domContent",a()+x.offset],null,"api")}function a(){return O.exists&&performance.now?Math.round(performance.now()):(u=Math.max((new Date).getTime(),u))-x.offset}var u=(new Date).getTime(),f=e("handle"),c=e(3),s=e("ee"),p=e(2),d=window,l=d.document,m="addEventListener",v="attachEvent",g=d.XMLHttpRequest,w=g&&g.prototype;NREUM.o={ST:setTimeout,SI:d.setImmediate,CT:clearTimeout,XHR:g,REQ:d.Request,EV:d.Event,PR:d.Promise,MO:d.MutationObserver};var h=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1099.min.js"},b=g&&w&&w[m]&&!/CriOS/.test(navigator.userAgent),x=n.exports={offset:u,now:a,origin:h,features:{},xhrWrappable:b,userAgent:p};e(1),l[m]?(l[m]("DOMContentLoaded",i,!1),d[m]("load",r,!1)):(l[v]("onreadystatechange",o),d[v]("onload",r)),f("mark",["firstbyte",u],null,"api");var E=0,O=e(5)},{}]},{},["loader"]);</script>
+  <meta property="og:site_name" content="爱范儿" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.ifanr.com/minapp/1115345" />
+<meta property="og:title" content="美团小程序也做拼团了！复制了拼多多的模式，就能复制它的成功吗？" />
+<meta property="og:image" content="https://s3.ifanr.com/wp-content/uploads/2018/10/1-45.jpg" />
+<meta name="weibo: article:create_at" content="2018-10-19 08:57:33" />
+<meta name="weibo: article:update_at" content="2018-10-19 08:57:33" />
+  <meta name="MSSmartTagsPreventParsing" content="true" />
+  <meta http-equiv="imagetoolbar" content="no" />
+  <meta name="robots" content="all" />
+  <title> 美团小程序也做拼团了！复制了拼多多的模式，就能复制它的成功吗？ | 爱范儿 </title>
+  <link rel="shortcut icon" href="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/favicon.ico" />
+  <link rel="dns-prefetch" href="//7tn0u2fl3q-dsn.algolia.net/">
+  <link rel="dns-prefetch" href="//at.alicdn.com/">
+  <link rel="dns-prefetch" href="//cdn.ifanr.cn/">
+  <link rel="dns-prefetch" href="//images.ifanr.cn/">
+  <link rel="dns-prefetch" href="//s3.ifanr.com/">
+  <link rel="dns-prefetch" href="//sso.ifanr.com/">
+    <meta property="og:site_name" content="爱范儿" />
+  <meta property="og:type" content="article" />
+      <meta property="og:url" content="https://www.ifanr.com" />
+      <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline":"拼团就写在美团最初的基因里。",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://www.ifanr.com/minapp/1115345"
+    },
+    "image": "https://s3.ifanr.com/wp-content/uploads/2018/10/70-1.jpg",
+    "datePublished": "2018-10-19 08:57:33",
+    "dateModified":"2018-10-19 08:57:33",
+    "author": {
+      "@type": "Person",
+      "name":"冷思真"
+    },
+     "publisher": {
+      "@type": "Organization",
+      "name": "ifanr",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://dl.ifanr.cn/ifanr/ifanr-logo.jpg"
+      }
+    },
+    "description": "拼团就写在美团最初的基因里。"
+  }
+  </script>
+
+  <link rel='dns-prefetch' href='//images.ifanr.cn' />
+<link rel='dns-prefetch' href='//s.w.org' />
+<link rel='dns-prefetch' href='//s3.ifanr.com' />
+<link rel='stylesheet' id='videojs-css'  href='https://images.ifanr.cn/wp-content/plugins/more-editor-style/editor-function-button-style.css?ver=4.9.8' type='text/css' media='all' />
+<link rel='stylesheet' id='doge-style-css'  href='https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/dist/app-e0052068b7.min.css?ver=4.9.8' type='text/css' media='all' />
+<link rel='stylesheet' id='widgetbuzz-css'  href='//images.ifanr.cn/wp-content/plugins/ifanr-widget-buzz/dist/build/buzz.auto_create_ts_1446046962.css?ver=4.9.8' type='text/css' media='all' />
+<link rel='https://api.w.org/' href='https://www.ifanr.com/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://www.ifanr.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://images.ifanr.cn/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='小程序支持主体变更了！我们为你总结了最为详尽的迁移攻略' href='https://www.ifanr.com/minapp/1114677' />
+<link rel="canonical" href="https://www.ifanr.com/minapp/1115345" />
+<link rel="alternate" type="application/json+oembed" href="https://www.ifanr.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.ifanr.com%2Fminapp%2F1115345" />
+<link rel="alternate" type="text/xml+oembed" href="https://www.ifanr.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.ifanr.com%2Fminapp%2F1115345&#038;format=xml" />
+<script type="text/javascript">
+/* Try to get out of frames! */
+if ( window.top != window.self ) {
+  window.top.location = self.location.href
+}
+
+var ga = ga || function() {(ga.q = ga.q || []).push(arguments)};
+</script>
+  
+
+  <script>
+    USER = {};
+    USER.SSO_URL_MYACCOUNT = 'https://sso.ifanr.com/myaccount/';
+    USER.SSO_URL_LOGIN = 'https://sso.ifanr.com/embed/login/' + '?referer=' + location.origin;
+    USER.SSO_URL_REGISTER = 'https://sso.ifanr.com/embed/login/#register' + '?referer=' + location.origin;
+    USER.SSO_URL_LOGOUT = '';
+    USER.SSO_USER_ACTIVITY = 'https://sso.ifanr.com/myactivity/';
+
+    IFR = {};
+    IFR.apiUrl = '/api/v3.0/';
+    IFR.staticUrl = "https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/"
+    IFR.slideNum = 3;
+    IFR.apiNonce = {
+      appkey: 'lI5287M8UyxBI98U2YKq',
+      timestamp: '1540112777',
+      sign: 'c54c5f721247355664672e45690333f7'
+    };
+    IFR.ssoHost = 'https://sso.ifanr.com/';
+
+      </script>
+  
+    <script charset="utf-8" id="ParadigmSDK" src="https://nbrecsys.4paradigm.com/sdk/js/ParadigmSDK_v2.js" data="312" defSI="509"></script>
+  <script>
+    IFR.useRecommend = '1';
+    IFR.REC_DESFI  = '509';
+    ParadigmSDK.init("0cb1b818923148bbb454c1393b6b96c5");
+    ParadigmSDK.trackDetailPageShow();
+  </script>
+    
+
+</head>
+
+<body class="minapp-template-default single single-minapp postid-1115345" data-component="TextClamp">
+<div class="page-body">
+
+    <div id="progress-bar"><div class="white"></div><div class="red"></div></div>
+
+  <div class="sidebar-drawer-menu-overlay js-drawer-menu-overlay--hide"
+    data-component="DrawerMenuOverlay">
+  <div class="sidebar-drawer-menu">
+    <header class="sidebar-drawer-menu__title menu-wrap-seprator">分类</header>
+    <div class="menu-wrap">
+      <ul>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/cartoon-saloon">Cartoon Saloon</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/ces2018">CES 2018</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/cesaisa">CES Asia</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/ifanq">ifanQ</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/top-rank">ifanRank</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/mindtalk">MindTalk</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/mwc-2018">MWC 2018</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/product">产品</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/people">人物</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/business">公司</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/%e5%9b%be%e8%ae%b0">图记</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/%e5%a5%bd%e8%8e%b1%e5%9d%9e">好莱坞</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/%e5%b9%bf%e5%91%8a">广告</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/innovation">新创</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/%e6%96%b0%e6%b6%88%e8%b4%b9">新消费</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/ifanrnews">早报</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/game-special">游戏</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/special">特稿</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/life">生活</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/%e8%8c%83%e8%af%84">范评</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/intelligentcar">董车会</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/video">视频</a></li>
+                <li class="menu-wrap__item menu-wrap-seprator"><a href="https://www.ifanr.com/category/review">评测</a></li>
+              </ul>
+            <div class="special-section">
+              </div>
+    </div>
+  </div>
+</div>
+      <header class="c-global-header" data-component="Navbar">
+      <div class="c-header-sns" data-component="UserPanel">
+  <div class="c-header-sns__wrapper">
+    <div class="c-header-sns__icons">
+      <a class="ifanrx ifanrx-twitter1"
+         href="https://twitter.com/ifanr"
+         ga-bind="click" ga-action="Clicktwitter" ga-category="ArticlePage_Topbar" ga-label="TwitterButton"></a>
+      <a class="ifanrx ifanrx-wechat1"
+         href="https://www.ifanr.com/weixin"
+         ga-bind="click" ga-action="ClickWeChat" ga-category="ArticlePage_Topbar" ga-label="WeChatButton"></a>
+      <a class="ifanrx ifanrx-weibo1"
+         href="http://weibo.com/ifanr"
+         ga-bind="click" ga-action="ClickWeibo" ga-category="ArticlePage_Topbar" ga-label="WeiboButton"></a>
+      <a class="ifanrx ifanrx-rss1"
+         href="https://www.ifanr.com/feed"
+         ga-bind="click" ga-action="ClicktRss" ga-category="ArticlePage_Topbar" ga-label="RssButton"></a>
+    </div>
+    <div class="c-header-sns__about">
+      <div class="c-header-sns__about--hover" href="javascript:;">
+        <a href="/ifanr-app-download/" target="_blank" ga-category="ArticlePage_Topbar" ga-bind="click">
+          <i class="ifanrx ifanrx-phone icon-phone"></i>
+          下载客户端
+        </a>
+        <div class="c-download-client o-navbar-tooltip" ga-bind="hover" ga-action="" ga-category="ArticlePage_Topbar">
+          <img src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/ifanr-app.png" alt="下载客户端">
+          <div class="o-navbar-tooltip__spliter"></div>
+          <img src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/ifanr/ifanr-nav-logo.svg" alt="爱范儿 logo">
+        </div>
+      </div>
+
+      <a class="c-header-navbar__report" href="https://www.ifanr.com/about/contribute/" ga-category="ArticlePage_Topbar"
+         ga-bind="click" ga-category="Bar" ga-action="Report">寻求报道</a>
+      <ul class="c-global-navbar__user c-user-bar" data-component="SSOUser">
+        <li class="js-navbar-user-unauthenticated c-user-bar__unauthenticated">
+          <a class="c-global-navbar-login js-button-login" ga-bind="click" ga-category="Login" ga-action="ClickLogin"
+             ga-label="LoginButton">登录</a>
+        </li>
+        <li class="js-navbar-user-unauthenticated c-user-bar__unauthenticated">
+          <a class="c-global-navbar-login js-button-register" ga-bind="click" ga-category="ArticlePage_Topbar"
+             ga-action="ToSign-up" ga-label="Sign-upButton">注册</a>
+        </li>
+        <li class="js-navbar-user-authenticated c-user-bar__authenticated is-hidden">
+          <img class="js-user-avatar c-user-bar__avatar" src="" ga-bind="click" ga-category="ArticlePage_Topbar"
+               ga-action="Profile" ga-label="enter">
+        </li>
+        <div class="user-panel hidden">
+  <div class="user-card">
+    <div class="user-info">
+      <img class="user-info__avatar" src="#" alt="" ga-bind="click" ga-category="Head" ga-action="Profile" ga-label="avator">
+      <div class="user-info__nickname-email">
+        <span class="user-info__nickname"></span>
+        <span class="user-info__email"></span>
+      </div>
+      <a href="https://sso.ifanr.com/myaccount/" target="_blank" class="cover-block">
+      
+      </a>
+    </div>
+    <ul class="user-nav">
+      <li><a href="https://sso.ifanr.com/myactivity/" ga-bind="click" ga-category="Head" ga-action="Profile" ga-label="myrecent" target="_blank">我的动态</a></li>
+      <li><a href="https://sso.ifanr.com/mymessage/" ga-bind="click" ga-category="Head" ga-action="Profile" ga-label="notice" target="_blank">消息中心<span class="notification-count"></span></a></li>
+      <li><a href="https://sso.ifanr.com/mycollection/" ga-bind="click" ga-category="Head" ga-action="Profile" ga-label="mycollection" target="_blank">我的收藏</a></li>
+      <li><a href="https://sso.ifanr.com/myaccount/" ga-bind="click" ga-category="Head" ga-action="Profile" ga-label="mysetting" target="_blank">账户设置</a></li>
+    </ul>
+    <a href="https://sso.ifanr.com/logout/" class="user-card__logout-link" ga-bind="click" ga-category="Head" ga-action="Profile" ga-label="logout">退出登录</a>
+  </div>
+</div>      </ul>
+      <div class="c-header-navbar__search">
+        <a href="javascript:;">
+          <i class="js-navbar-search-btn ifanrx ifanrx-search" ga-bind="click" ga-category="ArticlePage_Topbar"
+             ga-action="search" ga-label="searchbutton"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+      <div class="c-header-navbar c-header-navbar__white" data-component="Navbar">
+  <div class="c-header-navbar__content">
+    <div class="c-header-navbar－content__left">
+      <a href="https://www.ifanr.com/" ga-bind="click" ga-category="ArticlePage_Header" ga-action="Clickifanr" ga-label="ifanr Button">
+        <img class="c-header-navbar__logo" src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/ifanr/ifanr-white-logo.svg">
+      </a>
+      <ul class="c-header-navigation">
+        <li class="c-header-navigation__item">
+          <a href="https://coolbuy.com/" target="_blank" ga-bind="click" ga-category="ArticlePage_Header" ga-action="ClickCoolbuy" ga-label="coolbuy Button">好物商店</a>
+        </li>
+        <li class="c-header-navigation__item">
+          <a href="https://minapp.com/" target="_blank" ga-bind="click" ga-category="ArticlePage_Header" ga-action="ClickMinapp" ga-label="Minapp Button">知晓程序</a>
+        </li>
+        <li class="c-header-navigation__item">
+          <a href="https://cloud.minapp.com/?utm_source=ifanr&utm_medium=navigation" target="_blank" ga-bind="click" ga-category="ArticlePage_Header" ga-action="ClickCloudminapp" ga-label="CloudMinapp Button">知晓云</a>
+        </li>
+        <li class="c-header-navigation__item">
+          <a href="https://www.ifanr.com/lab/" target="_blank" ga-bind="click" ga-category="ArticlePage_Header" ga-action="ClickCloudminapp" ga-label="CloudMinapp Button">未来实验室</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+  
+  <div class="c-content-search c-content-search_modal" data-component="Search">
+  <div class="c-content-search__input">
+    <i class="c-content-search__close ifanrx ifanrx-guanbi-sousuolan js-search-close-btn"></i>
+    <input class="js-modal-search-input" type="input" name="" placeholder="请输入关键字" data-query="">
+    <i class="c-content-search__search ifanrx ifanrx-sousuo-sousuolan js-modal-search-btn" href=""></i>
+  </div>
+  <div class="clearfix c-content-search__empty-box is-hidden js-search-empty">
+    <div class="c-content-hot__search">
+      <div class="c-content-hot__label">热门搜索</div>
+        <ul class="c-header-search__hot-word">
+        </ul>
+    </div>
+    <div class="c-content-hot__recommend">
+        <div class="c-content-hot__label">热门推荐</div>
+        <div class="inner-box"></div>
+    </div>
+  </div>
+  <div class="c-content-search__result js-search-result is-hidden">
+      <p class="c-content-search-result__title">为您查询到 <span class="js-search-result-count"></span> 篇文章</p>
+      <ul class="js-search-result-list"></ul>
+      <button class="c-search-load-more js-search-load-more">加载更多</button>
+  </div>
+  <div class="c-content-search__loading js-search-loading"></div>
+</div></header>  
+    <div class="o-single-wrapper ">
+    <div class="o-single" data-category="">
+      <div class="o-single-content" id="article-content-wrapper">
+        <div class="o-single-content__body o-single-content__body--main">
+                    <div id="article-header" class="o-single-content__header">
+            <img src="https://s3.ifanr.com/wp-content/uploads/2018/10/70-1.jpg!720" alt="" width="100%">
+          </div>
+                    <div class="o-single-content__body c-single-normal__header" id="content-meta-header">
+            <div class="o-single-normal-content">
+              <h1 class="c-single-normal__title">美团小程序也做拼团了！复制了拼多多的模式，就能复制它的成功吗？</h1>
+            </div>
+          </div>
+          <div class="o-single-content__body__content">
+              <div id="ArticleContentMeta" data-component="ArticleContentMeta">
+  <div class="c-meta-share__left">
+    <div class="c-article-header-meta">
+      <a class="text-link" href="https://www.ifanr.com/minapp/" ga-bind="click" ga-action="ClickCategory" ga-category="ArticlePage_Category" ga-label="ArticlePage_CategoryButton" target="_blank">
+        <p class="c-article-header-meta__category">小程序</p>
+      </a>
+      <p class="c-article-header-meta__time"
+         data-timestamp="1539910653">前天 08:57</p>
+    </div>
+  </div>
+  <div class="c-meta-share__right">
+    <aside>
+      <div class="c-article-count" data-post-id="1115345"><p class="js-placeholder-comments-counter"> - </p> 评论</div>
+      <div
+          class="c-social-bar c-social-bar--horizontal c-social-bar--circle c-social-bar--sqaured c-single-video-share-bar__medias"
+          data-component="SocialBar"
+          data-post-id="1115345">
+        <button class="c-social-bar__icon c-social-bar__icon--comment js-goto-comments"></button>
+
+        <div class="social-bar--horizontal_divider"></div>
+
+        <a class="c-social-bar__icon c-social-bar__icon--weibo" ga-bind="click" ga-category="SharePage_Top" ga-action="ClickShareLinkButton" ga-label="T_WeiboButton"
+           href="http://v.t.sina.com.cn/share/share.php?url=https://www.ifanr.com/minapp/1115345&title=美团小程序也做拼团了！复制了拼多多的模式，就能复制它的成功吗？" target="_blank" rel="nofollow noopener noreferrer"></a>
+        <div class="c-social-bar__icon c-social-bar__icon--wechat" ga-bind="hover" ga-category="SharePage_Top" ga-action="ClickShareLinkButton" ga-label="T_WechatButton">
+          <div class="c-social-bar__icon--wechat__qrcode c-popup-qrcode">
+            <div class="c-popup-qrcode__title">分享到微信</div>
+            <div class="js-qrcode" data-qrcode-class="c-popup-qrcode__image"></div>
+            <div class="c-popup-qrcode__hint">使用微信扫码将网页分享到微信</div>
+          </div>
+        </div>
+        <a class="c-social-bar__icon c-social-bar__icon--twitter" ga-bind="click" ga-category="SharePage_Top" ga-action="ClickShareLinkButton" ga-label="T_TwitterButton"
+           href="https://twitter.com/intent/tweet?button_hashtag=ifanr&text=美团小程序也做拼团了！复制了拼多多的模式，就能复制它的成功吗？&url=https://www.ifanr.com/minapp/1115345"
+           target="_blank" rel="nofollow noopener noreferrer"></a>
+        <a class="c-social-bar__icon c-social-bar__icon--linkedin" ga-bind="click" ga-category="SharePage_Top" ga-action="ClickShareLinkButton" ga-label="T_LinkedinButton"
+           href="https://www.linkedin.com/shareArticle?title=美团小程序也做拼团了！复制了拼多多的模式，就能复制它的成功吗？&url=https://www.ifanr.com/minapp/1115345&summary=&source=ifanr"
+           target="_blank" rel="nofollow noopener noreferrer"></a>
+      </div>
+    </aside>
+  </div>
+</div>
+          </div>
+            
+<article class="o-single-content__body__content c-article-content s-single-article js-article">
+  <blockquote><p>美团也入局社交电商了。</p></blockquote>
+<p><img class="aligncenter size-full wp-image-1115421" src="https://s3.ifanr.com/wp-content/uploads/2018/10/70-1.jpg!720" alt="" width="1200" height="675" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/70-1.jpg!720 1200w, https://s3.ifanr.com/wp-content/uploads/2018/10/70-1-360x203.jpg 360w, https://s3.ifanr.com/wp-content/uploads/2018/10/70-1-768x432.jpg 768w, https://s3.ifanr.com/wp-content/uploads/2018/10/70-1-1024x576.jpg 1024w" sizes="(max-width: 1200px) 100vw, 1200px" /></p>
+<p>近日，美团官方小程序上线了一个全新版块——好货拼团，该功能由「美团拼团」小程序提供。不过这个小程序目前尚未开放搜索，所以目前大部分用户进入「美团拼团」的渠道可能只有美团官方小程序的跳转打开。</p>
+<p><img class="aligncenter size-full wp-image-1115407" src="https://s3.ifanr.com/wp-content/uploads/2018/10/9-1.png!720" alt="" width="1000" height="994" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/9-1.png!720 1000w, https://s3.ifanr.com/wp-content/uploads/2018/10/9-1-360x358.png 360w, https://s3.ifanr.com/wp-content/uploads/2018/10/9-1-768x763.png 768w" sizes="(max-width: 1000px) 100vw, 1000px" /></p>
+<p>经知晓程序测试，目前<strong>只有杭州地区的用户能够看到「好货拼团」界面</strong>，其他地区的用户只能看到美团小程序已有的「附近拼团」服务。</p>
+<p>「好货拼团」拼了些什么呢？答案是，什么都拼。既有漱口水也有茶叶，既有面膜也有手机支架，既有游戏机也有农产品。脱离了美团代金劵的传统印象，这次上线的「好货拼团」什么都可以拼。</p>
+<p><img class="aligncenter size-full wp-image-1115376" src="https://s3.ifanr.com/wp-content/uploads/2018/10/2-37.jpg!720" alt="" width="700" height="1000" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/2-37.jpg!720 700w, https://s3.ifanr.com/wp-content/uploads/2018/10/2-37-360x514.jpg 360w" sizes="(max-width: 700px) 100vw, 700px" /></p>
+<p>「美团拼团」小程序的公开信息显示其于 8 月 16 日就已经完成了注册，而技术服务支持则由有赞提供。美团对媒体表示，他们从今年 9 月开始就与有赞进行了基于微信小程序插件的技术合作。<strong>他们将作为有赞拼团功能的流量入口，有赞则提供了所有的拼团服务，双方对于新模式的探索仍处于初期阶段。</strong></p>
+<p>而美团小程序的业务负责人也对知晓程序表示，他们此前在小程序层面已经与多家合作商进行了合作，但与有赞在插件层面的技术合作仍属首次尝试，目前仅在部分城市进行了小范围测试。</p>
+<p><img class="aligncenter size-full wp-image-1115378" src="https://s3.ifanr.com/wp-content/uploads/2018/10/3-6.png!720" alt="" width="700" height="1000" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/3-6.png!720 700w, https://s3.ifanr.com/wp-content/uploads/2018/10/3-6-360x514.png 360w" sizes="(max-width: 700px) 100vw, 700px" /></p>
+<p>在微信试水的电商业务还要拉一个合作伙伴，这很符合美团给人一贯的印象——谨慎。早前美团点评战略副总裁陈少晖在接受媒体采访时曾表示，<strong>在网约车、短租平台、软件服务这些新的领域，美团是会非常谨慎的，不会一开始就投入重兵。</strong></p>
+<p>美团这次对社交拼团的尝试或许也是如此，与熟知微信生态的有赞进行合作，在杭州进行小范围的试点，更多承担的流量入口的角色，而货源、物流、商城系统等电商服务则由有赞提供。美团的社交拼团之路走得确实谨慎。</p>
+<p><img class="aligncenter size-full wp-image-1115390" src="https://s3.ifanr.com/wp-content/uploads/2018/10/66-2.jpg!720" alt="" width="1200" height="675" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/66-2.jpg!720 1200w, https://s3.ifanr.com/wp-content/uploads/2018/10/66-2-360x203.jpg 360w, https://s3.ifanr.com/wp-content/uploads/2018/10/66-2-768x432.jpg 768w, https://s3.ifanr.com/wp-content/uploads/2018/10/66-2-1024x576.jpg 1024w" sizes="(max-width: 1200px) 100vw, 1200px" /></p>
+<div class="editor-image-source">
+<p>▲ 图片来自：视觉中国</p>
+</div>
+<blockquote><p>美团对边界的界定并不盲目。 在 all in 某个领域前，美团要对先期小规模投入的业务试点地进行评估，主要看业务的机会、与大战略的协同能力以及投入产出比，进而决定是否会加大投入。</p></blockquote>
+<p>陈少晖接受 The Information 采访时说的话亦能验证「美团拼团」这次的小尝试。即使社交拼团再怎么热，资本再怎么涌入，美团还是要先自行验证这个业务的可行性再正式入场。</p>
+<p>美团是中国大陆地区第一个精品团购形式的类 Groupon 的电子商务网站。其上线初始，便有极其强大的地推团队在搜寻商家入驻，然后再通过较低的拼团价吸引消费者的购买。可以说，拼团就写在它最初的基因里。如今重新尝试，也只不过是鼓起勇气再走一遍而已。</p>
+<p><strong>作为一个更偏向服务业的团购网站，美团早期其实也有购物平台。</strong>只是之后随着业务的发展，购物这个平台被默默的移除了。而随着拼多多的上市，社交团购、社区团购都已经成为了资本争先追求的潜力股。面对诱惑，美团谨慎地做出了尝试。 <img class="aligncenter size-full wp-image-1115379" src="https://s3.ifanr.com/wp-content/uploads/2018/10/8ce825ad181de9cf2ded4a16c6a1d023_r.jpg!720" alt="" width="1118" height="626" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/8ce825ad181de9cf2ded4a16c6a1d023_r.jpg!720 1118w, https://s3.ifanr.com/wp-content/uploads/2018/10/8ce825ad181de9cf2ded4a16c6a1d023_r-360x202.jpg 360w, https://s3.ifanr.com/wp-content/uploads/2018/10/8ce825ad181de9cf2ded4a16c6a1d023_r-768x430.jpg 768w, https://s3.ifanr.com/wp-content/uploads/2018/10/8ce825ad181de9cf2ded4a16c6a1d023_r-1024x573.jpg 1024w" sizes="(max-width: 1118px) 100vw, 1118px" /></p>
+<div class="editor-image-source">
+<p>▲ 当年美团的购物业务. 图片来自：知乎网友@大猫布丁</p>
+</div>
+<p>美团一直以来都是中国互联网独立的力量之一，不同于拼多多的「借地起高楼」，也不同于京东较多的流量倾斜，美团始终保有一定的克制。<strong>他们只有 10% 的流量来源于微信，剩下 90% 的流量都来自于自己的应用。</strong></p>
+<p>腾讯也是美团最大的投资人之一，看着腾讯投资的拼多多获得了如此的成功，坐不住的想必不只阿里和京东。小程序再加团购，利用微信的社交关系链，估计大部分人第一时间想到的都是拼多多。</p>
+<p>不过与拼多多不同，「美团拼团」瞄准的并非是下沉市场。它商品中的颈霜不太受下沉市场的青睐，它销售的水果农副产品在价格上和拼多多对比也没有竞争力。相似的产品定位很难撼动优势产品的垄断，所以我们可以大胆猜测，「美团拼团」的目标人群更可能是对拼多多不感兴趣又需要共克时艰的「五环内人群」。</p>
+<p><img class="aligncenter size-full wp-image-1115392" src="https://s3.ifanr.com/wp-content/uploads/2018/10/51-2.jpg!720" alt="" width="1200" height="675" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/51-2.jpg!720 1200w, https://s3.ifanr.com/wp-content/uploads/2018/10/51-2-360x203.jpg 360w, https://s3.ifanr.com/wp-content/uploads/2018/10/51-2-768x432.jpg 768w, https://s3.ifanr.com/wp-content/uploads/2018/10/51-2-1024x576.jpg 1024w" sizes="(max-width: 1200px) 100vw, 1200px" /></p>
+<div class="editor-image-source">
+<p>▲ 图片来自：视觉中国</p>
+</div>
+<p>目前我们在「美团拼团」看到的社交电商模式多是两人成团的砍价模式，但在砍价之外，知晓程序在「我的」页面还看到了有赞社交电商的「分销员中心」。</p>
+<p>不过这里还没有内容，只是一个入口。不知道未来的「美团拼团」会不会在这加入社交电商常用的「微分销」，衍生出更多的裂变玩法。</p>
+<p><img class="aligncenter size-full wp-image-1115402" src="https://s3.ifanr.com/wp-content/uploads/2018/10/7-4.png!720" alt="" width="1000" height="994" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/7-4.png!720 1000w, https://s3.ifanr.com/wp-content/uploads/2018/10/7-4-360x358.png 360w, https://s3.ifanr.com/wp-content/uploads/2018/10/7-4-768x763.png 768w" sizes="(max-width: 1000px) 100vw, 1000px" /></p>
+<p>拼团、裂变传播、更低的获客成本……这都是吸引各大平台投身社交拼团的重要原因，淘宝和支付宝一起打造的「每日必抢」页面有独立的拼团页，而京东拼购、苏宁易购拼团、网页严选、洋码头砍价团、贝贝拼团等电商平台也纷纷涌入了社交拼团，想要在红利期还没消失的时候一起来「薅流量」。</p>
+<p><img class="aligncenter size-full wp-image-1115406" src="https://s3.ifanr.com/wp-content/uploads/2018/10/0-6.jpg!720" alt="" width="1000" height="994" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/0-6.jpg!720 1000w, https://s3.ifanr.com/wp-content/uploads/2018/10/0-6-360x358.jpg 360w, https://s3.ifanr.com/wp-content/uploads/2018/10/0-6-768x763.jpg 768w" sizes="(max-width: 1000px) 100vw, 1000px" /></p>
+<div class="editor-image-source">
+<p>▲ 支付宝「每日必抢」拼团页面</p>
+</div>
+<div class="editor-image-source">在这些浩浩荡荡的平台中，美团已经不算先进入的巨头了。不过前面尝试的阿里、苏宁较难借到微信的流量，反而是与「美团拼团」定位更相似、主打低价优质的「京东拼购」更应该被美团密切关注。</div>
+<p><strong>「京东拼购」的页面与「拼多多」风格较为相似</strong>，砍价免费领和 9.9 元拼在主页面都有着醒目的图标。相较近来刚刚上线的「美团拼团」，「京东拼购」要更为成熟，更有先发优势，商品种类也更加丰富。<strong>数据显示「京东拼购」小程序的累计用户已有 2.13 亿</strong>，走在前面的京东应该也会给美团带来不小的压力。</p>
+<p><img class="aligncenter size-full wp-image-1115418" src="https://s3.ifanr.com/wp-content/uploads/2018/10/9-15.jpg!720" alt="" width="1000" height="994" srcset="https://s3.ifanr.com/wp-content/uploads/2018/10/9-15.jpg!720 1000w, https://s3.ifanr.com/wp-content/uploads/2018/10/9-15-360x358.jpg 360w, https://s3.ifanr.com/wp-content/uploads/2018/10/9-15-768x763.jpg 768w" sizes="(max-width: 1000px) 100vw, 1000px" /></p>
+<p>团购并不新鲜，但以小程序为载体的社交团购对移动社交路径的优化却是新鲜的。这也是当年「千团大战」时期的产品不曾具备的时代优势。当年从「千团大战」中杀出重围的美团，如今也要在群狼环伺的「千团大战」中努力找到自己独有的价值。</p>
+<p>社交电商的下半场是更精彩还是更残酷，没有人知道。</p>
+
+  </article>
+<div id="article-content" class="o-single-content__body__content c-article-meta">
+    <div class="c-article-tags">
+                    <a ga-bind="click" ga-action="ToLabelpage" ga-category="ArticlePage_Label" ga-label="LabelButton" href="https://www.ifanr.com/tags/%e5%b0%8f%e7%a8%8b%e5%ba%8f" class="c-article-tags__item">小程序</a>
+                    <a ga-bind="click" ga-action="ToLabelpage" ga-category="ArticlePage_Label" ga-label="LabelButton" href="https://www.ifanr.com/tags/%e5%be%ae%e4%bf%a1" class="c-article-tags__item">微信</a>
+                    <a ga-bind="click" ga-action="ToLabelpage" ga-category="ArticlePage_Label" ga-label="LabelButton" href="https://www.ifanr.com/tags/%e6%8b%bc%e5%a4%9a%e5%a4%9a" class="c-article-tags__item">拼多多</a>
+                    <a ga-bind="click" ga-action="ToLabelpage" ga-category="ArticlePage_Label" ga-label="LabelButton" href="https://www.ifanr.com/tags/%e6%9c%89%e8%b5%9e" class="c-article-tags__item">有赞</a>
+                    <a ga-bind="click" ga-action="ToLabelpage" ga-category="ArticlePage_Label" ga-label="LabelButton" href="https://www.ifanr.com/tags/%e7%a4%be%e4%ba%a4%e5%9b%a2%e8%b4%ad" class="c-article-tags__item">社交团购</a>
+                    <a ga-bind="click" ga-action="ToLabelpage" ga-category="ArticlePage_Label" ga-label="LabelButton" href="https://www.ifanr.com/tags/%e7%a4%be%e4%ba%a4%e7%94%b5%e5%95%86" class="c-article-tags__item">社交电商</a>
+                    <a ga-bind="click" ga-action="ToLabelpage" ga-category="ArticlePage_Label" ga-label="LabelButton" href="https://www.ifanr.com/tags/%e9%98%bf%e9%87%8c" class="c-article-tags__item">阿里</a>
+            </div>
+</div>          <div class="o-single-content__body__content">
+              <div class="c-article-likes" data-component="ArticleLikes" data-post-id="1115345">
+  <div class="c-article-share__button" ga-bind="hover" ga-action="HoverShareCard" ga-category="ArticlePage_Share" ga-label="ShareButton">
+    <span class="c-article-share__button_word">分享</span>
+    <i class="ifanrx ifanrx-dropdown"></i>
+    <div class="c-article-share__card">
+      <div class="c-article-share__card__left">
+        <aside>
+          <div class="c-social-bar c-social-bar--vertical c-social-bar--colored c-social-bar--sqaured"
+               data-component="SocialBar"
+               data-post-id="1115345">
+            <a class="c-social-bar__icon c-social-bar__icon--weibo" target="_blank" ga-bind="click" ga-category="SharePage_Footer" ga-action="ClickShareLinkButton" ga-label="F_WeiboButton"
+               href="http://v.t.sina.com.cn/share/share.php?url=https://www.ifanr.com/minapp/1115345&title=美团小程序也做拼团了！复制了拼多多的模式，就能复制它的成功吗？"> <span
+                  class="c-social-bar__icon_hint">分享到微博</span></a>
+            <a class="c-social-bar__icon c-social-bar__icon--twitter" ga-bind="click" ga-category="SharePage_Footer" ga-action="ClickShareLinkButton" ga-label="F_TwitterButton"
+               href="https://twitter.com/intent/tweet?button_hashtag=ifanr&text=美团小程序也做拼团了！复制了拼多多的模式，就能复制它的成功吗？&url=https://www.ifanr.com/minapp/1115345">
+              <span class="c-social-bar__icon_hint">分享到Twitter</span></a>
+            <a class="c-social-bar__icon c-social-bar__icon--linkedin" ga-bind="click" ga-category="SharePage_Footer" ga-action="ClickShareLinkButton" ga-label="F_LinkedinButton"
+               href="https://www.linkedin.com/shareArticle?title=美团小程序也做拼团了！复制了拼多多的模式，就能复制它的成功吗？&url=https://www.ifanr.com/minapp/1115345&summary=&source=ifanr">
+              <span class="c-social-bar__icon_hint">分享到LinkedIn</span></a>
+          </div>
+        </aside>
+      </div>
+      <div class="c-article-share__card__right">
+        <div class="js-qrcode" data-qrcode-class="c-article-share-qrcode"></div>
+        <div class="c-article-share-qrcode__hint">扫一扫分享到微信</div>
+      </div>
+    </div>
+  </div>
+  </div>
+          </div>
+            <div class="o-single-content__body__content">
+  <div class="c-jiong c-jiong--block c-jiong-report">
+  </div>
+</div>
+            <div class="o-single-content__body__content c-jiong-bottom"></div>          <div class="o-single-content__body__content">
+              <div id="article-comments"
+     class="c-article-comments "
+     data-component="ArticleCommentsComponent"
+     data-post-id="1115345">
+
+    <div class="c-article-comments-item is-unauthenticated js-article-comments-post-field">
+    <div class="c-article-comments-item__info">
+      <form class="c-article-comments-form is-unauthenticated js-article-comments-post-form">
+        <div class="c-article-comments-form__headline">
+          <div class="c-article-comments-form__head">
+            <div class="c-article-comments-form-left">
+              <img  class="c-article-comments-form-left__avatar js-user-avatar"
+                    src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/default-avatar.jpg"
+                    alt="">
+              <button type="button"
+                      class="c-article-comments-form-left__login c-article-comments-form-button c-article-comments-form-vertical-align">登录 </button>
+              <span class="c-article-comments-form__username c-article-comments-form-vertical-align"></span>
+              <span class="c-article-comments-form-tips c-article-comments-form-vertical-align">后评论</span>
+            </div>
+          </div>
+          <button type="button" class="js-close-reply-form">放弃回复</button>
+        </div>
+        <div class="c-article-comments-form__textarea">
+          <input  class="c-article-comments-form__input c-article-comments-form__user"
+                  type="email"
+                  name="author_email"
+                  placeholder="你的邮箱*"
+                  required
+                  style="display: none;">
+          <input  class="c-article-comments-form__input c-article-comments-form__user"
+                  type="text"
+                  name="author_name"
+                  placeholder="你的昵称*"
+                  required
+                  style="display: none;">
+          <textarea class="c-article-comments-form__input c-article-comments-form__input--textarea"
+                    name="content"
+                    placeholder="参与讨论前请先登录"
+                    disabled="true"></textarea>
+        </div>
+        <div class="c-article-comments-form__bottom-wrap">
+          <label class="c-article-comments-form__notifier" for="comment-email-notifier">
+            <input type="checkbox" id="comment-email-notifier">收到回复邮件通知我</label>
+          <button type="button" class="c-article-comments-form__submit js-submit-comment">发表评论</button>
+          <div class="c-article-comments-form__toast js-submit-toast"><p>评论在审核通过后将对所有人可见</p></div>
+        </div>
+
+        <input type="hidden" name="post_id" value="1115345">
+        <input type="hidden" name="author_source" value="web" />
+        <input type="hidden" name="comment_mail_notify" value="0" />
+        <input type="hidden" name="comment_weixin_notify" value="0" />
+      </form>
+    </div>
+  </div>
+    <div class="c-article-comments__hint js-comments-hint">
+    <span class="js-comments-hint-content">正在加载中</span>
+  </div>
+
+  <div class="c-article-comments__body is-hidden js-comments-body">
+    <nav class="c-article-comments__nav">
+      <h5 class="c-card-category c-article-comments__headline">全部评论 (<span class="js-placeholder-comments-counter">-</span>)
+      </h5>
+      <span class="c-comment-label">
+        <button class="is-active js-comments-sorting" data-comment-sort="rate">热门</button>
+        <button class="js-comments-sorting" data-comment-sort="time">时间</button>
+      </span>
+
+    </nav>
+
+    <ul class="c-article-comments__list js-comments-list">
+          </ul>
+
+    <div class="c-article-comments-item__info">
+
+      <a class="c-article-comments__submit-shortcut" href="#article-comments">写评论</a>
+      <button class="c-article-comments__view-all js-comments-show-more">查看更多评论</button>
+    </div>
+  </div>
+</div>
+          </div>
+          <div class=" o-single-content__body__content">
+              <div class="footer-rec-posts" id="footerRecPosts" data-component="FooterRecPosts" data-post-id="1115345">
+    <div class="inner-box" id="footer-articles-collection">
+        <h3 class="footer-articles-title">推荐文章</h3>
+            </div>
+</div>          </div>
+        </div>
+      </div>
+      <div class="o-single-aside">
+        <div class="o-single-aside__body" data-start-at="#article-header" data-stop-at="#footer" data-sibling="#single-content-wrapper">
+            <div class="o-widget c-card-author">
+  <!--<h5 class="c-card-category">作者</h5>-->
+  <div class="c-card c-card-author__info">
+    <a ga-bind="click" ga-action="ClickToAuthor" ga-category="ArticlePage_sidebar" ga-label="AuthorButton" class="c-card-author__info__avatar" href="https://www.ifanr.com/author/lengsizhen" target="_blank"><img src="https://s3.ifanr.com/wp-content/uploads/2018/03/right.png!100" alt="冷思真" ></a>
+    <div class="c-card-author__info__contacts">
+      <a ga-bind="click" ga-action="ClicktAuthorE-mail" ga-category="ArticlePage_sidebar" ga-label="AuthorE-mailButton" class="c-card-author__contact" href="mailto:lengsizhen@ifanr.com" target="_blank">发邮件</a>
+    </div>
+    <a ga-bind="click" ga-action="ClickToAuthor" ga-category="ArticlePage_sidebar" ga-label="AuthorButton" class="c-card-author__wrapper" href="https://www.ifanr.com/author/lengsizhen" target="_blank">
+      <p class="c-card-author__name">冷思真</p>
+                  <p class="c-card-author__position">知晓程序 编辑</p>
+            </a>
+  </div>
+
+  <div class="c-card c-card-author__intro">
+    <p>nice，不耐撕的我</p>
+  </div>
+  <div class="c-card c-card-author__recent">
+    <p class="c-card-author__total">累计已发布 <span class="c-card-author__number">86</span> 篇文章 </p>
+    <div class="c-card">
+      <span class="c-card-author__recent__article_title ">最近文章：</span>
+      <div class="c-card-author__recent__article">
+                      <a ga-bind="click" ga-action="ReadAuthorRecentArticle" ga-category="ArticlePage_sidebar" ga-label="AuthorRecentArticle" href="https://www.ifanr.com/app/1114481" target="_blank">80 元现金红包免费领，这个超市红包你一定能用上</a>
+                      <a ga-bind="click" ga-action="ReadAuthorRecentArticle" ga-category="ArticlePage_sidebar" ga-label="AuthorRecentArticle" href="https://www.ifanr.com/minapp/1114677" target="_blank">小程序支持主体变更了！我们为你总结了最为详尽的迁移攻略</a>
+                </div>
+    </div>
+
+  </div>
+</div>
+<section class="column-widget js-current-column-widget" data-component="CurrentColumnWidget" data-post-id="1115345">
+  <div class="widget-header">
+    <h3><span>本篇来自栏目</span></h3>
+  </div>
+  <div class="js-column-inject-point">
+      </div>
+    <a ga-bind="click" ga-category="ArticlePage_sidebar" ga-action="ClickColumn" ga-label="SubscribeButton" class="column-widget-items__item u-block" href="https://www.ifanr.com/ifanr-app-download/" target="_blank">
+    <div class="unlock-subscription" >解锁订阅模式，获得更多专属优质内容</div>
+  </a>
+</section>
+        </div>
+      </div>
+    </div>
+  </div>
+    <div id="prevNextPostCard">
+      <div ga-bind="click" ga-action="click" ga-category="Domain" ga-label="FrontArticle" class="inner-box" style="background-image:url('https://s3.ifanr.com/wp-content/uploads/2018/10/mm.jpg!/both/320x160')">
+    <a href="https://www.ifanr.com/minapp/1114677">
+      <p><span class="prev-next-post-btn">上一篇</span><span class="ifr-relative-time">10-18 13:47</span></p>
+      <h3>小程序支持主体变更了！我们为你总结了最为详尽的迁移攻略</h3>
+    </a>
+  </div>
+  </div>
+
+      <div class="u-clearfix footer-content"></div>
+<div class="ifanr-footer">
+  <div class="c-footer" id="footer">
+    <div class="o-wrapper">
+      <div class="u-clearfix"></div>
+      <div class="c-footer__logo">
+      </div>
+      <div class="c-footer__container">
+        <div class="c-footer__navigation">
+          <h5>爱范儿，让未来触手可及</h5>
+          <a href="https://www.ifanr.com" ga-bind="click" ga-category="Footer" ga-action="ClickIfanr"
+             ga-label="ifanrButton">爱范儿</a>
+          <a href="/app/" ga-bind="click" ga-category="Footer" ga-action="ClickAppSo" ga-label="AppSoButton"> AppSo </a>
+          <a href="/category/intelligentcar" ga-bind="click" ga-category="Footer" ga-action="ClickTime2Drive"
+             ga-label="Time2DriveButton">董车会</a>
+          <a href="https://minapp.com/miniapp/" target="_blank" ga-bind="click" ga-category="Footer"
+             ga-action="ClickMinapp" ga-label="MinappButton">知晓程序</a>
+        </div>
+        <div class="c-footer__navigation c-footer-nav-aboutus">
+          <h5>关于爱范儿</h5>
+          <a href="https://www.ifanr.com/about/our-team/" ga-bind="click" ga-category="Footer" ga-action="ClickAboutWe"
+             ga-label="AboutWeButton">关于我们</a>
+          <a href="https://www.ifanr.com/shequguize/" ga-bind="click" ga-category="Footer" ga-action="ClickCommunityRegulations"
+             ga-label="CommunityRegulationsButton">社区规则</a>
+          <a href="https://www.ifanr.com/privacypolicy/" ga-bind="click" ga-category="Footer" ga-action="ClickPrivacy-policy"
+             ga-label="Privacy-policyButton">隐私策略</a>
+          <a href="https://www.lagou.com/gongsi/j25623.html" target="_blank" ga-bind="click" ga-category="Footer" ga-action="ClickJoinus"
+             ga-label="Join us Button">加入我们</a>
+          <a href="https://www.ifanr.com/adinfo/" ga-bind="click" ga-category="Footer" ga-action="ClickCooperation"
+             ga-label="CooperationButton">商务合作</a>
+        </div>
+        <div class="c-footer__navigation c-footer__navigation--inline-nav">
+          <h5>合作伙伴</h5>
+          <div class="c-footer-sponsors">
+            <a href="https://www.upyun.com/" target="_blank" class="c-footer-sponsors_item" ga-bind="click"
+               ga-category="Footer" ga-action="Clickupyun" ga-label="upyunButton">
+              <div class="c-footer-sponsors_youpaiyun"></div>
+            </a>
+            <a href="https://cloud.minapp.com/" target="_blank" class="c-footer-sponsors_item" ga-bind="click"
+               ga-category="Footer" ga-action="ClickCloudMinapp" ga-label="CloudMinappButton">
+              <div class="c-footer-sponsors_zhixiaoyun"></div>
+            </a>
+            <a href="https://aws.amazon.com/what-is-cloud-computing" rel="nofollow noopener noreferrer" target="_blank"
+               class="c-footer-sponsors_item" ga-bind="click" ga-category="Footer" ga-action="ClickAmazon"
+               ga-label="AmazonButton">
+              <div class="c-footer-sponsors_amazon"></div>
+            </a>
+
+          </div>
+        </div>
+        <div class="u-clearfix"></div>
+        <div class="c-footer__copyright">
+          <div class="c-footer__contacts c-contacts">
+            <a class="c-contacts__icon c-contacts__icon--weibo" href="http://weibo.com/ifanr" target="_blank"
+               rel="nofollow noopener noreferrer"></a>
+            <div class="c-contacts__icon c-contacts__icon--wechat">
+              <div class="c-contacts__icon--wechat__qrcode c-popup-qrcode">
+                <div class="c-popup-qrcode__title">关注爱范儿</div>
+                <img class="js-qrcode c-popup-qrcode__image" src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/ifanr-qrcode.jpg" />
+                <div class="c-popup-qrcode__hint">使用微信扫码关注爱范儿微信公众号</div>
+              </div>
+            </div>
+            <a class="c-contacts__icon c-contacts__icon--zhihu" href="https://www.zhihu.com/org/ai-fan-er-85"
+               target="_blank"></a>
+            <a class="c-contacts__icon c-contacts__icon--email" href="mailto:info@ifanr.com" target="_blank"></a>
+            <a class="c-contacts__icon c-contacts__icon--twitter" href="https://twitter.com/ifanr"
+               rel="nofollow noopener noreferrer" target="_blank"></a>
+            <a class="c-contacts__icon c-contacts__icon--rss" href="https://www.ifanr.com/feed" target="_blank"></a>
+          </div>
+          <a class="u-text-right" href="http://www.miibeian.gov.cn/" target="_blank"
+             rel="nofollow noopener noreferrer">粤 ICP 备 18066688 号 - 2</a>
+          <div class="u-text">
+            <p class="u-text-left">版权所有 &copy; 广州爱范儿科技股份有限公司 2008 - 2018。以商业目的使用爱范儿网站内容需获许可。非商业目的使用授权遵循 <a
+                  href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>。</p>
+            <p class="u-text-english">All content is made available under the CC BY-NC 4.0 for non-commercial use. Commercial use of this content is prohibited without explicit permission. </p>
+            <div class="u-text-design_studio">Designed by
+              <div class="design-studio"><p class="design-studio_name"><span>if</span>
+                  <span>Design Studio.</span></p>
+                <div class="c-design-studio_card c-popup-qrcode">
+                  <div class="c-popup-qrcode__title">关注 if Design Studio.</div>
+                  <img class="js-qrcode c-popup-qrcode__image"
+                       src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/ifanr-desing-studio__qrcode.jpg" />
+                  <div class="c-popup-qrcode__hint">微信扫码关注公众号 if Design Studio.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <div class="c-goto-top" data-component="VisibilityOnScroll"
+     data-visibility-top-bound="1200" data-visibility-bottom-bound="#footer" style="visibility: hidden;">
+  <a ga-bind="click" ga-action="ClickReport" ga-category="Floating_Action_Button" ga-label="ReportButton" href="https://www.ifanr.com/about/contribute/" class="c-goto-top-item c-goto-top-item--contribute c-goto-top-link"></a>
+  <div ga-bind="hover" ga-action="HoverDownloadApp" ga-category="Floating_Action_Button" ga-label="DownloadApp Button" class="c-goto-top-item c-goto-top-item--app">
+    <div class="c-goto-top__app__container c-goto-top-app">
+      <img src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/ifanr-app.png" alt="" class="c-goto-top__app__qrcode">
+      <div class="c-goto-top-app__intro">
+        <p class="c-goto-app-intro__title">爱范儿 App</p>
+        <p class="c-goto-app-intro__desc">爱范儿,让未来触手可及</p>
+      </div>
+    </div>
+  </div>
+  <div ga-bind="hover" ga-action="HoverQRCard" ga-category="Floating_Action_Button" ga-label="QRCordButton" class="c-goto-top-item c-goto-top-item--qrcodes">
+    <div class="c-goto-top__qrcodes__container c-goto-top-qrcodes" data-component="Tab">
+      <div class="c-goto-top-qrcodes-nav" data-component="AwesomeUnderline">
+        <div class="c-goto-top-qrcodes__tab">
+          <span class="c-goto-top-qrcodes-header" as-decorated data-tab="ifanr" data-default-tab>爱范儿</span>
+        </div>
+        <div class="c-goto-top-qrcodes__tab">
+          <span class="c-goto-top-qrcodes-header" as-decorated data-tab="appso">AppSo</span>
+        </div>
+        <div class="c-goto-top-qrcodes__tab">
+          <span class="c-goto-top-qrcodes-header" as-decorated data-tab="coolbuy">玩物志</span>
+        </div>
+        <div class="c-goto-top-qrcodes__tab">
+          <span class="c-goto-top-qrcodes-header" as-decorated data-tab="zhixiaoyun">知晓云</span>
+        </div>
+        <div class="c-goto-top-qrcodes__tab" style="min-width:60px">
+          <span class="c-goto-top-qrcodes-header" as-decorated data-tab="minapp">知晓程序</span>
+        </div>
+        <div class="c-goto-top-qrcodes__line" as-underline></div>
+      </div>
+      <div>
+        <div class="c-goto-top-qrcodes-body js-goto-top-qrcode" data-tab-target="ifanr">
+          <img src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/ifanrqrcode.jpg" alt="Ifanr QR Code" class="c-goto-top-qrcodes-body__image">
+          <p class="c-goto-top-qrcodes-body__text">关注爱范儿微信号，连接热爱，关注这个时代最好的产品。</p>
+        </div>
+        <div class="c-goto-top-qrcodes-body js-goto-top-qrcode" data-tab-target="appso">
+          <img src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/appsoqrcode.jpg" alt="AppSo QR Code" class="c-goto-top-qrcodes-body__image">
+          <p class="c-goto-top-qrcodes-body__text">想让你的手机好用到哭？关注这个号就够了。</p>
+        </div>
+        <div class="c-goto-top-qrcodes-body js-goto-top-qrcode" data-tab-target="coolbuy">
+          <img src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/coolbuyqrcode.jpg" alt="CoolBuy QR Code" class="c-goto-top-qrcodes-body__image">
+          <p class="c-goto-top-qrcodes-body__text">关注玩物志微信号，就是让你乱花钱。</p>
+        </div>
+        <div class="c-goto-top-qrcodes-body js-goto-top-qrcode" data-tab-target="zhixiaoyun">
+          <img src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/zhixiaoyunqrcode.jpg" alt="CoolBuy QR Code" class="c-goto-top-qrcodes-body__image">
+          <p class="c-goto-top-qrcodes-body__text">小程序开发快人一步。</p>
+        </div>
+        <div class="c-goto-top-qrcodes-body js-goto-top-qrcode" data-tab-target="minapp">
+          <img src="https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/images/minappqrcode.jpg" alt="CoolBuy QR Code" class="c-goto-top-qrcodes-body__image">
+          <p class="c-goto-top-qrcodes-body__text">最好的微信新商业服务平台。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="c-goto-top-item c-goto-top-item--go" ga-bind="click" ga-category="Floating_Action_Button" ga-action="ClickTop" ga-label="TopButton" data-component="GotoTop"></div>
+</div>
+
+  <script type='text/javascript' src='https://images.ifanr.cn/wp-content/themes/ifanr-5.0-pc/static/dist/app-5f59d398d8.min.js?ver=4.9.8'></script>
+      <![if gte IE 9]>
+    <script src="//cdn.ifanr.cn/vendor/raven/3.22.4/raven.min.js"></script>
+    <script type="text/javascript">
+      Raven.config('https://d19b2d48c27542a2af4f6ff35063ebaf@sentry.io/41363', {}).install();
+      window.onerror = function(msg, src, lineNo, columnNo, err) {
+        var string = msg.toLowerCase();
+        if (string.indexOf(substring) > -1) {
+          return;
+        }
+          Raven.captureException(err)
+      };
+    </script>
+    <![endif]>
+    <script type="text/javascript">
+  _atrk_opts = { atrk_acct:"M/54m1aU8KL352", domain:"ifanr.com",dynamic: true};
+  (function() { var as = document.createElement('script'); as.type = 'text/javascript'; as.async = true; as.src = "https://d31qbv1cthcecs.cloudfront.net/atrk.js"; var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(as, s); })();
+  </script>
+  <noscript><img src="https://d5nxst8fruw4z.cloudfront.net/atrk.gif?account=M/54m1aU8KL352" style="display:none" height="1" width="1" alt="" /></noscript>
+  <script type="text/javascript">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  </script>
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+  <script src="https://images.ifanr.cn/wp-content/plugins/ifanr-function/library/js/animate.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        var widgetId = '';
+        if (widgetId) {
+          return new window.WidgetBuzz('#' + widgetId);
+        }
+        return;
+      });
+    </script>
+    
+    </div>
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"eee3fec2bc","applicationID":"182054813","transactionName":"M1FbZxFUXBdWVxFQVgobbEEKGlsKU1EdF0kMRA==","queueTime":0,"applicationTime":4,"atts":"HxZYEVlOTxk=","errorBeacon":"bam.nr-data.net","agent":""}</script></body>
+</html>
+
+<!-- t:0.25835, h:'2018-10-21T17:06:17+08:00 28800', H:'ip-172-31-11-251' --><!--
+Whitelist mode: 
+Remote address: 58.247.234.89
+Request REQUEST_URI: /minapp/1115345
+Rebuilt REQUEST_URI: /minapp/1115345
+Rebuilt QUERY_STRING: 
+
+Cacheable: 1
+Cache key: 7272f44fbcf6bbb88df5e6543edfaa523fc6120c
+Cache namespace: db99e7e417a46a9fb399eb0741008a64b67b0ae3
+Cache hit: 1
+Cache hits: 3
+Cache mtime: 1540112777.6108
+Cache age: 117.64785695076
+
+Memory usage: 2 MiB
+Peak memory usage: 2 MiB
+-->
+<!-- t:0.00513, h:'2018-10-21T09:08:15+00:00 0', H:'ip-172-31-15-115' -->
