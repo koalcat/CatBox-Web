@@ -1,0 +1,1130 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"><meta name="google-site-verification" content="cCHsgG9ktuCTgWgYfqCJql8AeR4gAne4DTZqztPoirE"><meta name="apple-itunes-app" content="app-id=987739104"><meta name="baidu-site-verification" content="qiK2a1kcFc"><meta name="360-site-verification" content="4c3c7d57d59f0e1a308462fbc7fd7e51"><meta name="sogou_site_verification" content="c49WUDZczQ"><meta data-vue-meta="true" data-vmid="keywords" name="keywords" content=""><meta data-vue-meta="true" data-vmid="description" name="description" content="简介 Raft 介绍 节点选举 "><title data-vue-meta="true">高可用分布式存储 etcd 的实现原理 - 后端 - 掘金</title><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/js/manifest.060adf3290877312ec3f.js" as="script"><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/js/vendor.e6fd81aa1499049a5bee.js" as="script"><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/js/app.a99a1e8180beec940a3f.js" as="script"><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/css/app.2fc0167e71ee3966ab7d22d43915528f.css" as="style"><link rel="preload" href="https://b-gold-cdn.xitu.io/v3/static/js/3.f84ea6333e04793cc1e2.js" as="script"><link rel="apple-touch-icon" sizes="180x180" href="https://b-gold-cdn.xitu.io/favicons/v2/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://b-gold-cdn.xitu.io/favicons/v2/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://b-gold-cdn.xitu.io/favicons/v2/favicon-16x16.png"><link rel="manifest" href="https://b-gold-cdn.xitu.io/favicons/v2/manifest.json"><link rel="mask-icon" href="https://b-gold-cdn.xitu.io/favicons/v2/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="https://b-gold-cdn.xitu.io/favicons/v2/favicon.ico"><meta name="msapplication-config" content="https://b-gold-cdn.xitu.io/favicons/v2/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="search" title="掘金" href="https://b-gold-cdn.xitu.io/conf/search.xml" type="application/opensearchdescription+xml"><link rel="stylesheet" href="https://b-gold-cdn.xitu.io/ionicons/2.0.1/css/ionicons.min.css"><link rel="stylesheet" href="https://b-gold-cdn.xitu.io/asset/fw-icon/1.0.9/iconfont.css"><link href="https://b-gold-cdn.xitu.io/v3/static/css/app.2fc0167e71ee3966ab7d22d43915528f.css" rel="stylesheet"><script async="" src="https://hm.baidu.com/hm.js?93bbd335a208870aa1f296bcd6842e5e"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://assets.growingio.com/vds.js"></script><script type="text/javascript" charset="utf-8" async="" src="https://b-gold-cdn.xitu.io/v3/static/js/3.f84ea6333e04793cc1e2.js"></script></head><body><div id="juejin" data-v-6ede48a3=""><div class="global-component-box" data-v-6ede48a3=""><!----><div data-v-2840e9c3="" data-v-6ede48a3="" class="alert-list alert-list"></div><div data-v-6ddb54c6="" data-v-6ede48a3="" class="suspension-panel suspension-panel"><button data-v-6ddb54c6="" title="回到顶部" class="btn to-top-btn" style="display: none;"><i data-v-6ddb54c6="" class="ion-android-arrow-dropup"></i></button><button data-v-6ddb54c6="" title="建议反馈" class="btn meiqia-btn" style=""><i data-v-6ddb54c6="" class="ion-chatbubble-working"></i></button></div><!----><!----><div class="emoji-barrage" data-v-475389e2="" data-v-6ede48a3=""><!----></div><div class="book-new-user-award-popup" style="display: none;" data-v-7c95f01f="" data-v-6ede48a3=""><div class="content-box" style="display:;" data-v-7c95f01f=""><div class="close ion-close-round" data-v-7c95f01f=""></div><div class="header" data-v-7c95f01f=""><div class="icon" data-v-7c95f01f=""><img src="https://b-gold-cdn.xitu.io/v3/static/img/icon.a87e5ae.svg" data-v-7c95f01f=""></div><div class="txt" data-v-7c95f01f="">新人专享好礼</div></div><div class="desc" data-v-7c95f01f="">凡未购买过小册的用户，均可领取三张 5 折新人专享券，购买小册时自动使用专享券，最高可节省 45 元。</div><div class="tickets" data-v-7c95f01f=""><div class="ticket" data-v-7c95f01f=""><div class="ticket__inner" data-v-7c95f01f=""><div class="enjoy" data-v-7c95f01f=""><span class="new-title" data-v-7c95f01f="">小册新人 5 折券</span></div><div class="sale" data-v-7c95f01f="">最高可省 15 元</div></div></div><div class="ticket" data-v-7c95f01f=""><div class="ticket__inner" data-v-7c95f01f=""><div class="enjoy" data-v-7c95f01f=""><span class="new-title" data-v-7c95f01f="">小册新人 5 折券</span></div><div class="sale" data-v-7c95f01f="">最高可省 15 元</div></div></div><div class="ticket" data-v-7c95f01f=""><div class="ticket__inner" data-v-7c95f01f=""><div class="enjoy" data-v-7c95f01f=""><span class="new-title" data-v-7c95f01f="">小册新人 5 折券</span></div><div class="sale" data-v-7c95f01f="">最高可省 15 元</div></div></div></div><div class="remark" data-v-7c95f01f="">注：专享券的使用期限在领券的七天内。</div><div class="submit-btn" data-v-7c95f01f="">一键领取</div></div><div class="model success" style="display: none;" data-v-7c95f01f=""><div class="heading" data-v-7c95f01f="">领取成功</div><div class="content-text" data-v-7c95f01f="">购买小册时自动使用专享券</div><div class="btn-success-footer" data-v-7c95f01f=""><div class="btn-ok" data-v-7c95f01f="">知道了</div><div class="btn-ok btn-link" data-v-7c95f01f="">前往小册首页</div></div></div><div class="model fail" style="display: none;" data-v-7c95f01f=""><div class="heading" data-v-7c95f01f="">领取失败</div><div class="content-text" data-v-7c95f01f="">本活动仅适用于小册新用户</div><div class="btn-ok" data-v-7c95f01f="">知道了</div></div></div><!----></div><!----><div data-v-3f216172="" data-v-41d33d72="" data-v-6ede48a3="" class="view-container"><div data-v-3f216172="" class="main-header-box"><header data-v-5ce25e66="" data-v-3f216172="" class="main-header main-header unauthorized visible"><div data-v-5ce25e66="" class="container"><a data-v-5ce25e66="" href="/" class="logo"><img data-v-5ce25e66="" src="https://b-gold-cdn.xitu.io/v3/static/img/logo.a7995ad.svg" alt="掘金" class="logo-img"></a><nav data-v-5ce25e66="" role="navigation" class="main-nav"><ul data-v-5ce25e66="" class="nav-list"><li data-v-5ce25e66="" class="main-nav-list"><div data-v-5ce25e66="" class="phone-show-menu"><span data-v-5ce25e66="">首页</span><div data-v-5ce25e66="" class="icon ion-arrow-down-b"></div></div><ul data-v-5ce25e66="" class="phone-hide"><li data-v-5ce25e66="" class="nav-item link-item route-active"><a data-v-5ce25e66="" href="/">首页</a></li><li data-v-5ce25e66="" class="nav-item link-item pin"><a data-v-5ce25e66="" href="/pins">沸点</a><!----></li><li data-v-5ce25e66="" class="nav-item link-item book"><a data-v-5ce25e66="" href="/books">小册</a></li><li data-v-5ce25e66="" class="nav-item link-item"><a data-v-5ce25e66="" href="/repos">开源库</a></li><li data-v-5ce25e66="" class="nav-item link-item"><a data-v-5ce25e66="" href="/events/all">活动</a></li><li data-v-5ce25e66="" class="nav-item link-item conf"><a data-v-5ce25e66="" st:name="confGif" title="掘金开发者大会 · 微信小程序专场" target="_blank" href="https://conf.juejin.im/2018/mini-programs"><img data-v-5ce25e66="" src="https://b-gold-cdn.xitu.io/v3/static/img/conf.78960f5.gif" alt="掘金开发者大会 · 微信小程序专场" class="conf-icon"></a></li></ul></li><li data-v-5ce25e66="" class="nav-item search"><form data-v-5ce25e66="" role="search" class="search-form"><input data-v-5ce25e66="" maxlength="32" placeholder="搜索掘金" class="search-input"><img data-v-5ce25e66="" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjJweCIgaGVpZ2h0PSIyMnB4IiB2aWV3Qm94PSIwIDAgMjIgMjIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogc2tldGNodG9vbCA0MS4yICgzNTM5NykgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+CiAgICA8dGl0bGU+Qjk3RUIxMEEtOEYzNC00QUI1LUFCQUYtNDFEOTMzNzQxRUQwPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBza2V0Y2h0b29sLjwvZGVzYz4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSLpppbpobUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSLlr7zoiKrmoI/mkJzntKLmoYYiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC05OTAuMDAwMDAwLCAtMTkuMDAwMDAwKSIgZmlsbD0iI0MzQ0NENSI+CiAgICAgICAgICAgIDxnIGlkPSJHcm91cCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOTkwLjAwMDAwMCwgMTkuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTIuOTg2MTI2LDE0LjQwMDMzOTUgTDE2LjI5Mjg5MzIsMTcuNzA3MTA2OCBDMTYuNjgzNDE3NSwxOC4wOTc2MzExIDE3LjMxNjU4MjUsMTguMDk3NjMxMSAxNy43MDcxMDY4LDE3LjcwNzEwNjggQzE4LjA5NzYzMTEsMTcuMzE2NTgyNSAxOC4wOTc2MzExLDE2LjY4MzQxNzUgMTcuNzA3MTA2OCwxNi4yOTI4OTMyIEwxNC40MDAzMzk1LDEyLjk4NjEyNiBDMTUuOTYwMzg4MSwxMC43NTczMjk4IDE1Ljc0NTI0MDIsNy42NjQwMTk4MyAxMy43NTQ4OTU5LDUuNjczNjc1NTQgQzExLjUyMzMyODUsMy40NDIxMDgxNSA3LjkwNTI0MjkyLDMuNDQyMTA4MTUgNS42NzM2NzU1NCw1LjY3MzY3NTU0IEMzLjQ0MjEwODE1LDcuOTA1MjQyOTIgMy40NDIxMDgxNSwxMS41MjMzMjg1IDUuNjczNjc1NTQsMTMuNzU0ODk1OSBDNy42NjQwMTk4MywxNS43NDUyNDAyIDEwLjc1NzMyOTgsMTUuOTYwMzg4MSAxMi45ODYxMjYsMTQuNDAwMzM5NSBaIE03LjA4Nzg4OTEsMTIuMzQwNjgyMyBDNS42MzczNzAzLDEwLjg5MDE2MzUgNS42MzczNzAzLDguNTM4NDA3OSA3LjA4Nzg4OTEsNy4wODc4ODkxIEM4LjUzODQwNzksNS42MzczNzAzIDEwLjg5MDE2MzUsNS42MzczNzAzIDEyLjM0MDY4MjMsNy4wODc4ODkxIEMxMy43OTEyMDExLDguNTM4NDA3OSAxMy43OTEyMDExLDEwLjg5MDE2MzUgMTIuMzQwNjgyMywxMi4zNDA2ODIzIEMxMC44OTAxNjM1LDEzLjc5MTIwMTEgOC41Mzg0MDc5LDEzLjc5MTIwMTEgNy4wODc4ODkxLDEyLjM0MDY4MjMgWiIgaWQ9IkNvbWJpbmVkLVNoYXBlIj48L3BhdGg+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==" alt="搜索" class="search-icon"></form></li><!----><!----><!----><li data-v-5ce25e66="" class="nav-item submit"><img data-v-5ce25e66="" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjJweCIgaGVpZ2h0PSIyMnB4IiB2aWV3Qm94PSIwIDAgMjIgMjIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogc2tldGNodG9vbCA0MiAoMzY3ODEpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPjA1Q0I0NzU5LUIyRkQtNDcxOC04RTBDLTg0OEVCNzQ2RDAyMzwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggc2tldGNodG9vbC48L2Rlc2M+CiAgICA8ZGVmcz4KICAgICAgICA8cmVjdCBpZD0icGF0aC0xIiB4PSIyMzgiIHk9IjEyOCIgd2lkdGg9IjcwMCIgaGVpZ2h0PSI1MCIgcng9IjIiPjwvcmVjdD4KICAgICAgICA8ZmlsdGVyIHg9Ii01MCUiIHk9Ii01MCUiIHdpZHRoPSIyMDAlIiBoZWlnaHQ9IjIwMCUiIGZpbHRlclVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgaWQ9ImZpbHRlci0yIj4KICAgICAgICAgICAgPGZlT2Zmc2V0IGR4PSIwIiBkeT0iMSIgaW49IlNvdXJjZUFscGhhIiByZXN1bHQ9InNoYWRvd09mZnNldE91dGVyMSI+PC9mZU9mZnNldD4KICAgICAgICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMSIgaW49InNoYWRvd09mZnNldE91dGVyMSIgcmVzdWx0PSJzaGFkb3dCbHVyT3V0ZXIxIj48L2ZlR2F1c3NpYW5CbHVyPgogICAgICAgICAgICA8ZmVDb2xvck1hdHJpeCB2YWx1ZXM9IjAgMCAwIDAgMCAgIDAgMCAwIDAgMCAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNTAyNzE3MzkxIDAiIHR5cGU9Im1hdHJpeCIgaW49InNoYWRvd0JsdXJPdXRlcjEiPjwvZmVDb2xvck1hdHJpeD4KICAgICAgICA8L2ZpbHRlcj4KICAgICAgICA8cmVjdCBpZD0icGF0aC0zIiB4PSI0IiB5PSI0IiB3aWR0aD0iMTMiIGhlaWdodD0iMTQiIHJ4PSIyIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stNCIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxMyIgaGVpZ2h0PSIxNCIgZmlsbD0id2hpdGUiPgogICAgICAgICAgICA8dXNlIHhsaW5rOmhyZWY9IiNwYXRoLTMiPjwvdXNlPgogICAgICAgIDwvbWFzaz4KICAgIDwvZGVmcz4KICAgIDxnIGlkPSLpppbpobUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSLpppbpobUyX0NvX+aZrumAmueUqOaItyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTMwNS4wMDAwMDAsIC0xNDIuMDAwMDAwKSI+CiAgICAgICAgICAgIDxnIGlkPSJDb21iaW5lZC1TaGFwZSI+CiAgICAgICAgICAgICAgICA8dXNlIGZpbGw9ImJsYWNrIiBmaWxsLW9wYWNpdHk9IjEiIGZpbHRlcj0idXJsKCNmaWx0ZXItMikiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPHVzZSBmaWxsPSIjRkZGRkZGIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxnIGlkPSJHcm91cC0zMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzA1LjAwMDAwMCwgMTQyLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS0zIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjIiIGhlaWdodD0iMjIiPjwvcmVjdD4KICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik05Ljg5NTY2MjY1LDkuMzQ2Mjc4MzIgTDYuNjY3NTA3MzEsOS4zNDYyNzgzMiBDNi4zNzA1MDcxNyw5LjM0NjI3ODMyIDYuMTI5NDQ5ODQsOS4xMDI3MDQ4MiA2LjEyOTQ0OTg0LDguODAyNTc4MzYgQzYuMTI5NDQ5ODQsOC41MDI0NzMxNyA2LjM3MDUwNzE3LDguMjU4ODk5NjggNi42Njc1MDczMSw4LjI1ODg5OTY4IEw5Ljg5NTY4MzcxLDguMjU4ODk5NjggQzEwLjE5MjYyMDcsOC4yNTg4OTk2OCAxMC40MzM2NTcsOC41MDI0NzMxNyAxMC40MzM2NTcsOC44MDI1NzgzNiBDMTAuNDMzNjM1OSw5LjEwMjcwNDgyIDEwLjE5MjU5OTYsOS4zNDYyNzgzMiA5Ljg5NTY2MjY1LDkuMzQ2Mjc4MzIgTTEzLjExMzIzNzEsMTIuNjA4NDE0MiBMNi42NjY2OTgyLDEyLjYwODQxNDIgQzYuMzcwMTQ0NjcsMTIuNjA4NDE0MiA2LjEyOTQ0OTg0LDEyLjM2NTQwNTcgNi4xMjk0NDk4NCwxMi4wNjQ3NTY4IEM2LjEyOTQ0OTg0LDExLjc2NDAyMjkgNi4zNzAxNDQ2NywxMS41MjEwMzU2IDYuNjY2Njk4MiwxMS41MjEwMzU2IEwxMy4xMTMyMzcxLDExLjUyMTAzNTYgQzEzLjQxMDI3NDEsMTEuNTIxMDM1NiAxMy42NTA0ODU0LDExLjc2NDAyMjkgMTMuNjUwNDg1NCwxMi4wNjQ3NTY4IEMxMy42NTA0ODU0LDEyLjM2NTM4NDQgMTMuNDEwMjc0MSwxMi42MDg0MTQyIDEzLjExMzIzNzEsMTIuNjA4NDE0MiIgaWQ9Imljb25mb250LWJpYW5qaSIgZmlsbD0iIzAwN0ZGRiI+PC9wYXRoPgogICAgICAgICAgICAgICAgPHVzZSBpZD0iUmVjdGFuZ2xlIiBzdHJva2U9IiMwMDdGRkYiIG1hc2s9InVybCgjbWFzay00KSIgc3Ryb2tlLXdpZHRoPSIyIiB4bGluazpocmVmPSIjcGF0aC0zIj48L3VzZT4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" class="icon"><span data-v-5ce25e66="">写文章</span><!----></li><li data-v-5ce25e66="" class="nav-item auth"><span data-v-5ce25e66="" class="login">登录</span><span data-v-5ce25e66="" class="register">注册</span></li></ul></nav></div></header></div><main data-v-3f216172="" class="container main-container"><div data-v-41d33d72="" data-v-3f216172="" class="view entry-public-view"><div data-v-41d33d72="" data-v-3f216172="" class="entry-public-main shadow"><!----><!----><article data-v-41d33d72="" itemscope="itemscope" itemtype="http://schema.org/Article" class="entry-content-box" data-v-3f216172=""><meta itemprop="url" content="https://juejin.im/entry/5bce69fcf265da0ad82c4933"><meta itemprop="headline" content="高可用分布式存储 etcd 的实现原理"><!----><meta itemprop="datePublished" content="2018-10-23T00:23:24.231Z"><meta itemprop="image" content="https://b-gold-cdn.xitu.io/icon/icon-128.png"><div itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person"><meta itemprop="name" content="Draveness"><meta itemprop="url" content="https://juejin.im/user/571fa19df38c8400597af677"></div><div itemprop="publisher" itemscope="itemscope" itemtype="http://schema.org/Organization"><meta itemprop="name" content="掘金"><div itemprop="logo" itemscope="itemscope" itemtype="https://schema.org/ImageObject"><meta itemprop="url" content="https://b-gold-cdn.xitu.io/icon/icon-white-180.png"><meta itemprop="width" content="180"><meta itemprop="height" content="180"></div></div><h1 data-v-41d33d72="">高可用分布式存储 etcd 的实现原理</h1><div data-v-41d33d72="" class="entry-public-info"><div data-v-41d33d72="" class="text-muted info-item">阅读 85</div><div data-v-41d33d72="" class="text-muted info-item">收藏 7</div><div data-v-41d33d72="" class="text-muted info-item">2018-10-23</div></div><div data-v-41d33d72="" class="originalUrl">原文链接：<a data-v-41d33d72="" st:name="originLink" href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fetcd-introduction" rel="nofollow noopener noreferrer" target="_blank">draveness.me</a></div><a data-v-41d33d72="" class="banner" href="https://cn.udacity.com/20181111?utm_source=juejin-streaming&amp;utm_medium=banner&amp;utm_campaign=20181111" rel="nofollow noopener noreferrer" target="_blank"><span data-v-41d33d72="" class="text">Udacity 学习狂欢节，一年一次触底优惠</span><span data-v-41d33d72="" class="link">cn.udacity.com</span></a><div data-v-41d33d72="" itemprop="articleBody" class="entry-content article-content">
+    <section>
+        <ul>
+            <li><a href="#简介">简介</a></li>
+            <li><a href="#raft">Raft</a>
+                <ul>
+                    <li><a href="#介绍">介绍</a></li>
+                    <li><a href="#节点选举">节点选举</a>
+                        <ul> </ul>
+                    </li>
+                    <li><a href="#节点状态">节点状态</a></li>
+                </ul>
+            </li>
+            <li><a href="#存储">存储</a>
+                <ul>
+                    <li><a href="#后端">后端</a>
+                        <ul> </ul>
+                    </li>
+                    <li><a href="#索引">索引</a>
+                        <ul> </ul>
+                    </li>
+                    <li><a href="#存储-1">存储</a>
+                        <ul> </ul>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#应用">应用</a></li>
+            <li><a href="#总结">总结</a></li>
+            <li><a href="#相关文章">相关文章</a></li>
+            <li><a href="#reference">Reference</a></li>
+        </ul>
+        <p>在上一篇文章 <a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fzookeeper-chubby" target="_blank" rel="nofollow noopener noreferrer">详解分布式协调服务 ZooKeeper</a> 中，我们介绍过分布式协调服务 Zookeeper 的实现原理以及应用，今天想要介绍的 etcd 其实也是在生产环境中经常被使用的协调服务，它与 Zookeeper 一样，也能够为整个集群提供服务发现、配置以及分布式协调的功能。</p>
+        <p><img alt="etcd-logo" class="lazyload inited loaded" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e303aebfa3?imageView2/0/w/1280/h/960/ignore-error/1" data-width="750" data-height="250" src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e303aebfa3?imageView2/0/w/1280/h/960/ignore-error/1"></p>
+        <p>这篇文章将会介绍 etcd 的实现原理，其中包括 Raft 协议、存储两大模块，在最后我们也会简单介绍 etcd 一些具体应用场景。</p>
+        <h2 id="简介" data-id="heading-0"> <a id="简介" href="#%E7%AE%80%E4%BB%8B"><span></span></a>简介</h2>
+        <p>etcd 的官方将它定位成一个可信赖的分布式键值存储服务，它能够为整个分布式集群存储一些关键数据，协助分布式集群的正常运转。</p>
+        <p><img alt="etcd-keywords" class="lazyload inited loaded" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e30390b900?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="280" src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e30390b900?imageView2/0/w/1280/h/960/ignore-error/1"></p>
+        <p>我们可以简单看一下 etcd 和 Zookeeper 在定义上有什么不同：</p>
+        <ul>
+            <li>etcd is a distributed reliable key-value store for the most critical data of a distributed system…</li>
+            <li>ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.</li>
+        </ul>
+        <p>其中前者是一个用于存储关键数据的键值存储，后者是一个用于管理配置等信息的中心化服务。</p>
+        <p>etcd 的使用其实非常简单，它对外提供了 gRPC 接口，我们可以通过 Protobuf 和 gRPC 直接对 etcd 中存储的数据进行管理，也可以使用官方提供的 etcdctl 操作存储的数据。</p>
+        <pre><code>service KV {
+  rpc Range(RangeRequest) returns (RangeResponse) {
+      option (google.api.http) = {
+        post: "/v3beta/kv/range"
+        body: "*"
+    };
+  }
+
+  rpc Put(PutRequest) returns (PutResponse) {
+      option (google.api.http) = {
+        post: "/v3beta/kv/put"
+        body: "*"
+    };
+  }
+}
+</code></pre>
+        <p>文章并不会展开介绍 etcd 的使用方法，这一小节将逐步介绍几大核心模块的实现原理，包括 etcd 使用 Raft 协议同步各个节点数据的过程以及 etcd 底层存储数据使用的结构。</p>
+        <h2 id="raft" data-id="heading-1"> <a id="raft" href="#raft"><span></span></a>Raft</h2>
+        <p>在每一个分布式系统中，etcd 往往都扮演了非常重要的地位，由于很多服务配置发现以及配置的信息都存储在 etcd 中，所以整个集群可用性的上限往往就是 etcd 的可用性，而使用 3 ~ 5 个 etcd 节点构成高可用的集群往往都是常规操作。</p>
+        <p><img alt="etcd-cluste" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e3047e551d?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="620" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;620&quot;&gt;&lt;/svg&gt;"></p>
+        <p>正是因为 etcd 在使用的过程中会启动多个节点，如何处理几个节点之间的分布式一致性就是一个比较有挑战的问题了。</p>
+        <p>解决多个节点数据一致性的方案其实就是共识算法，在之前的文章中我们简单介绍过 Zookeeper 使用的 <a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fzookeeper-chubby%23zab-%25E5%258D%258F%25E8%25AE%25AE" target="_blank" rel="nofollow noopener noreferrer">Zab 协议</a> 以及常见的 <a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fconsensus%23%25E5%2585%25B1%25E8%25AF%2586%25E7%25AE%2597%25E6%25B3%2595" target="_blank" rel="nofollow noopener noreferrer">共识算法</a> Paxos 和 Raft，etcd
+            使用的共识算法就是 Raft，这一节我们将详细介绍 Raft 以及 etcd 中 Raft 的一些实现细节。</p>
+        <h3 id="介绍" data-id="heading-2"> <a id="介绍" href="#%E4%BB%8B%E7%BB%8D"><span></span></a>介绍</h3>
+        <p>Raft 从一开始就被设计成一个易于理解和实现的共识算法，它在容错和性能上与 Paxos 协议比较类似，区别在于它将分布式一致性的问题分解成了几个子问题，然后一一进行解决。</p>
+        <p>每一个 Raft 集群中都包含多个服务器，在任意时刻，每一台服务器只可能处于 Leader、Follower 以及 Candidate 三种状态；在处于正常的状态时，集群中只会存在一个 Leader，其余的服务器都是 Follower。</p>
+        <p><img alt="raft-server-states" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e30376f430?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="445" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;445&quot;&gt;&lt;/svg&gt;"></p>
+        <blockquote>
+            <p>上述图片修改自 <a href="https://link.juejin.im?target=https%3A%2F%2Fraft.github.io%2Fraft.pdf" target="_blank" rel="nofollow noopener noreferrer">In Search of an Understandable Consensus Algorithm</a> 一文 5.1 小结中图四。</p>
+        </blockquote>
+        <p>所有的 Follower 节点都是被动的，它们不会主动发出任何的请求，只会响应 Leader 和 Candidate 发出的请求，对于每一个用户的可变操作，都会被路由给 Leader 节点进行处理，除了 Leader 和 Follower 节点之外，Candidate 节点其实只是集群运行过程中的一个临时状态。</p>
+        <p>Raft 集群中的时间也被切分成了不同的几个任期（Term），每一个任期都会由 Leader 的选举开始，选举结束后就会进入正常操作的阶段，直到 Leader 节点出现问题才会开始新一轮的选择。</p>
+        <p><img alt="raft-terms" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e4464bb92c?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="275" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;275&quot;&gt;&lt;/svg&gt;"></p>
+        <p>每一个服务器都会存储当前集群的最新任期，它就像是一个单调递增的逻辑时钟，能够同步各个节点之间的状态，当前节点持有的任期会随着<strong>每一个</strong>请求被传递到其他的节点上。</p>
+        <p>Raft 协议在每一个任期的开始时都会从一个集群中选出一个节点作为集群的 Leader 节点，这个节点会负责集群中的日志的复制以及管理工作。</p>
+        <p><img alt="raft-subproblems" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e447067c17?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="275" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;275&quot;&gt;&lt;/svg&gt;"></p>
+        <p>我们将 Raft 协议分成三个子问题：节点选举、日志复制以及安全性，文章会以 etcd 为例介绍 Raft 协议是如何解决这三个子问题的。</p>
+        <h3 id="节点选举" data-id="heading-3"> <a id="节点选举" href="#%E8%8A%82%E7%82%B9%E9%80%89%E4%B8%BE"><span></span></a>节点选举</h3>
+        <p>使用 Raft 协议的 etcd 集群在启动节点时，会遵循 Raft 协议的规则，所有节点一开始都被初始化为 Follower 状态，新加入的节点会在 <code>NewNode</code> 中做一些配置的初始化，包括用于接收各种信息的 Channel：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/node.go#L190-225
+func StartNode(c *Config, peers []Peer) Node {
+	r := newRaft(c)
+	r.becomeFollower(1, None)
+	r.raftLog.committed = r.raftLog.lastIndex()
+	for _, peer := range peers {
+		r.addNode(peer.ID)
+	}
+
+	n := newNode()
+	go n.run(r)
+	return &amp;n
+}
+</code></pre>
+        <p>在做完这些初始化的节点和 Raft 配置的事情之后，就会进入一个由 <code>for</code> 和 <code>select</code> 组成的超大型循环，这个循环会从 Channel 中获取待处理的事件：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/node.go#L291-423
+func (n *node) run(r *raft) {
+	lead := None
+
+	for {
+		if lead != r.lead {
+			lead = r.lead
+		}
+
+		select {
+		case m := &lt;-n.recvc:
+			r.Step(m)
+		case &lt;-n.tickc:
+			r.tick()
+		case &lt;-n.stop:
+			close(n.done)
+			return
+		}
+	}
+}
+</code></pre>
+        <p>作者对整个循环内的代码进行了简化，因为当前只需要关心三个 Channel 中的消息，也就是用于接受其他节点消息的 <code>recvc</code>、用于触发定时任务的 <code>tickc</code> 以及用于暂停当前节点的 <code>stop</code>。</p>
+        <p><img alt="raft-etcd" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e447a07155?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="360" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;360&quot;&gt;&lt;/svg&gt;"></p>
+        <p>除了 <code>stop</code> Channel 中介绍到的消息之外，<code>recvc</code> 和 <code>tickc</code> 两个 Channel 中介绍到事件时都会交给当前节点持有 <code>Raft</code> 结构体处理。</p>
+        <h4 id="定时器与心跳" data-id="heading-4"> <a id="定时器与心跳" href="#%E5%AE%9A%E6%97%B6%E5%99%A8%E4%B8%8E%E5%BF%83%E8%B7%B3"><span></span></a>定时器与心跳</h4>
+        <p>当节点从任意状态（包括启动）调用 <code>becomeFollower</code> 时，都会将节点的定时器设置为 <code>tickElection</code>：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L636-643
+func (r *raft) tickElection() {
+	r.electionElapsed++
+
+	if r.promotable() &amp;&amp; r.pastElectionTimeout() {
+		r.electionElapsed = 0
+		r.Step(pb.Message{From: r.id, Type: pb.MsgHup})
+	}
+}
+</code></pre>
+        <p>如果当前节点可以成为 Leader 并且上一次收到 Leader 节点的消息或者心跳已经超过了等待的时间，当前节点就会发送 <code>MsgHup</code> 消息尝试开始新的选举。</p>
+        <p>但是如果 Leader 节点正常运行，就能够同样通过它的定时器 <code>tickHeartbeat</code> 向所有的 Follower 节点广播心跳请求，也就是 <code>MsgBeat</code> 类型的 RPC 消息：</p>
+        <pre><code>func (r *raft) tickHeartbeat() {
+	r.heartbeatElapsed++
+	r.electionElapsed++
+
+	if r.heartbeatElapsed &gt;= r.heartbeatTimeout {
+		r.heartbeatElapsed = 0
+		r.Step(pb.Message{From: r.id, Type: pb.MsgBeat})
+	}
+}
+</code></pre>
+        <p>上述代码段 Leader 节点中调用的 <code>Step</code> 函数，最终会调用 <code>stepLeader</code> 方法，该方法会根据消息的类型进行不同的处理：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L931-1142
+func stepLeader(r *raft, m pb.Message) error {
+	switch m.Type {
+	case pb.MsgBeat:
+		r.bcastHeartbeat()
+		return nil
+	// ...
+	}
+
+	//...
+}
+</code></pre>
+        <p><code>bcastHeartbeat</code> 方法最终会向所有的 Follower 节点发送 <code>MsgHeartbeat</code> 类型的消息，通知它们目前 Leader 的存活状态，重置所有 Follower 持有的超时计时器。</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L518-534
+func (r *raft) sendHeartbeat(to uint64, ctx []byte) {
+	commit := min(r.getProgress(to).Match, r.raftLog.committed)
+	m := pb.Message{
+		To:      to,
+		Type:    pb.MsgHeartbeat,
+		Commit:  commit,
+		Context: ctx,
+	}
+
+	r.send(m)
+}
+</code></pre>
+        <p>作为集群中的 Follower，它们会在 <code>stepFollower</code> 方法中处理接收到的全部消息，包括 Leader 节点发送的心跳 RPC 消息：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L1191-1247
+func stepFollower(r *raft, m pb.Message) error {
+	switch m.Type {
+	case pb.MsgHeartbeat:
+		r.electionElapsed = 0
+		r.lead = m.From
+		r.handleHeartbeat(m)
+	// ...
+	}
+	return nil
+}
+</code></pre>
+        <p>当 Follower 接受到了来自 Leader 的 RPC 消息 <code>MsgHeartbeat</code> 时，会将当前节点的选举超时时间重置并通过 <code>handleHeartbeat</code> 向 Leader 节点发出响应 —— 通知 Leader 当前节点能够正常运行。</p>
+        <p>而 Candidate 节点对于 <code>MsgHeartBeat</code> 消息的处理会稍有不同，它会先执行 <code>becomeFollower</code> 设置当前节点和 Raft 协议的配置：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L1146-1189
+func stepCandidate(r *raft, m pb.Message) error {
+  // ...
+	switch m.Type {
+	case pb.MsgHeartbeat:
+		r.becomeFollower(m.Term, m.From) // always m.Term == r.Term
+		r.handleHeartbeat(m)
+	}
+  // ...
+	return nil
+}
+</code></pre>
+        <p>Follower 与 Candidate 会根据节点类型的不同做出不同的响应，两者收到心跳请求时都会重置节点的选举超时时间，不过后者会将节点的状态直接转变成 Follower：</p>
+        <p><img alt="raft-heartbeat" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e45c8363d3?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="310" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;310&quot;&gt;&lt;/svg&gt;"></p>
+        <p>当 Leader 节点收到心跳的响应时就会将对应节点的状态设置为 <code>Active</code>，如果 Follower 节点在一段时间内没有收到来自 Leader 节点的消息就会尝试发起竞选。</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L636-643
+func (r *raft) tickElection() {
+	r.electionElapsed++
+
+	if r.promotable() &amp;&amp; r.pastElectionTimeout() {
+		r.electionElapsed = 0
+		r.Step(pb.Message{From: r.id, Type: pb.MsgHup})
+	}
+}
+</code></pre>
+        <p>到了这里，心跳机制就起到了作用开始发送 <code>MsgHup</code> 尝试重置整个集群中的 Leader 节点，接下来我们就会开始分析 Raft 协议中的竞选流程了。</p>
+        <h4 id="竞选流程" data-id="heading-5"> <a id="竞选流程" href="#%E7%AB%9E%E9%80%89%E6%B5%81%E7%A8%8B"><span></span></a>竞选流程</h4>
+        <p>如果集群中的某一个 Follower 节点长时间内没有收到来自 Leader 的心跳请求，当前节点就会通过 <code>MsgHup</code> 消息进入预选举或者选举的流程。</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L785-927
+func (r *raft) Step(m pb.Message) error {
+  // ...
+
+	switch m.Type {
+	case pb.MsgHup:
+		if r.state != StateLeader {
+			if r.preVote {
+				r.campaign(campaignPreElection)
+			} else {
+				r.campaign(campaignElection)
+			}
+		} else {
+			r.logger.Debugf("%x ignoring MsgHup because already leader", r.id)
+		}
+	}
+  // ...
+  return nil
+}
+</code></pre>
+        <p>如果收到 <code>MsgHup</code> 消息的节点不是 Leader 状态，就会根据当前集群的配置选择进入 <code>PreElection</code> 或者 <code>Election</code> 阶段，<code>PreElection</code> 阶段并不会真正增加当前节点的 <code>Term</code>，它的主要作用是得到当前集群能否成功选举出一个 Leader 的答案，如果当前集群中只有两个节点而且没有预选举阶段，那么这两个节点的 <code>Term</code>            会无休止的增加，预选举阶段就是为了解决这一问题而出现的。</p>
+        <p><img alt="raft-cluster-states" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e464a2f278?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="305" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;305&quot;&gt;&lt;/svg&gt;"></p>
+        <p>在这里不会讨论预选举的过程，而是将目光主要放在选举阶段，具体了解一下使用 Raft 协议的 etcd 集群是如何从众多节点中选出 Leader 节点的。</p>
+        <p>我们可以继续来分析 <code>campaign</code> 方法的具体实现，下面就是删去预选举相关逻辑后的代码：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L730-766
+func (r *raft) campaign(t CampaignType) {
+	r.becomeCandidate()
+	
+	if r.quorum() == r.poll(r.id, voteRespMsgType(voteMsg), true) {
+		r.becomeLeader()
+		return
+	}
+	for id := range r.prs {
+		if id == r.id {
+			continue
+		}
+
+		r.send(pb.Message{Term: r.Term, To: id, Type: pb.MsgVote, Index: r.raftLog.lastIndex(), LogTerm: r.raftLog.lastTerm(), Context: ctx})
+	}
+}
+</code></pre>
+        <p>当前节点会立刻调用 <code>becomeCandidate</code> 将当前节点的 Raft 状态变成候选人；在这之后，它会将票投给自己，如果当前集群只有一个节点，该节点就会直接成为集群中的 Leader 节点。</p>
+        <p>如果集群中存在了多个节点，就会向集群中的其他节点发出 <code>MsgVote</code> 消息，请求其他节点投票，在 <code>Step</code> 函数中包含不同状态的节点接收到消息时的响应：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L785-927
+func (r *raft) Step(m pb.Message) error {
+  // ...
+
+	switch m.Type {
+	case pb.MsgVote, pb.MsgPreVote:
+		canVote := r.Vote == m.From || (r.Vote == None &amp;&amp; r.lead == None)
+		if canVote &amp;&amp; r.raftLog.isUpToDate(m.Index, m.LogTerm) {
+			r.send(pb.Message{To: m.From, Term: m.Term, Type: pb.MsgVoteResp})
+			r.electionElapsed = 0
+			r.Vote = m.From
+		} else {
+			r.send(pb.Message{To: m.From, Term: r.Term, Type: pb.MsgVoteResp, Reject: true})
+		}
+
+	}
+  // ...
+  return nil
+}
+</code></pre>
+        <p>如果当前节点投的票就是消息的来源或者当前节点没有投票也没有 Leader，那么就会向来源的节点投票，否则就会通知该节点当前节点拒绝投票。</p>
+        <p><img alt="raft-election" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e466521ed4?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="440" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;440&quot;&gt;&lt;/svg&gt;"></p>
+        <p>在 <code>stepCandidate</code> 方法中，候选人节点会处理来自其他节点的投票响应消息，也就是 <code>MsgVoteResp</code>：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L1146-1189
+func stepCandidate(r *raft, m pb.Message) error {
+	switch m.Type {
+	// ...
+	case pb.MsgVoteResp:
+		gr := r.poll(m.From, m.Type, !m.Reject)
+		switch r.quorum() {
+		case gr:
+			r.becomeLeader()
+			r.bcastAppend()
+		// ...
+		}
+	}
+	return nil
+}
+</code></pre>
+        <p>每当收到一个 <code>MsgVoteResp</code> 类型的消息时，就会设置当前节点持有的 <code>votes</code> 数组，更新其中存储的节点投票状态并返回投『同意』票的人数，如果获得的票数大于法定人数 <code>quorum</code>，当前节点就会成为集群的 Leader 并向其他的节点发送当前节点当选的消息，通知其余节点更新 Raft 结构体中的 <code>Term</code> 等信息。</p>
+        <h3 id="节点状态" data-id="heading-6"> <a id="节点状态" href="#%E8%8A%82%E7%82%B9%E7%8A%B6%E6%80%81"><span></span></a>节点状态</h3>
+        <p>对于每一个节点来说，它们根据不同的节点状态会对网络层发来的消息做出不同的响应，我们会分别介绍下面的四种状态在 Raft 中对于配置和消息究竟是如何处理的。</p>
+        <p><img alt="raft-node-states" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e469f2e5a4?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="305" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;305&quot;&gt;&lt;/svg&gt;"></p>
+        <p>对于每一个 Raft 的节点状态来说，它们分别有三个比较重要的区别，其中一个是在改变状态时调用 <code>becomeLeader</code>、<code>becomeCandidate</code>、<code>becomeFollower</code> 和 <code>becomePreCandidate</code> 方法改变 Raft 状态有比较大的不同，第二是处理消息时调用 <code>stepLeader</code>、<code>stepCandidate</code>            和 <code>stepFollower</code> 时有比较大的不同，最后是几种不同状态的节点具有功能不同的定时任务。</p>
+        <p>对于方法的详细处理，我们在这一节中不详细介绍和分析，如果一个节点的状态是 Follower，那么当前节点切换到 Follower 一定会通过 <code>becomeFollower</code> 函数，在这个函数中会重置节点持有任期，并且设置处理消息的函数为 <code>stepFollower</code>：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L671-678
+func (r *raft) becomeFollower(term uint64, lead uint64) {
+	r.step = stepFollower
+	r.reset(term)
+	r.tick = r.tickElection
+	r.lead = lead
+	r.state = StateFollower
+}
+
+// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L636-643
+func (r *raft) tickElection() {
+	r.electionElapsed++
+
+	if r.promotable() &amp;&amp; r.pastElectionTimeout() {
+		r.electionElapsed = 0
+		r.Step(pb.Message{From: r.id, Type: pb.MsgHup})
+	}
+}
+
+</code></pre>
+        <p>除此之外，它还会设置一个用于在 Leader 节点宕机时触发选举的定时器 <code>tickElection</code>。</p>
+        <p>Candidate 状态的节点与 Follower 的配置差不了太多，只是在消息处理函数 <code>step</code>、任期以及状态上的设置有一些比较小的区别：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L680-691
+func (r *raft) becomeCandidate() {
+	r.step = stepCandidate
+	r.reset(r.Term + 1)
+	r.tick = r.tickElection
+	r.Vote = r.id
+	r.state = StateCandidate
+}
+</code></pre>
+        <p>最后的 Leader 就与这两者有其他的区别了，它不仅设置了处理消息的函数 <code>step</code> 而且设置了与其他状态完全不同的 <code>tick</code> 函数：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L708-728
+func (r *raft) becomeLeader() {
+	r.step = stepLeader
+	r.reset(r.Term)
+	r.tick = r.tickHeartbeat
+	r.lead = r.id
+	r.state = StateLeader
+
+	r.pendingConfIndex = r.raftLog.lastIndex()
+	r.appendEntry(pb.Entry{Data: nil})
+}
+</code></pre>
+        <p>这里的 <code>tick</code> 函数 <code>tickHeartbeat</code> 每隔一段时间会通过 <code>Step</code> 方法向集群中的其他节点发送 <code>MsgBeat</code> 消息：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/raft/raft.go#L646-669
+func (r *raft) tickHeartbeat() {
+	r.heartbeatElapsed++
+	r.electionElapsed++
+
+	if r.electionElapsed &gt;= r.electionTimeout {
+		r.electionElapsed = 0
+		if r.checkQuorum {
+			r.Step(pb.Message{From: r.id, Type: pb.MsgCheckQuorum})
+		}
+	} 
+
+	if r.heartbeatElapsed &gt;= r.heartbeatTimeout {
+		r.heartbeatElapsed = 0
+		r.Step(pb.Message{From: r.id, Type: pb.MsgBeat})
+	}
+}
+</code></pre>
+        <p>上述代码中的 <code>MsgBeat</code> 消息会在 <code>Step</code> 中被转换成 <code>MsgHeartbeat</code> 最终发送给其他的节点，Leader 节点超时之后的选举流程我们在前两节中也已经介绍过了，在这里就不再重复了。</p>
+        <h2 id="存储" data-id="heading-7"> <a id="存储" href="#%E5%AD%98%E5%82%A8"><span></span></a>存储</h2>
+        <p>etcd 目前支持 V2 和 V3 两个大版本，这两个版本在实现上有比较大的不同，一方面是对外提供接口的方式，另一方面就是底层的存储引擎，V2 版本的实例是一个纯内存的实现，所有的数据都没有存储在磁盘上，而 V3 版本的实例就支持了数据的持久化。</p>
+        <p><img alt="etcd-storage" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e485372e7f?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="290" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;290&quot;&gt;&lt;/svg&gt;"></p>
+        <p>在这一节中，我们会介绍 V3 版本的 etcd 究竟是通过什么样的方式存储用户数据的。</p>
+        <h3 id="后端" data-id="heading-8"> <a id="后端" href="#%E5%90%8E%E7%AB%AF"><span></span></a>后端</h3>
+        <p>在 V3 版本的设计中，etcd 通过 backend 后端这一设计，很好地封装了存储引擎的实现细节，为上层提供一个更一致的接口，对于 etcd 的其他模块来说，它们可以将更多注意力放在接口中的约定上，不过在这里，我们更关注的是 etcd 对 <code>Backend</code> 接口的实现。</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/backend.go#L51-69
+type Backend interface {
+	ReadTx() ReadTx
+	BatchTx() BatchTx
+
+	Snapshot() Snapshot
+	Hash(ignores map[IgnoreKey]struct{}) (uint32, error)
+	Size() int64
+	SizeInUse() int64
+	Defrag() error
+	ForceCommit()
+	Close() error
+}
+</code></pre>
+        <p>etcd 底层默认使用的是开源的嵌入式键值存储数据库 <a href="https://link.juejin.im?target=https%3A%2F%2Fgithub.com%2Fboltdb%2Fbolt" target="_blank" rel="nofollow noopener noreferrer">bolt</a>，但是这个项目目前的状态已经是归档不再维护了，如果想要使用这个项目可以使用 CoreOS 的 <a href="https://link.juejin.im?target=https%3A%2F%2Fgithub.com%2Fetcd-io%2Fbbolt" target="_blank" rel="nofollow noopener noreferrer">bbolt</a> 版本。</p>
+        <p><img alt="boltdb-logo" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e500c9e8da?imageView2/0/w/1280/h/960/ignore-error/1" data-width="400" data-height="400" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;400&quot; height=&quot;400&quot;&gt;&lt;/svg&gt;"></p>
+        <p>这一小节中，我们会简单介绍 etcd 是如何使用 BoltDB 作为底层存储的，首先可以先来看一下 pacakge 内部的 <code>backend</code> 结构体，这是一个实现了 <code>Backend</code> 接口的结构：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/backend.go#L80-104
+type backend struct {
+	size int64
+	sizeInUse int64
+	commits int64
+
+	mu sync.RWMutex
+	db *bolt.DB
+
+	batchInterval time.Duration
+	batchLimit    int
+	batchTx       *batchTxBuffered
+
+	readTx *readTx
+
+	stopc chan struct{}
+	donec chan struct{}
+
+	lg *zap.Logger
+}
+</code></pre>
+        <p>从结构体的成员 <code>db</code> 我们就可以看出，它使用了 BoltDB 作为底层存储，另外的两个 <code>readTx</code> 和 <code>batchTx</code> 分别实现了 <code>ReadTx</code> 和 <code>BatchTx</code> 接口：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/read_tx.go#L30-36
+type ReadTx interface {
+	Lock()
+	Unlock()
+
+	UnsafeRange(bucketName []byte, key, endKey []byte, limit int64) (keys [][]byte, vals [][]byte)
+	UnsafeForEach(bucketName []byte, visitor func(k, v []byte) error) error
+}
+
+// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/batch_tx.go#L28-38
+type BatchTx interface {
+	ReadTx
+	UnsafeCreateBucket(name []byte)
+	UnsafePut(bucketName []byte, key []byte, value []byte)
+	UnsafeSeqPut(bucketName []byte, key []byte, value []byte)
+	UnsafeDelete(bucketName []byte, key []byte)
+	Commit()
+	CommitAndStop()
+}
+</code></pre>
+        <p>从这两个接口的定义，我们不难发现它们能够对外提供数据库的读写操作，而 <code>Backend</code> 就能对这两者提供的方法进行封装，为上层屏蔽存储的具体实现：</p>
+        <p><img alt="etcd-backends" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e50279f422?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="315" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;315&quot;&gt;&lt;/svg&gt;"></p>
+        <p>每当我们使用 <code>newBackend</code> 创建一个新的 <code>backend</code> 结构时，都会创建一个 <code>readTx</code> 和 <code>batchTx</code> 结构体，这两者一个负责处理只读请求，一个负责处理读写请求：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/backend.go#L137-176
+func newBackend(bcfg BackendConfig) *backend {
+	bopts := &amp;bolt.Options{}
+	bopts.InitialMmapSize = bcfg.mmapSize()
+	db, _ := bolt.Open(bcfg.Path, 0600, bopts)
+
+	b := &amp;backend{
+		db: db,
+		batchInterval: bcfg.BatchInterval,
+		batchLimit:    bcfg.BatchLimit,
+		readTx: &amp;readTx{
+			buf: txReadBuffer{
+				txBuffer: txBuffer{make(map[string]*bucketBuffer)},
+			},
+			buckets: make(map[string]*bolt.Bucket),
+		},
+		stopc: make(chan struct{}),
+		donec: make(chan struct{}),
+	}
+	b.batchTx = newBatchTxBuffered(b)
+	go b.run()
+	return b
+}
+</code></pre>
+        <p>当我们在 <code>newBackend</code> 中进行了初始化 BoltDB、事务等工作后，就会开一个 goroutine 异步的对所有批量读写事务进行定时提交：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/backend.go#L289-305
+func (b *backend) run() {
+	defer close(b.donec)
+	t := time.NewTimer(b.batchInterval)
+	defer t.Stop()
+	for {
+		select {
+		case &lt;-t.C:
+		case &lt;-b.stopc:
+			b.batchTx.CommitAndStop()
+			return
+		}
+		if b.batchTx.safePending() != 0 {
+			b.batchTx.Commit()
+		}
+		t.Reset(b.batchInterval)
+	}
+}
+</code></pre>
+        <p>对于上层来说，<code>backend</code> 其实只是对底层存储的一个抽象，很多时候并不会直接跟它打交道，往往都是使用它持有的 <code>ReadTx</code> 和 <code>BatchTx</code> 与数据库进行交互。</p>
+        <h4 id="只读事务" data-id="heading-9"> <a id="只读事务" href="#%E5%8F%AA%E8%AF%BB%E4%BA%8B%E5%8A%A1"><span></span></a>只读事务</h4>
+        <p>目前大多数的数据库对于只读类型的事务并没有那么多的限制，尤其是在使用了 MVCC 之后，所有的只读请求几乎不会被写请求锁住，这大大提升了读的效率，由于在 BoltDB 的同一个 goroutine 中开启两个相互依赖的只读事务和读写事务会发生死锁，为了避免这种情况我们还是引入了 <code>sync.RWLock</code> 保证死锁不会出现：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/read_tx.go#L38-47
+type readTx struct {
+	mu  sync.RWMutex
+	buf txReadBuffer
+
+	txmu    sync.RWMutex
+	tx      *bolt.Tx
+	buckets map[string]*bolt.Bucket
+}
+</code></pre>
+        <p>你可以看到在整个结构体中，除了用于保护 <code>tx</code> 的 <code>txmu</code> 读写锁之外，还存在另外一个 <code>mu</code> 读写锁，它的作用是保证 <code>buf</code> 中的数据不会出现问题，<code>buf</code> 和结构体中的 <code>buckets</code> 都是用于加速读效率的缓存。</p>
+        <p><img alt="etcd-backend-tx" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e50326f1a9?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="320" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;320&quot;&gt;&lt;/svg&gt;"></p>
+        <p>对于一个只读事务来说，它对上层提供了两个获取存储引擎中数据的接口，分别是 <code>UnsafeRange</code> 和 <code>UnsafeForEach</code>，在这里会重点介绍前面方法的实现细节：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/read_tx.go#L52-90
+func (rt *readTx) UnsafeRange(bucketName, key, endKey []byte, limit int64) ([][]byte, [][]byte) {
+	if endKey == nil {
+		limit = 1
+	}
+	keys, vals := rt.buf.Range(bucketName, key, endKey, limit)
+	if int64(len(keys)) == limit {
+		return keys, vals
+	}
+
+	bn := string(bucketName)
+	bucket, ok := rt.buckets[bn]
+	if !ok {
+		bucket = rt.tx.Bucket(bucketName)
+		rt.buckets[bn] = bucket
+	}
+
+	if bucket == nil {
+		return keys, vals
+	}
+	c := bucket.Cursor()
+
+	k2, v2 := unsafeRange(c, key, endKey, limit-int64(len(keys)))
+	return append(k2, keys...), append(v2, vals...)
+}
+</code></pre>
+        <p>上述代码中省略了加锁保护读缓存以及 <code>Bucket</code> 中存储数据的合法性，也省去了一些参数的检查，不过方法的整体接口还是没有太多变化，<code>UnsafeRange</code> 会先从自己持有的缓存 <code>txReadBuffer</code> 中读取数据，如果数据不能够满足调用者的需求，就会从 <code>buckets</code> 缓存中查找对应的 BoltDB bucket 并从 BoltDB 数据库中读取。</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/batch_tx.go#L121-141
+func unsafeRange(c *bolt.Cursor, key, endKey []byte, limit int64) (keys [][]byte, vs [][]byte) {
+	var isMatch func(b []byte) bool
+	if len(endKey) &gt; 0 {
+		isMatch = func(b []byte) bool { return bytes.Compare(b, endKey) &lt; 0 }
+	} else {
+		isMatch = func(b []byte) bool { return bytes.Equal(b, key) }
+		limit = 1
+	}
+
+	for ck, cv := c.Seek(key); ck != nil &amp;&amp; isMatch(ck); ck, cv = c.Next() {
+		vs = append(vs, cv)
+		keys = append(keys, ck)
+		if limit == int64(len(keys)) {
+			break
+		}
+	}
+	return keys, vs
+}
+</code></pre>
+        <p>这个包内部的函数 <code>unsafeRange</code> 实际上通过 BoltDB 中的游标来遍历满足查询条件的键值对。</p>
+        <p>到这里为止，整个只读事务提供的接口就基本介绍完了，在 etcd 中无论我们想要后去单个 Key 还是一个范围内的 Key 最终都是通过 <code>Range</code> 来实现的，这其实也是只读事务的最主要功能。</p>
+        <h4 id="读写事务" data-id="heading-10"> <a id="读写事务" href="#%E8%AF%BB%E5%86%99%E4%BA%8B%E5%8A%A1"><span></span></a>读写事务</h4>
+        <p>只读事务只提供了读数据的能力，包括 <code>UnsafeRange</code> 和 <code>UnsafeForeach</code>，而读写事务 <code>BatchTx</code> 提供的就是读和写数据的能力了：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/batch_tx.go#L40-46
+type batchTx struct {
+	sync.Mutex
+	tx      *bolt.Tx
+	backend *backend
+
+	pending int
+}
+</code></pre>
+        <p>读写事务同时提供了不带缓存的 <code>batchTx</code> 实现以及带缓存的 <code>batchTxBuffered</code> 实现，后者其实『继承了』前者的结构体，并额外加入了缓存 <code>txWriteBuffer</code> 加速读请求：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/batch_tx.go#L243-246
+type batchTxBuffered struct {
+	batchTx
+	buf txWriteBuffer
+}
+</code></pre>
+        <p>后者在实现接口规定的方法时，会直接调用 <code>batchTx</code> 的同名方法，并将操作造成的副作用的写入的缓存中，在这里我们并不会展开介绍这一版本的实现，还是以分析 <code>batchTx</code> 的方法为主。</p>
+        <p>当我们向 etcd 中写入数据时，最终都会调用 <code>batchTx</code> 的 <code>unsafePut</code> 方法将数据写入到 BoltDB 中：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/batch_tx.go#L65-67
+func (t *batchTx) UnsafePut(bucketName []byte, key []byte, value []byte) {
+	t.unsafePut(bucketName, key, value, false)
+}
+
+// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/batch_tx.go#L74-103
+func (t *batchTx) unsafePut(bucketName []byte, key []byte, value []byte, seq bool) {
+	bucket := t.tx.Bucket(bucketName)
+	if err := bucket.Put(key, value); err != nil {
+		plog.Fatalf("cannot put key into bucket (%v)", err)
+	}
+	t.pending++
+}
+</code></pre>
+        <p>这两个方法的实现非常清晰，作者觉得他们都并不值得展开详细介绍，只是调用了 BoltDB 提供的 API 操作一下 bucket 中的数据，而另一个删除方法的实现与这个也差不多：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/batch_tx.go#L144-169
+func (t *batchTx) UnsafeDelete(bucketName []byte, key []byte) {
+	bucket := t.tx.Bucket(bucketName)
+	err := bucket.Delete(key)
+	if err != nil {
+		plog.Fatalf("cannot delete key from bucket (%v)", err)
+	}
+	t.pending++
+}
+</code></pre>
+        <p>它们都是通过 <code>Bolt.Tx</code> 找到对应的 <code>Bucket</code>，然后做出相应的增删操作，但是这写请求在这两个方法执行后其实并没有提交，我们还需要手动或者等待 etcd 自动将请求提交：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/batch_tx.go#L184-188
+func (t *batchTx) Commit() {
+	t.Lock()
+	t.commit(false)
+	t.Unlock()
+}
+
+// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/backend/batch_tx.go#L210-241
+func (t *batchTx) commit(stop bool) {
+	if t.tx != nil {
+		if t.pending == 0 &amp;&amp; !stop {
+			return
+		}
+
+		start := time.Now()
+
+		err := t.tx.Commit()
+
+		rebalanceSec.Observe(t.tx.Stats().RebalanceTime.Seconds())
+		spillSec.Observe(t.tx.Stats().SpillTime.Seconds())
+		writeSec.Observe(t.tx.Stats().WriteTime.Seconds())
+		commitSec.Observe(time.Since(start).Seconds())
+		atomic.AddInt64(&amp;t.backend.commits, 1)
+
+		t.pending = 0
+	}
+	if !stop {
+		t.tx = t.backend.begin(true)
+	}
+}
+</code></pre>
+        <p>在每次调用 <code>Commit</code> 对读写事务进行提交时，都会先检查是否有等待中的事务，然后会将数据上报至 Prometheus 中，其他的服务就可以将 Prometheus 作为数据源对 etcd 的执行状况进行监控了。</p>
+        <h3 id="索引" data-id="heading-11"> <a id="索引" href="#%E7%B4%A2%E5%BC%95"><span></span></a>索引</h3>
+        <p>经常使用 etcd 的开发者可能会了解到，它本身对于每一个键值对都有一个 <code>revision</code> 的概念，键值对的每一次变化都会被 BoltDB 单独记录下来，所以想要在存储引擎中获取某一个 Key 对应的值，要先获取 <code>revision</code>，再通过它才能找到对应的值，在里我们想要介绍的其实是 etcd 如何管理和存储一个 Key 的多个 <code>revision</code> 记录。</p>
+        <p><img alt="B-Tree" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e505f5b833?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1024" data-height="300" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1024&quot; height=&quot;300&quot;&gt;&lt;/svg&gt;"></p>
+        <p>在 etcd 服务中有一个用于存储所有的键值对 <code>revision</code> 信息的 btree，我们可以通过 <code>index</code> 的 <code>Get</code> 接口获取一个 Key 对应 Revision 的值：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/index.go#L68-76
+func (ti *treeIndex) Get(key []byte, atRev int64) (modified, created revision, ver int64, err error) {
+	keyi := &amp;keyIndex{key: key}
+	if keyi = ti.keyIndex(keyi); keyi == nil {
+		return revision{}, revision{}, 0, ErrRevisionNotFound
+	}
+	return keyi.get(ti.lg, atRev)
+}
+</code></pre>
+        <p>上述方法通过 <code>keyIndex</code> 方法查找 Key 对应的 <code>keyIndex</code> 结构体，这里使用的内存结构体 <a href="https://link.juejin.im?target=https%3A%2F%2Fgithub.com%2Fgoogle%2Fbtree" target="_blank" rel="nofollow noopener noreferrer">btree</a> 是 Google 实现的一个版本：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/index.go#L84-89
+func (ti *treeIndex) keyIndex(keyi *keyIndex) *keyIndex {
+	if item := ti.tree.Get(keyi); item != nil {
+		return item.(*keyIndex)
+	}
+	return nil
+}
+</code></pre>
+        <p>可以看到这里的实现非常简单，只是从 <code>treeIndex</code> 持有的成员 btree 中查找 <code>keyIndex</code>，将结果强制转换成 <code>keyIndex</code> 类型后返回；获取 Key 对应 <code>revision</code> 的方式也非常简单：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/key_index.go#L149-171
+func (ki *keyIndex) get(lg *zap.Logger, atRev int64) (modified, created revision, ver int64, err error) {
+	g := ki.findGeneration(atRev)
+	if g.isEmpty() {
+		return revision{}, revision{}, 0, ErrRevisionNotFound
+	}
+
+	n := g.walk(func(rev revision) bool { return rev.main &gt; atRev })
+	if n != -1 {
+		return g.revs[n], g.created, g.ver - int64(len(g.revs)-n-1), nil
+	}
+
+	return revision{}, revision{}, 0, ErrRevisionNotFound
+}
+</code></pre>
+        <h4 id="keyindex" data-id="heading-12"> <a id="keyindex" href="#keyindex"><span></span></a>KeyIndex</h4>
+        <p>在我们具体介绍方法实现的细节之前，首先我们需要理解 <code>keyIndex</code> 包含的字段以及管理同一个 Key 不同版本的方式：</p>
+        <p><img alt="etcd-keyindex" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e52201a5e5?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="530" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;530&quot;&gt;&lt;/svg&gt;"></p>
+        <p>每一个 <code>keyIndex</code> 结构体中都包含当前键的值以及最后一次修改对应的 <code>revision</code> 信息，其中还保存了一个 Key 的多个 <code>generation</code>，每一个 <code>generation</code> 都会记录当前 Key『从生到死』的全部过程，每当一个 Key 被删除时都会调用 <code>timestone</code> 方法向当前的 <code>generation</code> 中追加一个新的墓碑版本：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/key_index.go#L127-145
+func (ki *keyIndex) tombstone(lg *zap.Logger, main int64, sub int64) error {
+	if ki.generations[len(ki.generations)-1].isEmpty() {
+		return ErrRevisionNotFound
+	}
+	ki.put(lg, main, sub)
+	ki.generations = append(ki.generations, generation{})
+	return nil
+}
+</code></pre>
+        <p>这个 tombstone 版本标识这当前的 Key 已经被删除了，但是在每次删除一个 Key 之后，就会在当前的 <code>keyIndex</code> 中创建一个新的 <code>generation</code> 结构用于存储新的版本信息，其中 <code>ver</code> 记录当前 <code>generation</code> 包含的修改次数，<code>created</code> 记录创建 <code>generation</code> 时的 <code>revision</code>            版本，最后的 <code>revs</code> 用于存储所有的版本信息。</p>
+        <h4 id="读操作" data-id="heading-13"> <a id="读操作" href="#%E8%AF%BB%E6%93%8D%E4%BD%9C"><span></span></a>读操作</h4>
+        <p>etcd 中所有的查询请求，无论是查询一个还是多个、是数量还是键值对，最终都会调用 <code>rangeKeys</code> 方法：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/kvstore_txn.go#L112-165
+func (tr *storeTxnRead) rangeKeys(key, end []byte, curRev int64, ro RangeOptions) (*RangeResult, error) {
+	rev := ro.Rev
+
+	revpairs := tr.s.kvindex.Revisions(key, end, rev)
+	if len(revpairs) == 0 {
+		return &amp;RangeResult{KVs: nil, Count: 0, Rev: curRev}, nil
+	}
+
+	kvs := make([]mvccpb.KeyValue, int(ro.Limit))
+	revBytes := newRevBytes()
+	for i, revpair := range revpairs[:len(kvs)] {
+		revToBytes(revpair, revBytes)
+		_, vs := tr.tx.UnsafeRange(keyBucketName, revBytes, nil, 0)
+		kvs[i].Unmarshal(vs[0])
+	}
+	return &amp;RangeResult{KVs: kvs, Count: len(revpairs), Rev: curRev}, nil
+}
+</code></pre>
+        <p>为了获取一个范围内的所有键值对，我们首先需要通过 <code>Revisions</code> 函数从 btree 中获取范围内所有的 <code>keyIndex</code>：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/index.go#L106-120
+func (ti *treeIndex) Revisions(key, end []byte, atRev int64) (revs []revision) {
+	if end == nil {
+		rev, _, _, err := ti.Get(key, atRev)
+		if err != nil {
+			return nil
+		}
+		return []revision{rev}
+	}
+	ti.visit(key, end, func(ki *keyIndex) {
+		if rev, _, _, err := ki.get(ti.lg, atRev); err == nil {
+			revs = append(revs, rev)
+		}
+	})
+	return revs
+}
+</code></pre>
+        <p>如果只需要获取一个 Key 对应的版本，就是直接使用 <code>treeIndex</code> 的方法，但是当上述方法会从 btree 索引中获取一个连续多个 <code>revision</code> 值时，就会调用 <code>keyIndex.get</code> 来遍历整颗树并选取合适的版本：</p>
+        <pre><code>func (ki *keyIndex) get(lg *zap.Logger, atRev int64) (modified, created revision, ver int64, err error) {
+	g := ki.findGeneration(atRev)
+	if g.isEmpty() {
+		return revision{}, revision{}, 0, ErrRevisionNotFound
+	}
+
+	n := g.walk(func(rev revision) bool { return rev.main &gt; atRev })
+	if n != -1 {
+		return g.revs[n], g.created, g.ver - int64(len(g.revs)-n-1), nil
+	}
+
+	return revision{}, revision{}, 0, ErrRevisionNotFound
+}
+</code></pre>
+        <p>因为每一个 Key 的 <code>keyIndex</code> 中其实都存储着多个 <code>generation</code>，我们需要根据传入的参数返回合适的 <code>generation</code> 并从其中返回主版本大于 <code>atRev</code> 的 <code>revision</code> 结构。</p>
+        <p>对于上层的键值存储来说，它会利用这里返回的 <code>revision</code> 从真正存储数据的 BoltDB 中查询当前 Key 对应 <code>revision</code> 的结果。</p>
+        <h4 id="写操作" data-id="heading-14"> <a id="写操作" href="#%E5%86%99%E6%93%8D%E4%BD%9C"><span></span></a>写操作</h4>
+        <p>当我们向 etcd 中插入数据时，会使用传入的 <code>key</code> 构建一个 <code>keyIndex</code> 结构体并从树中获取相关版本等信息：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/index.go#L53-66
+func (ti *treeIndex) Put(key []byte, rev revision) {
+	keyi := &amp;keyIndex{key: key}
+
+	item := ti.tree.Get(keyi)
+	if item == nil {
+		keyi.put(ti.lg, rev.main, rev.sub)
+		ti.tree.ReplaceOrInsert(keyi)
+		return
+	}
+	okeyi := item.(*keyIndex)
+	okeyi.put(ti.lg, rev.main, rev.sub)
+}
+</code></pre>
+        <p><code>treeIndex.Put</code> 在获取内存中的 <code>keyIndex</code> 结构之后会通过 <code>keyIndex.put</code> 其中加入新的 <code>revision</code>：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/key_index.go#L77-104
+func (ki *keyIndex) put(lg *zap.Logger, main int64, sub int64) {
+	rev := revision{main: main, sub: sub}
+
+	if len(ki.generations) == 0 {
+		ki.generations = append(ki.generations, generation{})
+	}
+	g := &amp;ki.generations[len(ki.generations)-1]
+	if len(g.revs) == 0 {
+		g.created = rev
+	}
+	g.revs = append(g.revs, rev)
+	g.ver++
+	ki.modified = rev
+}
+</code></pre>
+        <p>每一个新 <code>revision</code> 结构体写入 <code>keyIndex</code> 时，都会改变当前 <code>generation</code> 的 <code>created</code> 和 <code>ver</code> 等参数，从这个方法中我们就可以了解到 <code>generation</code> 中的各个成员都是如何被写入的。</p>
+        <p>写入的操作除了增加之外，删除某一个 Key 的函数也会经常被调用：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/kvstore_txn.go#L252-309
+func (tw *storeTxnWrite) delete(key []byte) {
+	ibytes := newRevBytes()
+	idxRev := revision{main: tw.beginRev + 1, sub: int64(len(tw.changes))}
+	revToBytes(idxRev, ibytes)
+
+	ibytes = appendMarkTombstone(tw.storeTxnRead.s.lg, ibytes)
+
+	kv := mvccpb.KeyValue{Key: key}
+
+	d, _ := kv.Marshal()
+
+	tw.tx.UnsafeSeqPut(keyBucketName, ibytes, d)
+	tw.s.kvindex.Tombstone(key, idxRev)
+	tw.changes = append(tw.changes, kv)
+}
+</code></pre>
+        <p>正如我们在文章前面所介绍的，删除操作会向结构体中的 <code>generation</code> 追加一个新的 tombstone 标记，用于标识当前的 Key 已经被删除；除此之外，上述方法还会将每一个更新操作的 <code>revision</code> 存到单独的 <code>keyBucketName</code> 中。</p>
+        <h4 id="索引的恢复" data-id="heading-15"> <a id="索引的恢复" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E6%81%A2%E5%A4%8D"><span></span></a>索引的恢复</h4>
+        <p>因为在 etcd 中，所有的 <code>keyIndex</code> 都是在内存的 btree 中存储的，所以在启动服务时需要从 BoltDB 中将所有的数据都加载到内存中，在这里就会初始化一个新的 btree 索引，然后调用 <code>restore</code> 方法开始恢复索引：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/kvstore.go#L321-433
+func (s *store) restore() error {
+	min, max := newRevBytes(), newRevBytes()
+	revToBytes(revision{main: 1}, min)
+	revToBytes(revision{main: math.MaxInt64, sub: math.MaxInt64}, max)
+
+	tx := s.b.BatchTx()
+
+	rkvc, revc := restoreIntoIndex(s.lg, s.kvindex)
+	for {
+		keys, vals := tx.UnsafeRange(keyBucketName, min, max, int64(restoreChunkKeys))
+		if len(keys) == 0 {
+			break
+		}
+		restoreChunk(s.lg, rkvc, keys, vals, keyToLease)
+		newMin := bytesToRev(keys[len(keys)-1][:revBytesLen])
+		newMin.sub++
+		revToBytes(newMin, min)
+	}
+	close(rkvc)
+	s.currentRev = &lt;-revc
+
+	return nil
+}
+</code></pre>
+        <p>在恢复索引的过程中，有一个用于遍历不同键值的『生产者』循环，其中由 <code>UnsafeRange</code> 和 <code>restoreChunk</code> 两个方法构成，这两个方法会从 BoltDB 中遍历数据，然后将键值对传到 <code>rkvc</code> 中，交给 <code>restoreIntoIndex</code> 方法中创建的 goroutine 处理：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/kvstore.go#L486-506
+func restoreChunk(lg *zap.Logger, kvc chan&lt;- revKeyValue, keys, vals [][]byte, keyToLease map[string]lease.LeaseID) {
+	for i, key := range keys {
+		rkv := r evKeyValue{key: key}
+		_ := rkv.kv.Unmarshal(vals[i])
+		rkv.kstr = string(rkv.kv.Key)
+		if isTombstone(key) {
+			delete(keyToLease, rkv.kstr)
+		} else if lid := lease.LeaseID(rkv.kv.Lease); lid != lease.NoLease {
+			keyToLease[rkv.kstr] = lid
+		} else {
+			delete(keyToLease, rkv.kstr)
+		}
+		kvc &lt;- rkv
+	}
+}
+</code></pre>
+        <p>先被调用的 <code>restoreIntoIndex</code> 方法会创建一个用于接受键值对的 Channel，在这之后会在一个 goroutine 中处理从 Channel 接收到的数据，并将这些数据恢复到内存里的 btree 中：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/kvstore.go#L441-484
+func restoreIntoIndex(lg *zap.Logger, idx index) (chan&lt;- revKeyValue, &lt;-chan int64) {
+	rkvc, revc := make(chan revKeyValue, restoreChunkKeys), make(chan int64, 1)
+	go func() {
+		currentRev := int64(1)
+		defer func() { revc &lt;- currentRev }()
+		for rkv := range rkvc {
+			ki = &amp;keyIndex{key: rkv.kv.Key}
+			ki := idx.KeyIndex(ki)
+
+			rev := bytesToRev(rkv.key)
+			currentRev = rev.main
+			if ok {
+				if isTombstone(rkv.key) {
+					ki.tombstone(lg, rev.main, rev.sub)
+					continue
+				}
+				ki.put(lg, rev.main, rev.sub)
+			} else if !isTombstone(rkv.key) {
+				ki.restore(lg, revision{rkv.kv.CreateRevision, 0}, rev, rkv.kv.Version)
+				idx.Insert(ki)
+			}
+		}
+	}()
+	return rkvc, revc
+}
+</code></pre>
+        <p>恢复内存索引的相关代码在实现上非常值得学习，两个不同的函数通过 Channel 进行通信并使用 goroutine 处理任务，能够很好地将消息的『生产者』和『消费者』进行分离。</p>
+        <p><img alt="etcd-restore-index" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e5261c1ef7?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="360" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;360&quot;&gt;&lt;/svg&gt;"></p>
+        <p>Channel 作为整个恢复索引逻辑的一个消息中心，它将遍历 BoltDB 中的数据和恢复索引两部分代码进行了分离。</p>
+        <h3 id="存储-1" data-id="heading-16"> <a id="存储-1" href="#%E5%AD%98%E5%82%A8-1"><span></span></a>存储</h3>
+        <p>etcd 的 mvcc 模块对外直接提供了两种不同的访问方式，一种是键值存储 <code>kvstore</code>，另一种是 <code>watchableStore</code> 它们都实现了包内公开的 <code>KV</code> 接口：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/kv.go#L100-125
+type KV interface {
+	ReadView
+	WriteView
+
+	Read() TxnRead
+	Write() TxnWrite
+
+	Hash() (hash uint32, revision int64, err error)
+	HashByRev(rev int64) (hash uint32, revision int64, compactRev int64, err error)
+
+	Compact(rev int64) (&lt;-chan struct{}, error)
+	Commit()
+	Restore(b backend.Backend) error
+	Close() error
+}
+</code></pre>
+        <h4 id="kvstore" data-id="heading-17"> <a id="kvstore" href="#kvstore"><span></span></a>kvstore</h4>
+        <p>对于 <code>kvstore</code> 来说，其实没有太多值得展开介绍的地方，它利用底层的 BoltDB 等基础设施为上层提供最常见的增伤改查，它组合了下层的 <code>readTx</code>、<code>batchTx</code> 等结构体，将一些线程不安全的操作变成线程安全的。</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/kvstore_txn.go#L32-40
+func (s *store) Read() TxnRead {
+	s.mu.RLock()
+	tx := s.b.ReadTx()
+	s.revMu.RLock()
+	tx.Lock()
+	firstRev, rev := s.compactMainRev, s.currentRev
+	s.revMu.RUnlock()
+	return newMetricsTxnRead(&amp;storeTxnRead{s, tx, firstRev, rev})
+}
+</code></pre>
+        <p>它也负责对内存中 btree 索引的维护以及压缩一些无用或者不常用的数据，几个对外的接口 <code>Read</code>、<code>Write</code> 就是对 <code>readTx</code>、<code>batchTx</code> 等结构体的组合并将它们的接口暴露给其他的模块。</p>
+        <h4 id="watchablestore" data-id="heading-18"> <a id="watchablestore" href="#watchablestore"><span></span></a>watchableStore</h4>
+        <p>另外一个比较有意思的存储就是 <code>watchableStore</code> 了，它是 mvcc 模块为外界提供 Watch 功能的接口，它负责了注册、管理以及触发 Watcher 的功能，我们先来看一下这个结构体的各个字段：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/watchable_store.go#L45-65
+type watchableStore struct {
+	*store
+
+	mu sync.RWMutex
+
+	unsynced watcherGroup
+	synced watcherGroup
+
+	stopc chan struct{}
+	wg    sync.WaitGroup
+}
+</code></pre>
+        <p>每一个 <code>watchableStore</code> 其实都组合了来自 <code>store</code> 结构体的字段和方法，除此之外，还有两个 <code>watcherGroup</code> 类型的字段，其中 <code>unsynced</code> 用于存储未同步完成的实例，<code>synced</code> 用于存储已经同步完成的实例。</p>
+        <p>在初始化一个新的 <code>watchableStore</code> 时，我们会创建一个用于同步<code>watcherGroup</code> 的 Goroutine，在 <code>syncWatchersLoop</code> 这个循环中会每隔 100ms 调用一次 <code>syncWatchers</code> 方法，将所有未通知的事件通知给所有的监听者，这可以说是整个模块的核心：</p>
+        <pre><code>func (s *watchableStore) syncWatchers() int {
+	curRev := s.store.currentRev
+	compactionRev := s.store.compactMainRev
+
+	wg, minRev := s.unsynced.choose(maxWatchersPerSync, curRev, compactionRev)
+	minBytes, maxBytes := newRevBytes(), newRevBytes()
+	revToBytes(revision{main: minRev}, minBytes)
+	revToBytes(revision{main: curRev + 1}, maxBytes)
+
+	tx := s.store.b.ReadTx()
+	revs, vs := tx.UnsafeRange(keyBucketName, minBytes, maxBytes, 0)
+	evs := kvsToEvents(nil, wg, revs, vs)
+
+	wb := newWatcherBatch(wg, evs)
+	for w := range wg.watchers {
+		w.minRev = curRev + 1
+
+		eb, ok := wb[w]
+		if !ok {
+			s.synced.add(w)
+			s.unsynced.delete(w)
+			continue
+		}
+
+		w.send(WatchResponse{WatchID: w.id, Events: eb.evs, Revision: curRev})
+
+		s.synced.add(w)
+		s.unsynced.delete(w)
+	}
+
+	return s.unsynced.size()
+}
+</code></pre>
+        <p>简化后的 <code>syncWatchers</code> 方法中总共做了三件事情，首先是根据当前的版本从未同步的 <code>watcherGroup</code> 中选出一些待处理的任务，然后从 BoltDB 中后去当前版本范围内的数据变更并将它们转换成事件，事件和 <code>watcherGroup</code> 在打包之后会通过 <code>send</code> 方法发送到每一个 <code>watcher</code> 对应的 Channel 中。</p>
+        <p><img alt="etcd-mvcc-watch-module" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e5298f0b93?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="400" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;400&quot;&gt;&lt;/svg&gt;"></p>
+        <p>上述图片中展示了 mvcc 模块对于向外界提供的监听某个 Key 和范围的接口，外部的其他模块会通过 <code>watchStream.watch</code> 函数与模块内部进行交互，每一次调用 <code>watch</code> 方法最终都会向 <code>watchableStore</code> 持有的 <code>watcherGroup</code> 中添加新的 <code>watcher</code> 结构。</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/watcher.go#L108-135
+func (ws *watchStream) Watch(id WatchID, key, end []byte, startRev int64, fcs ...FilterFunc) (WatchID, error) {
+	if id == AutoWatchID {
+		for ws.watchers[ws.nextID] != nil {
+			ws.nextID++
+		}
+		id = ws.nextID
+		ws.nextID++
+	}
+
+	w, c := ws.watchable.watch(key, end, startRev, id, ws.ch, fcs...)
+
+	ws.cancels[id] = c
+	ws.watchers[id] = w
+	return id, nil
+}
+
+// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/mvcc/watchable_store.go#L111-142
+func (s *watchableStore) watch(key, end []byte, startRev int64, id WatchID, ch chan&lt;- WatchResponse, fcs ...FilterFunc) (*watcher, cancelFunc) {
+	wa := &amp;watcher{
+		key:    key,
+		end:    end,
+		minRev: startRev,
+		id:     id,
+		ch:     ch,
+		fcs:    fcs,
+	}
+
+	synced := startRev &gt; s.store.currentRev || startRev == 0
+	if synced {
+		s.synced.add(wa)
+	} else {
+		s.unsynced.add(wa)
+	}
+
+	return wa, func() { s.cancelWatcher(wa) }
+}
+</code></pre>
+        <p>当 etcd 服务启动时，会在服务端运行一个用于处理监听事件的 <code>watchServer</code> gRPC 服务，客户端的 Watch 请求最终都会被转发到这个服务的 <code>Watch</code> 函数中：</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/etcdserver/api/v3rpc/watch.go#L136-206
+func (ws *watchServer) Watch(stream pb.Watch_WatchServer) (err error) {
+	sws := serverWatchStream{
+		// ...
+		gRPCStream:  stream,
+		watchStream: ws.watchable.NewWatchStream(),
+		ctrlStream: make(chan *pb.WatchResponse, ctrlStreamBufLen),
+	}
+
+	sws.wg.Add(1)
+	go func() {
+		sws.sendLoop()
+		sws.wg.Done()
+	}()
+
+	go func() {
+		sws.recvLoop()
+	}()
+
+	sws.wg.Wait()
+	return err
+}
+</code></pre>
+        <p>当客户端想要通过 <code>Watch</code> 结果监听某一个 Key 或者一个范围的变动，在每一次客户端调用服务端上述方式都会创建两个 Goroutine，这两个协程一个会负责向监听者发送数据变动的事件，另一个协程会负责处理客户端发来的事件。</p>
+        <pre><code>// https://sourcegraph.com/github.com/etcd-io/etcd@1cab49e/-/blob/etcdserver/api/v3rpc/watch.go#L220-334 
+func (sws *serverWatchStream) recvLoop() error {
+	for {
+		req, err := sws.gRPCStream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		switch uv := req.RequestUnion.(type) {
+		case *pb.WatchRequest_CreateRequest:
+			creq := uv.CreateRequest
+
+			filters := FiltersFromRequest(creq)
+			wsrev := sws.watchStream.Rev()
+			rev := creq.StartRevision
+			id, _ := sws.watchStream.Watch(mvcc.WatchID(creq.WatchId), creq.Key, creq.RangeEnd, rev, filters...)
+			wr := &amp;pb.WatchResponse{
+				Header:   sws.newResponseHeader(wsrev),
+				WatchId:  int64(id),
+				Created:  true,
+				Canceled: err != nil,
+			}
+			select {
+			case sws.ctrlStream &lt;- wr:
+			case &lt;-sws.closec:
+				return nil
+			}
+
+		case *pb.WatchRequest_CancelRequest: // ...
+		case *pb.WatchRequest_ProgressRequest: // ...
+		default:
+			continue
+		}
+	}
+}
+</code></pre>
+        <p>在用于处理客户端的 <code>recvLoop</code> 方法中调用了 mvcc 模块暴露出的 <code>watchStream.Watch</code> 方法，该方法会返回一个可以用于取消监听事件的 <code>watchID</code>；当 gRPC 流已经结束后者出现错误时，当前的循环就会返回，两个 Goroutine 也都会结束。</p>
+        <p>如果出现了更新或者删除事件，就会被发送到 <code>watchStream</code> 持有的 Channel 中，而 <code>sendLoop</code> 会通过 <code>select</code> 来监听多个 Channel 中的数据并将接收到的数据封装成 <code>pb.WatchResponse</code> 结构并通过 gRPC 流发送给客户端：</p>
+        <pre><code>func (sws *serverWatchStream) sendLoop() {
+	for {
+		select {
+		case wresp, ok := &lt;-sws.watchStream.Chan():
+			evs := wresp.Events
+			events := make([]*mvccpb.Event, len(evs))
+			for i := range evs {
+				events[i] = &amp;evs[i]			}
+
+			canceled := wresp.CompactRevision != 0
+			wr := &amp;pb.WatchResponse{
+				Header:          sws.newResponseHeader(wresp.Revision),
+				WatchId:         int64(wresp.WatchID),
+				Events:          events,
+				CompactRevision: wresp.CompactRevision,
+				Canceled:        canceled,
+			}
+
+			sws.gRPCStream.Send(wr)
+
+		case c, ok := &lt;-sws.ctrlStream: // ...
+		case &lt;-progressTicker.C: // ...
+		case &lt;-sws.closec:
+			return
+		}
+	}
+}
+</code></pre>
+        <p>对于每一个 <code>Watch</code> 请求来说，<code>watchServer</code> 会根据请求创建两个用于处理当前请求的 Goroutine，这两个协程会与更底层的 mvcc 模块协作提供监听和回调功能：</p>
+        <p><img alt="etcd-watch-server" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e52a7ffcf5?imageView2/0/w/1280/h/960/ignore-error/1" data-width="1200" data-height="340" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;1200&quot; height=&quot;340&quot;&gt;&lt;/svg&gt;"></p>
+        <p>到这里，我们对于 Watch 功能的介绍就差不多结束了，从对外提供的接口到底层的使用的数据结构以及具体实现，其他与 Watch 功能相关的话题可以直接阅读 etcd 的源代码了解更加细节的实现。</p>
+        <h2 id="应用" data-id="heading-19"> <a id="应用" href="#%E5%BA%94%E7%94%A8"><span></span></a>应用</h2>
+        <p>在上面已经介绍了核心的 Raft 共识算法以及使用的底层存储之后，这一节更想谈一谈 etcd 的一些应用场景，与之前谈到的 <a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fzookeeper-chubby" target="_blank" rel="nofollow noopener noreferrer">分布式协调服务 Zookeeper</a> 一样，etcd 在大多数的集群中还是处于比较关键的位置，工程师往往都会使用 etcd 存储集群中的重要数据和元数据，多个节点之间的强一致性以及集群部署的方式赋予了 etcd 集群高可用性。</p>
+        <p>我们依然可以使用 etcd 实现微服务架构中的服务发现、发布订阅、分布式锁以及分布式协调等功能，因为虽然它被定义成了一个可靠的分布式键值存储，但是它起到的依然是一个分布式协调服务的作用，这也使我们在需要不同的协调服务中进行权衡和选择。</p>
+        <p>为什么要在分布式协调服务中选择 etcd 其实是一个比较关键的问题，很多工程师选择 etcd 主要是因为它使用 Go 语言开发、部署简单、社区也比较活跃，但是缺点就在于它相比 Zookeeper 还是一个比较年轻的项目，需要一些时间来成长和稳定。</p>
+        <h2 id="总结" data-id="heading-20"> <a id="总结" href="#%E6%80%BB%E7%BB%93"><span></span></a>总结</h2>
+        <p>etcd 的实现原理非常有趣，我们能够在它的源代码中学习很多 Go 编程的最佳实践和设计，这也值得我们去研究它的源代码。</p>
+        <p>目前很多项目和公司都在生产环境中大规模使用 etcd，这对于社区来说是意见非常有利的事情，如果微服务的大部分技术栈是 Go，作者也更加推荐各位读者在选择分布式协调服务时选择 etcd 作为系统的基础设施。</p>
+        <h2 id="相关文章" data-id="heading-21"> <a id="相关文章" href="#%E7%9B%B8%E5%85%B3%E6%96%87%E7%AB%A0"><span></span></a>相关文章</h2>
+        <ul>
+            <li>分布式系统
+                <ul>
+                    <li>基础
+                        <ul>
+                            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fdistributed-transaction-principle" target="_blank" rel="nofollow noopener noreferrer">分布式事务的实现原理</a></li>
+                            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fmessage-delivery" target="_blank" rel="nofollow noopener noreferrer">分布式系统与消息的投递</a></li>
+                        </ul>
+                    </li>
+                    <li>系统
+                        <ul>
+                            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fdynamo" target="_blank" rel="nofollow noopener noreferrer">分布式键值存储 Dynamo 的实现原理</a></li>
+                            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fbigtable-leveldb" target="_blank" rel="nofollow noopener noreferrer">浅析 Bigtable 和 LevelDB 的实现</a></li>
+                            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fzookeeper-chubby" target="_blank" rel="nofollow noopener noreferrer">详解分布式协调服务 ZooKeeper</a></li>
+                            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fetcd-introduction" target="_blank" rel="nofollow noopener noreferrer">高可用分布式存储 etcd 的实现原理</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <h2 id="reference" data-id="heading-22"> <a id="reference" href="#reference"><span></span></a>Reference</h2>
+        <ul>
+            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fgithub.com%2Fetcd-io%2Fetcd" target="_blank" rel="nofollow noopener noreferrer">etcd · GitHub</a></li>
+            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fetcd.readthedocs.io%2Fen%2Flatest%2F" target="_blank" rel="nofollow noopener noreferrer">etcd Documentation</a></li>
+            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fraft.github.io%2F" target="_blank" rel="nofollow noopener noreferrer">The Raft Consensus Algorithm</a></li>
+            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fraft.github.io%2Fraft.pdf" target="_blank" rel="nofollow noopener noreferrer">In Search of an Understandable Consensus Algorithm</a></li>
+            <li><a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fzookeeper-chubby" target="_blank" rel="nofollow noopener noreferrer">详解分布式协调服务 ZooKeeper</a></li>
+        </ul>
+        <h3 data-id="heading-23">关于图片和转载</h3> <a href="https://link.juejin.im?target=http%3A%2F%2Fcreativecommons.org%2Flicenses%2Fby%2F4.0%2F" target="_blank" rel="nofollow noopener noreferrer"><img alt="知识共享许可协议" class="lazyload inited" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669e4e5b3789257?imageView2/0/w/1280/h/960/ignore-error/1" data-width="88" data-height="31" src="data:image/svg+xml;utf8,&lt;?xml version=&quot;1.0&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot; width=&quot;88&quot; height=&quot;31&quot;&gt;&lt;/svg&gt;"></a><br>本作品采用<a href="https://link.juejin.im?target=http%3A%2F%2Fcreativecommons.org%2Flicenses%2Fby%2F4.0%2F" target="_blank" rel="nofollow noopener noreferrer">知识共享署名 4.0 国际许可协议</a>进行许可。
+        转载时请注明原文链接，图片在使用时请保留图片中的全部内容，可适当缩放并在引用处附上图片所在的文章链接，图片使用 Sketch 进行绘制。
+        <h3 data-id="heading-24">关于评论和留言</h3> 如果对本文 <a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fetcd-introduction" target="_blank" rel="nofollow noopener noreferrer">高可用分布式存储 etcd 的实现原理</a> 的内容有疑问，请在下面的评论系统中留言，谢谢。
+        <blockquote>
+            <p>原文链接：<a href="https://link.juejin.im?target=https%3A%2F%2Fdraveness.me%2Fetcd-introduction" target="_blank" rel="nofollow noopener noreferrer">高可用分布式存储 etcd 的实现原理 · 面向信仰编程</a></p>
+            <p>Follow: <a href="https://link.juejin.im?target=https%3A%2F%2Fgithub.com%2FDraveness" target="_blank" rel="nofollow noopener noreferrer">Draveness · GitHub</a></p>
+        </blockquote>
+    </section>
+</div><div data-v-41d33d72="" class="footer"><ul data-v-41d33d72="" class="tag-list"></ul><section data-v-41d33d72=""><div data-v-a0f279e6="" data-v-41d33d72="" class="wechat-banner wechat-banner"><img data-v-a0f279e6="" src="https://b-gold-cdn.xitu.io/v3/static/img/backend.58ef824.png" class="wechat-img"></div></section><!----><div data-v-41d33d72="" class="related-entry-list-box"><div data-v-41d33d72="" class="title">相关热门文章</div><ul data-v-41d33d72="" class="related-entry-list"><li data-v-41d33d72="" class="item"><div data-v-9db545a6="" data-v-41d33d72="" st:block="relatedEntry" class="related-entry related-entry"><a data-v-9db545a6="" href="/entry/5bce4883e51d4579ef2c7572/detail" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-b2db8566="" data-v-009ea7bb="" data-v-9db545a6="" data-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgBAMAAACPjaivAAAAElBMVEXi6O3////R3ujj6e/c5u3X4usQB3wbAAABCElEQVR42u3Vy03FQBBE0U6BDBCfPSEQAvlHw44FmvaoEbJLz+dGcORWeUqSJEmSJEmS/trTphoGCAi4CRAQcNMtgfUrQMDjbjgSQMBJgIDTjgyAj3JiQMBJtwTG/2bigfEnBgScdEtg/G8mHhh/YkDASYCAgJsAAQE3AQICbgIEBNwECPgvwJef3mrY2cCvGnY28KOGnQx8rcs7Btb1LYE5E2mAORNpgEEXXgNzJtIAgz7gGpgzkQaYM5EGmPKKtMCciRwBPyuiFvheGS2BQRdeA3Mm0gOfK6QlMGciDTBnIg0w6MJrYM5EGmDQB1wDcybSAHMm0gBTXpEWmDMRSZIkSZIk6cK+AUdTxLnCoi0gAAAAAElFTkSuQmCC" class="lazy thumb thumb loaded" style="background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgBAMAAACPjaivAAAAElBMVEXi6O3////R3ujj6e/c5u3X4usQB3wbAAABCElEQVR42u3Vy03FQBBE0U6BDBCfPSEQAvlHw44FmvaoEbJLz+dGcORWeUqSJEmSJEmS/trTphoGCAi4CRAQcNMtgfUrQMDjbjgSQMBJgIDTjgyAj3JiQMBJtwTG/2bigfEnBgScdEtg/G8mHhh/YkDASYCAgJsAAQE3AQICbgIEBNwECPgvwJef3mrY2cCvGnY28KOGnQx8rcs7Btb1LYE5E2mAORNpgEEXXgNzJtIAgz7gGpgzkQaYM5EGmPKKtMCciRwBPyuiFvheGS2BQRdeA3Mm0gOfK6QlMGciDTBnIg0w6MJrYM5EGmDQB1wDcybSAHMm0gBTXpEWmDMRSZIkSZIk6cK+AUdTxLnCoi0gAAAAAElFTkSuQmCC); background-size: cover;"></div><div data-v-9db545a6="" class="info"><div data-v-9db545a6="" class="row title-row"><span data-v-9db545a6="" class="title">分布式消息队列 RocketMQ 源码分析 —— 高可用</span></div><div data-v-9db545a6="" class="row meta-row"><ul data-v-9db545a6="" class="meta-list"><li data-v-9db545a6="" class="meta user"><div data-v-9db545a6="" class="username">Java公众号_芋道源码_每日更新</div></li><li data-v-9db545a6="" class="meta like"><div data-v-9db545a6="" class="icon icon-likes iconfont icon-xlcollection"></div><div data-v-9db545a6="" class="count">26</div></li><!----></ul></div></div></a></div></li><li data-v-41d33d72="" class="item"><div data-v-9db545a6="" data-v-41d33d72="" st:block="relatedEntry" class="related-entry related-entry"><a data-v-9db545a6="" href="/post/5bce68226fb9a05ce46a0476" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-b2db8566="" data-v-009ea7bb="" data-v-9db545a6="" data-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgBAMAAACPjaivAAAAElBMVEXi6O3////R3ujj6e/c5u3X4usQB3wbAAABCElEQVR42u3Vy03FQBBE0U6BDBCfPSEQAvlHw44FmvaoEbJLz+dGcORWeUqSJEmSJEmS/trTphoGCAi4CRAQcNMtgfUrQMDjbjgSQMBJgIDTjgyAj3JiQMBJtwTG/2bigfEnBgScdEtg/G8mHhh/YkDASYCAgJsAAQE3AQICbgIEBNwECPgvwJef3mrY2cCvGnY28KOGnQx8rcs7Btb1LYE5E2mAORNpgEEXXgNzJtIAgz7gGpgzkQaYM5EGmPKKtMCciRwBPyuiFvheGS2BQRdeA3Mm0gOfK6QlMGciDTBnIg0w6MJrYM5EGmDQB1wDcybSAHMm0gBTXpEWmDMRSZIkSZIk6cK+AUdTxLnCoi0gAAAAAElFTkSuQmCC" class="lazy thumb thumb loaded" style="background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgBAMAAACPjaivAAAAElBMVEXi6O3////R3ujj6e/c5u3X4usQB3wbAAABCElEQVR42u3Vy03FQBBE0U6BDBCfPSEQAvlHw44FmvaoEbJLz+dGcORWeUqSJEmSJEmS/trTphoGCAi4CRAQcNMtgfUrQMDjbjgSQMBJgIDTjgyAj3JiQMBJtwTG/2bigfEnBgScdEtg/G8mHhh/YkDASYCAgJsAAQE3AQICbgIEBNwECPgvwJef3mrY2cCvGnY28KOGnQx8rcs7Btb1LYE5E2mAORNpgEEXXgNzJtIAgz7gGpgzkQaYM5EGmPKKtMCciRwBPyuiFvheGS2BQRdeA3Mm0gOfK6QlMGciDTBnIg0w6MJrYM5EGmDQB1wDcybSAHMm0gBTXpEWmDMRSZIkSZIk6cK+AUdTxLnCoi0gAAAAAElFTkSuQmCC); background-size: cover;"></div><div data-v-9db545a6="" class="info"><div data-v-9db545a6="" class="row title-row"><span data-v-9db545a6="" class="title">这一次，彻底解决Java的值传递和引用传递</span></div><div data-v-9db545a6="" class="row meta-row"><ul data-v-9db545a6="" class="meta-list"><li data-v-9db545a6="" class="meta user"><div data-v-9db545a6="" class="username">顾家进</div></li><li data-v-9db545a6="" class="meta like"><div data-v-9db545a6="" class="icon icon-likes iconfont icon-xlcollection"></div><div data-v-9db545a6="" class="count">2</div></li><li data-v-9db545a6="" class="meta comment"><div data-v-9db545a6="" class="icon icon-comments iconfont icon-xlchatbox"></div><div data-v-9db545a6="" class="count">1</div></li></ul></div></div></a></div></li><li data-v-41d33d72="" class="item"><div data-v-9db545a6="" data-v-41d33d72="" st:block="relatedEntry" class="related-entry related-entry"><a data-v-9db545a6="" href="/post/5bcdcbc551882577e512085a" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-b2db8566="" data-v-009ea7bb="" data-v-9db545a6="" data-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgBAMAAACPjaivAAAAElBMVEXi6O3////R3ujj6e/c5u3X4usQB3wbAAABCElEQVR42u3Vy03FQBBE0U6BDBCfPSEQAvlHw44FmvaoEbJLz+dGcORWeUqSJEmSJEmS/trTphoGCAi4CRAQcNMtgfUrQMDjbjgSQMBJgIDTjgyAj3JiQMBJtwTG/2bigfEnBgScdEtg/G8mHhh/YkDASYCAgJsAAQE3AQICbgIEBNwECPgvwJef3mrY2cCvGnY28KOGnQx8rcs7Btb1LYE5E2mAORNpgEEXXgNzJtIAgz7gGpgzkQaYM5EGmPKKtMCciRwBPyuiFvheGS2BQRdeA3Mm0gOfK6QlMGciDTBnIg0w6MJrYM5EGmDQB1wDcybSAHMm0gBTXpEWmDMRSZIkSZIk6cK+AUdTxLnCoi0gAAAAAElFTkSuQmCC" class="lazy thumb thumb loaded" style="background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAACgBAMAAACPjaivAAAAElBMVEXi6O3////R3ujj6e/c5u3X4usQB3wbAAABCElEQVR42u3Vy03FQBBE0U6BDBCfPSEQAvlHw44FmvaoEbJLz+dGcORWeUqSJEmSJEmS/trTphoGCAi4CRAQcNMtgfUrQMDjbjgSQMBJgIDTjgyAj3JiQMBJtwTG/2bigfEnBgScdEtg/G8mHhh/YkDASYCAgJsAAQE3AQICbgIEBNwECPgvwJef3mrY2cCvGnY28KOGnQx8rcs7Btb1LYE5E2mAORNpgEEXXgNzJtIAgz7gGpgzkQaYM5EGmPKKtMCciRwBPyuiFvheGS2BQRdeA3Mm0gOfK6QlMGciDTBnIg0w6MJrYM5EGmDQB1wDcybSAHMm0gBTXpEWmDMRSZIkSZIk6cK+AUdTxLnCoi0gAAAAAElFTkSuQmCC); background-size: cover;"></div><div data-v-9db545a6="" class="info"><div data-v-9db545a6="" class="row title-row"><span data-v-9db545a6="" class="title">程序员如何搭建自己的个人博客</span></div><div data-v-9db545a6="" class="row meta-row"><ul data-v-9db545a6="" class="meta-list"><li data-v-9db545a6="" class="meta user"><div data-v-9db545a6="" class="username">方志朋</div></li><li data-v-9db545a6="" class="meta like"><div data-v-9db545a6="" class="icon icon-likes iconfont icon-xlcollection"></div><div data-v-9db545a6="" class="count">57</div></li><li data-v-9db545a6="" class="meta comment"><div data-v-9db545a6="" class="icon icon-comments iconfont icon-xlchatbox"></div><div data-v-9db545a6="" class="count">8</div></li></ul></div></div></a></div></li><li data-v-41d33d72="" class="item"><div data-v-9db545a6="" data-v-41d33d72="" st:block="relatedEntry" class="related-entry related-entry"><a data-v-9db545a6="" href="/post/5bce7e9fe51d457a772bcfc6" target="_blank" rel="" st:name="link" class="entry-link"><div data-v-b2db8566="" data-v-009ea7bb="" data-v-9db545a6="" data-src="https://user-gold-cdn.xitu.io/2018/10/23/1669ea22a3ca6b50?imageView2/1/q/85/interlace/1" class="lazy thumb thumb loaded" style="background-image: url(https://user-gold-cdn.xitu.io/2018/10/23/1669ea22a3ca6b50?imageView2/1/q/85/interlace/1); background-size: cover;"></div><div data-v-9db545a6="" class="info"><div data-v-9db545a6="" class="row title-row"><span data-v-9db545a6="" class="title">深入分析 Redis Lua 脚本运行原理</span></div><div data-v-9db545a6="" class="row meta-row"><ul data-v-9db545a6="" class="meta-list"><li data-v-9db545a6="" class="meta user"><div data-v-9db545a6="" class="username">老錢</div></li><li data-v-9db545a6="" class="meta like"><div data-v-9db545a6="" class="icon icon-likes iconfont icon-xlcollection"></div><div data-v-9db545a6="" class="count">2</div></li><!----></ul></div></div></a></div></li></ul></div></div></article><div data-v-4f97d566="" data-v-41d33d72="" class="comment-list-box" id="comment-box" data-v-3f216172=""><div data-v-4f97d566="" class="title">评论</div><div data-v-1cbbd4f0="" data-v-4f97d566="" class="comment-form comment-form"><div data-v-1cbbd4f0="" class="avatar-box"><div data-v-b2db8566="" data-v-1b9df826="" data-v-1cbbd4f0="" data-src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjM2cHgiIGhlaWdodD0iMzZweCIgdmlld0JveD0iMCAwIDM2IDM2IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbG5zOnNrZXRjaD0iaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoL25zIj4KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggMy4zLjMgKDEyMDgxKSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4KICAgIDx0aXRsZT5kZWZhdWx0X2dyYXZhdGFyPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGRlZnM+PC9kZWZzPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+CiAgICAgICAgPGcgaWQ9ImRlZmF1bHRfZ3JhdmF0YXIiIHNrZXRjaDp0eXBlPSJNU0FydGJvYXJkR3JvdXAiPgogICAgICAgICAgICA8ZyBpZD0iUmVjdGFuZ2xlLTIxMC0rLUltcG9ydGVkLUxheWVycy1Db3B5LUNvcHkiIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiPgogICAgICAgICAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS0yMTAiIGZpbGw9IiNEOEQ4RDgiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiI+PC9yZWN0PgogICAgICAgICAgICAgICAgPHBhdGggZD0iTTI3Ljg2OTAzMjEsMjYuODUzNjU2OCBMOCwyNi44NTM2NTY4IEM4LDI1Ljg0OTQ1MTQgOC40NzE4MjUsMjQuMTEwOTQ2NiAxMS41MTg5MDQ1LDIyLjM4ODMxNzYgQzEyLjE1Nzg5NiwyMi4wMjcxMjEzIDE1LjM0Mzk1MTIsMjAuMDk2MTA5OCAxNS42MTU5Njc3LDE5LjYzNzE3MjEgQzE1LjkyNDU4MjgsMTkuMTE3MjA4MSAxNi4wMTA2Mzg5LDE4LjQ3NjE4MzcgMTUuNDIwMTE1OCwxNy41MzI1MDg1IEMxNS4zNzI2MzY2LDE3LjQ1NjEwMTYgMTQuNDM0OTIxNSwxNi4wMDgzMzkxIDE0LjE0NTEwMDMsMTUuMDMwNDI5NyBDMTMuOTQwMzQ2LDE0LjMzODMwMiAxMy45MTc1OTU1LDEzLjU0NTQ1NjEgMTMuOTE3NTk1NSwxMi43MTM0MTQ0IEMxMy45MTc1OTU1LDkuODM2MjQ3MDIgMTUuNzIyMzAxNCw4IDE3Ljk0ODM4NTYsOCBDMjAuMTc0NDY5OSw4IDIxLjk3OTE3NTgsOS44MzYyNDcwMiAyMS45NzkxNzU4LDEyLjcxMzQxNDQgQzIxLjk3OTE3NTgsMTMuMzk5MDkyMiAyMS45NjYzMTY4LDE0LjA1NTk5MzMgMjEuODQ3MTI0MSwxNC42NTM4NTI3IEMyMS42Mzk4OTcsMTUuNjkwMzA3NyAyMC43NzU4NzM2LDE3LjAwNTU5ODQgMjAuNTg4NDI5NSwxNy4zMzA1NzU5IEMyMC41NDM5MTc3LDE3LjQwNzQ3OSAyMC41MDc4MTM3LDE3LjQ2NzUxMyAyMC40ODUwNjMzLDE3LjUwMTI1MTEgQzIwLjA3OTAxNjgsMTguMTA3MDQ4OSAxOS45NjI3OTE2LDE4LjU1MzU4MjkgMjAuMDAwODczOSwxOC45MTUyNzU1IEMyMC4wNDQzOTY1LDE5LjMyODU2NzUgMjAuMzEzOTQwMSwxOS42MTYzMzM4IDIwLjY2NzA2NywxOS44NTQ0ODUzIEMyMS4wMzQ1MzY2LDIwLjEwMjA2MzYgMjQuMDExODgxLDIyLjE0OTY3IDI0LjM3Nzg2NjgsMjIuMzg4MzE3NiBDMjYuODcxNTE2MywyNC4wMTY2NzgzIDI3Ljg2OTAzMjEsMjUuNjA2MzM4NSAyNy44NjkwMzIxLDI2Ljg1MzY1NjggTDI3Ljg2OTAzMjEsMjYuODUzNjU2OCBaIiBpZD0iSW1wb3J0ZWQtTGF5ZXJzLUNvcHkiIGZpbGw9IiNGRkZGRkYiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiPjwvcGF0aD4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" class="lazy avatar avatar" title="" style="background-image: none;"></div></div><div data-v-1cbbd4f0="" class="form-box"><div data-v-1cbbd4f0="" class="input-box"><div data-v-1cbbd4f0="" contenteditable="true" spellcheck="false" placeholder="输入评论..." class="rich-input empty"><br data-v-1cbbd4f0=""></div><!----></div><!----></div><input data-v-1cbbd4f0="" type="file" class="hidden"></div><!----><!----></div></div><div data-v-41d33d72="" data-v-3f216172="" st:block="aside" class="entry-public-aside"><div data-v-70a2cd6d="" data-v-fb64097a="" data-v-41d33d72="" class="sidebar-block app-download-sidebar-block shadow"><!----><div data-v-70a2cd6d="" class="block-body"><a data-v-fb64097a="" data-v-70a2cd6d="" class="app-link" href="https://juejin.im/app" target="_blank"><img data-v-fb64097a="" data-v-70a2cd6d="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAEx0lEQVR4Xu2c7XbbMAxD0zffm2cna7NlbuwLkJJjN+hfUiQF8ENS0nxcr9frJX+HQeDjRsjHr/3juT74fOb/Ub6MTomX7C9tdv2NQjCEfCEZQlIhT4sqFZIK+UTA7fFuj+7a7653473rr1bIVk91ndHQVob01hAm+xQvrSc52Sf5o/0QcrlcCHCSE+AkDyELhAhwkhPgJLcJmd1SKvZpk26Lc/W7M2ZtvdSyKoBRwM6Mqvh3AXb1aX+UMCEE7j0hxHiuSYUMuCdQSe/dsqiFpEKaFdJ9e+omBCUcJcCPmyEhhChfyCmDRmboMjRl5oz0r/hTW+Ihjr2VDakbVPPIrThKOPJ76Ja1ByEEYAgx7wXVjLuvCyHGB1CpkH/p9jYz5EdVCLULktNrKcmVU5RzaqJ49/Znv/a6G3A3FELMlhVCviMwsiKlCumSQOudnl4Z+l37tJ72V5Wf4lsn1NJeIa8CTutCSPEzdQK2Kg8hIeQzd6hHk5wykNZ35eS/Kv9TIdXFo9ZVZgD5HnkKIl8j5SFkJJoDbIWQASCONFEe6u5z9TJo6uEjN/nMVjd+iq9q/7SEVDd8B7K7PoQsEOgC2l0fQkLIdg6cfQbsHb/q7+kpS3nMUx0869mK/dEtwW1Ro/en2gshg55OCHCS3xMwhLwrIdSCunLKQJLP9q/aH1IhS2fKjCCAOj2fNj/77ayz/xDyxR4lCJHsrl/TDyEh5BOBURmlHqvJH8mpQlz5rhXiBuf2XLJPM6KyntaQXP18ZkrLouC6hwCyH0IIIZCnQv4BNKRCFECXnLg929Xf8kf5U9kP2VSP8UM+MaxswAXY1e8QMrulbtkPIZTaK08rswgPIWckhE4tZ29ZI/anHmtv/G/hJVUIBaz0XHWoPbvoURK78bnxdu0r/u46IaT4/O5URAhZPM10K2z3CtljBhAorrx7DCZ/s+2v+R/yvSzKoArhrwbMnXkUr3oxDiErSIYQM8Vmt5QQYhIyW31Pwr/90+fszbn2R8wcAtQ5tirxOPa28JDuIS6gXX0FAPIRQgghQ/72hCgAUMapxzqDl6mq7n7cYNxDwV1fPva6G3D1XULdDbv2XQK27CtPJyFk8O91hZCNXzWd0YLdinEr+O0rxAXY1a+27EMce+ktzAVDqRCy6dwrKH5HHkIKb1nOkL7phhDjV7PXKuWlFTKixKkFuMdOtwe7+hQv2SN51b58DyEHrrybgc4xU2kxeybMVjwhRJghzgyotMBvr72vbllUXUp8Myvu7QhRACfSqKeTfM+Whd/LogwgMEhO9iuEVG/Ca8fQ0TPJje/uX/plawKc5CHkf4RSIc1/oesmnHPKkyqk21JmVAiB5M4E156rr86wQxDibm5GgrgxuPohZIGYCogLtKqv+k+FqIg29X4UIZUWdbQZovJ5igqpHAq6N/fqPUIFfi1hQojweYVzbA0hBUAVgN+6QiozQh2S1Yx91Qw6RMs6GyEzKyyEiCXktjBX33pcnJHB3ZbTXS/y8FfNBdjVPz0hLqB7608lpLuZ7j1iRoXOHtrOPegxFmmGhBAfgRDSfEwcPZOGE+LnhLeCACC55+312upMOcTXgLozRrkXuDOjmuE3P7SfrXhDSAFAqrcOIb8BQLPhcIRSNNMAAAAASUVORK5CYII=" class="qr-img"><div data-v-fb64097a="" data-v-70a2cd6d="" class="content-box"><div data-v-fb64097a="" data-v-70a2cd6d="" class="headline">下载掘金客户端</div><div data-v-fb64097a="" data-v-70a2cd6d="" class="desc">一个帮助开发者成长的社区</div></div><!----></a></div></div><div data-v-70a2cd6d="" data-v-1988842d="" data-v-41d33d72="" class="sidebar-block wechat-sidebar-block pure"><div data-v-a0f279e6="" data-v-1988842d="" class="wechat-banner" data-v-70a2cd6d=""><img data-v-a0f279e6="" src="https://b-gold-cdn.xitu.io/v3/static/img/backend.ba44b94.png" class="wechat-img"></div><!----></div><div data-v-1f85cb5f="" data-v-17a8ac96="" data-v-41d33d72="" class="index-book-collect" place="entry" category="5562b419e4b00c57d9b94ae2"><div data-v-1f85cb5f="" class="header"><div data-v-1f85cb5f="" class="title">掘金小册</div><div data-v-1f85cb5f="" class="controllers"><div data-v-1f85cb5f="" class="arrow icon ion-chevron-left"></div><div data-v-1f85cb5f="" class="arrow icon ion-chevron-right"></div></div></div><div data-v-1f85cb5f="" class="slide-book transition--next"><div data-v-133abdc5="" data-v-1f85cb5f="" class="slide-book-list item"><a data-v-133abdc5="" href="/book/5b0778756fb9a07aa632301e" class="item"><div data-v-133abdc5="" class="poster"><div data-v-b2db8566="" data-v-009ea7bb="" data-v-133abdc5="" data-src="https://user-gold-cdn.xitu.io/2018/6/26/1643b682a5be1090?imageView2/1/w/104/h/144/q/95/interlace/1" class="lazy thumb poster-img loaded" style="background-image: url(https://user-gold-cdn.xitu.io/2018/6/26/1643b682a5be1090?imageView2/1/w/104/h/144/q/95/interlace/1); background-size: cover;"></div></div><div data-v-133abdc5="" class="content-text"><div data-v-133abdc5="" class="title">基于 Go 语言构建企业级的 RESTful API 服务</div><div data-v-133abdc5="" class="price"><div data-v-133abdc5="" class="new">新人价 ￥19.95</div><div data-v-133abdc5="" class="delete">￥39.9</div></div></div></a><a data-v-133abdc5="" href="/book/5a261d8f5188253ee45b4b21" class="item"><div data-v-133abdc5="" class="poster"><div data-v-b2db8566="" data-v-009ea7bb="" data-v-133abdc5="" data-src="https://user-gold-cdn.xitu.io/2017/12/19/1606e20aea39c319?imageView2/1/w/104/h/144/q/95/interlace/1" class="lazy thumb poster-img loaded" style="background-image: url(https://user-gold-cdn.xitu.io/2017/12/19/1606e20aea39c319?imageView2/1/w/104/h/144/q/95/interlace/1); background-size: cover;"></div></div><div data-v-133abdc5="" class="content-text"><div data-v-133abdc5="" class="title">详解 Laravel 源码中优秀的设计模式</div><div data-v-133abdc5="" class="price"><div data-v-133abdc5="" class="new">新人价 ￥9.95</div><div data-v-133abdc5="" class="delete">￥19.9</div></div></div></a></div></div><div data-v-1f85cb5f="" class="book-newuser"><div data-v-1f85cb5f="" class="newuser-title"><span data-v-1f85cb5f="">新人专享好礼</span></div><div data-v-1f85cb5f="" class="giftbag"><img data-v-1f85cb5f="" src="https://b-gold-cdn.xitu.io/v3/static/img/45.b99ea03.svg"><div data-v-1f85cb5f="" class="content-text"><div data-v-1f85cb5f="" class="title">送你<span data-v-1f85cb5f="" class="highlight">45元</span>买小册</div><div data-v-1f85cb5f="" class="btn-box"><div data-v-1f85cb5f="" class="btn-giftbag">立即领取</div></div></div></div></div></div><!----><div data-v-70a2cd6d="" data-v-f6632f66="" data-v-41d33d72="" class="sidebar-block related-entry-sidebar-block sticky-section shadow" st:block="relatedEntrySidebarBlock" data-v-3f216172=""><div data-v-70a2cd6d="" class="block-title">相关文章</div><div data-v-70a2cd6d="" class="block-body"><div data-v-f6632f66="" data-v-70a2cd6d="" class="entry-list"><a data-v-f6632f66="" href="/entry/5bce4883e51d4579ef2c7572" target="_blank" rel="" st:name="link" class="item" data-v-70a2cd6d=""><div data-v-f6632f66="" class="entry-title">分布式消息队列 RocketMQ 源码分析 —— 高可用</div><div data-v-f6632f66="" class="entry-meta-box"><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">26</span></div><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik0yIDR2OC4wMzhoNC40NDRMMTEuMTExIDE1di0yLjk2MkgxNFY0eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">0</span></div></div></a><a data-v-f6632f66="" href="/post/5bce68226fb9a05ce46a0476" target="_blank" rel="" st:name="link" class="item" data-v-70a2cd6d=""><div data-v-f6632f66="" class="entry-title">这一次，彻底解决Java的值传递和引用传递</div><div data-v-f6632f66="" class="entry-meta-box"><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">2</span></div><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik0yIDR2OC4wMzhoNC40NDRMMTEuMTExIDE1di0yLjk2MkgxNFY0eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">1</span></div></div></a><a data-v-f6632f66="" href="/post/5bcdcbc551882577e512085a" target="_blank" rel="" st:name="link" class="item" data-v-70a2cd6d=""><div data-v-f6632f66="" class="entry-title">程序员如何搭建自己的个人博客</div><div data-v-f6632f66="" class="entry-meta-box"><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">57</span></div><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik0yIDR2OC4wMzhoNC40NDRMMTEuMTExIDE1di0yLjk2MkgxNFY0eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">8</span></div></div></a><a data-v-f6632f66="" href="/post/5bce7e9fe51d457a772bcfc6" target="_blank" rel="" st:name="link" class="item" data-v-70a2cd6d=""><div data-v-f6632f66="" class="entry-title">深入分析 Redis Lua 脚本运行原理</div><div data-v-f6632f66="" class="entry-meta-box"><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik00LjIzNCA2LjY5M3Y3LjI0M0gyLjg4MWMtLjQ4NiAwLS44ODEtLjQ5Mi0uODgxLTEuMDk1VjcuODc1YzAtLjYzLjQxMi0xLjE4Mi44OC0xLjE4MmgxLjM1NHptMy42ODgtMy43QzguMDEgMi40MDQgOC40OSAxLjk5IDkuMDE4IDJjLjc1NC4wMTUgMS4yMDQuNjYzIDEuMzYuOTgzLjI4NC41ODUuMjkyIDEuNTQ5LjA5NyAyLjE2Ny0uMTc3LjU2LS41ODYgMS4yOTYtLjU4NiAxLjI5NmgzLjA2NmMuMzI0IDAgLjYyNS4xNjQuODI2LjQ0OS4yMDQuMjkuMjcuNjY4LjE3OCAxLjAxMWwtMS4zODcgNS4xODNjLS4xMjYuNDk5LS41NDQuODQ3LTEuMDE2Ljg0N0g1LjUzVjYuNjkzYzEuMzg1LS4zMDkgMi4yMzYtMi42MzIgMi4zOTItMy43eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">2</span></div><div data-v-f6632f66="" class="entry-meta"><img data-v-f6632f66="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTAgMGgxNnYxNkgweiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNCMkJBQzIiIGQ9Ik0yIDR2OC4wMzhoNC40NDRMMTEuMTExIDE1di0yLjk2MkgxNFY0eiIvPgogICAgPC9nPgo8L3N2Zz4K" class="icon"><span data-v-f6632f66="" class="count">0</span></div></div></a></div></div></div></div></div><div data-v-2febaf4d="" data-v-41d33d72="" class="article-suspended-panel article-suspended-panel" data-v-3f216172=""><div data-v-2febaf4d="" badge="7" class="like-btn panel-btn like-adjust with-badge"></div><div data-v-2febaf4d="" badge="0" class="comment-btn panel-btn comment-adjust"></div><div data-v-2febaf4d="" class="collect-btn panel-btn"><!----></div><div data-v-2febaf4d="" class="share-title">分享</div><div data-v-2febaf4d="" class="weibo-btn share-btn panel-btn"></div><div data-v-2febaf4d="" class="qq-btn share-btn panel-btn"></div><div data-v-2febaf4d="" class="wechat-btn share-btn panel-btn"><img data-v-2febaf4d="" src="" class="wechat-qr-code-img shadow" style="display: none;"></div></div><div data-v-f0e3c22e="" data-v-41d33d72="" class="image-viewer-box" data-v-3f216172=""><!----></div><div data-v-00a4671b="" data-v-41d33d72="" st:block="mobileBottomBar" class="mobile-bottom-bar" data-v-3f216172=""><div data-v-00a4671b="" class="bar-container"><a data-v-00a4671b="" href="https://juejin.im/about" class="left"><img data-v-00a4671b="" src="https://b-gold-cdn.xitu.io/images/logo-bold.svg"><span data-v-00a4671b="">一个帮助开发者成长的社区</span></a><a data-v-00a4671b="" st:name="openInAppBtn" class="button">打开应用<div data-v-00a4671b="" class="pop-up" style="display: none;"><a data-v-00a4671b="" class="pop-up-content"></a></div></a></div></div></main></div><div data-v-19078e6d="" data-v-6ede48a3="" class="recommend-box"><div data-v-19078e6d="" class="extension"><div data-v-19078e6d="" data-growing-container="true" data-growing-title="掘金插件" class="link"><div data-v-19078e6d="" class="title">掘金浏览器插件 - 下载插件，送你<span data-v-19078e6d="" class="price">45元</span>买小册</div></div><div data-v-19078e6d="" class="ion-close"></div></div><!----></div></div>
+      
+      <script type="text/javascript" src="https://b-gold-cdn.xitu.io/v3/static/js/manifest.060adf3290877312ec3f.js"></script><script type="text/javascript" src="https://b-gold-cdn.xitu.io/v3/static/js/vendor.e6fd81aa1499049a5bee.js"></script><script type="text/javascript" src="https://b-gold-cdn.xitu.io/v3/static/js/app.a99a1e8180beec940a3f.js"></script>
+    </body></html>
